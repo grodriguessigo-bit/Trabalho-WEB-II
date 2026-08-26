@@ -2,5 +2,5 @@ package com.web2.trabalhoFinal.service;
 
 
 
-public class ClienteService {
+public class ClientService {
 }
