@@ -1,4 +1,4 @@
-package com.exemplo.cadastro.model;
+package com.web2.trabalhoFinal.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;

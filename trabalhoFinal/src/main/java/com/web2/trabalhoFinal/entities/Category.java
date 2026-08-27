@@ -1,4 +1,4 @@
-package com.web2.trabalhoFinal.model;
+package com.web2.trabalhoFinal.entities.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

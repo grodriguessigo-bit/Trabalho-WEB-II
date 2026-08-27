@@ -1,4 +1,4 @@
-package com.web2.trabalhoFinal.model.enums;
+package com.web2.trabalhoFinal.entities.enums;
 
 public enum EstadoSolicitacao {
     ABERTA,

@@ -1,8 +1,6 @@
-package com.web2.trabalhoFinal.model;
+package com.web2.trabalhoFinal.entities.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
 @Entity
 @Table(name="address")

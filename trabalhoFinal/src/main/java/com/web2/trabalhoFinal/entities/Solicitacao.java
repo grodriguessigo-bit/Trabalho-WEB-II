@@ -1,6 +1,6 @@
-package com.web2.trabalhoFinal.model;
+package com.web2.trabalhoFinal.entities.model;
 
-import com.web2.trabalhoFinal.model.enums.EstadoSolicitacao;
+import com.web2.trabalhoFinal.entities.enums.EstadoSolicitacao;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -18,7 +18,7 @@ public class Solicitacao {
     private String descricaoEquipamento;
 
     @ManyToOne
-    private Category categoria;
+    private com.web2.trabalhoFinal.entities.model.Category categoria;
 
     private String descricaoDefeito;
 
@@ -29,7 +29,7 @@ public class Solicitacao {
     public Solicitacao() {
     }
 
-    public Solicitacao(String descricaoEquipamento, Category categoria, String descricaoDefeito) {
+    public Solicitacao(String descricaoEquipamento, com.web2.trabalhoFinal.entities.model.Category categoria, String descricaoDefeito) {
         this.descricaoEquipamento = descricaoEquipamento;
         this.categoria = categoria;
         this.descricaoDefeito = descricaoDefeito;
@@ -49,11 +49,11 @@ public class Solicitacao {
         this.descricaoEquipamento = descricaoEquipamento;
     }
 
-    public Category getCategoria() {
+    public com.web2.trabalhoFinal.entities.model.Category getCategoria() {
         return categoria;
     }
 
-    public void setCategoria(Category categoria) {
+    public void setCategoria(com.web2.trabalhoFinal.entities.model.Category categoria) {
         this.categoria = categoria;
     }
 

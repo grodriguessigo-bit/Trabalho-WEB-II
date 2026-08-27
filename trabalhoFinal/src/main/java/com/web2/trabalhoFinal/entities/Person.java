@@ -1,10 +1,8 @@
-package com.web2.trabalhoFinal.model;
+package com.web2.trabalhoFinal.entities.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import javax.annotation.processing.Generated;
 
 @Entity
 @Table(name="person")
@@ -29,7 +27,7 @@ public abstract class Person {
     @Setter
     @OneToOne
     @JoinColumn(name = "id_address")
-    private Address id_address; //chave estrangeira de address, fazendo o vinculo de cliente com endereço.
+    private com.web2.trabalhoFinal.entities.model.Address id_address; //chave estrangeira de address, fazendo o vinculo de cliente com endereço.
 
     @Getter
     @Setter
