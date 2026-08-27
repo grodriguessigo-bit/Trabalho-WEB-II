@@ -1,6 +1,6 @@
 package com.web2.trabalhoFinal.controller;
 
-import com.web2.trabalhoFinal.model.User;
+import com.web2.trabalhoFinal.entities.model.User;
 import com.web2.trabalhoFinal.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

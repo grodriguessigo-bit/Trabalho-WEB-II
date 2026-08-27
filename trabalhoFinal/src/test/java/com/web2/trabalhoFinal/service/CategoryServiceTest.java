@@ -1,6 +1,6 @@
 package com.web2.trabalhoFinal.service;
 
-import com.web2.trabalhoFinal.model.Category;
+import com.web2.trabalhoFinal.entities.model.Category;
 import com.web2.trabalhoFinal.repository.CategoryRepository;
 import org.junit.jupiter.api.Test;
 

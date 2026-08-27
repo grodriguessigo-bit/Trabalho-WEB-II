@@ -2,7 +2,7 @@ package com.web2.trabalhoFinal.controller;
 
 import com.web2.trabalhoFinal.dto.CategoryRequest;
 import com.web2.trabalhoFinal.dto.CategoryResponse;
-import com.web2.trabalhoFinal.model.Category;
+import com.web2.trabalhoFinal.entities.model.Category;
 import com.web2.trabalhoFinal.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

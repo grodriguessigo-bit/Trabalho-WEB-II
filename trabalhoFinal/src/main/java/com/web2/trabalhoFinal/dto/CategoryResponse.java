@@ -1,6 +1,6 @@
 package com.web2.trabalhoFinal.dto;
 
-import com.web2.trabalhoFinal.model.Category;
+import com.web2.trabalhoFinal.entities.model.Category;
 
 public record CategoryResponse(Long id, String nome, boolean ativo) {
 
