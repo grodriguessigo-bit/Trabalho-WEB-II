@@ -2,7 +2,6 @@ package com.web2.trabalhoFinal.controller;
 
 import com.web2.trabalhoFinal.model.User;
 import com.web2.trabalhoFinal.service.UserService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +15,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<Object> register(@RequestBody @Valid User user) {
+    public ResponseEntity<Object> register(@RequestBody User user) {
         try {
             User newUser = userService.registerUser(user);
             return ResponseEntity.status(HttpStatus.CREATED).body("Registration successful! Check your email for your password.");

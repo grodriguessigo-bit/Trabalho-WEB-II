@@ -1,0 +1,124 @@
+<main class="categories-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Administração</p>
+      <h1>Categorias de equipamentos</h1>
+      <p class="subtitle">
+        Cadastre e organize as categorias usadas nas solicitações de manutenção.
+      </p>
+    </div>
+    <a class="back-link" routerLink="/login">Voltar</a>
+  </header>
+
+  <section class="content-grid" aria-label="Gerenciamento de categorias">
+    <article class="panel form-panel">
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">{{ editingId === null ? 'Nova categoria' : 'Editar categoria' }}</p>
+          <h2>{{ editingId === null ? 'Adicionar categoria' : 'Atualizar categoria' }}</h2>
+        </div>
+        <span class="counter">{{ categories().length }} cadastradas</span>
+      </div>
+
+      <form (ngSubmit)="submit()" novalidate>
+        <label for="category-name">Nome</label>
+        <input
+          id="category-name"
+          name="categoryName"
+          type="text"
+          maxlength="100"
+          autocomplete="off"
+          placeholder="Ex.: Notebook"
+          [(ngModel)]="categoryName"
+          [disabled]="saving()"
+        />
+        <p class="hint">Use até 100 caracteres. O nome não pode se repetir.</p>
+
+        <div class="form-actions">
+          <button
+            class="primary-button"
+            type="submit"
+            [disabled]="saving() || !categoryName.trim()"
+          >
+            {{ saving() ? 'Salvando...' : editingId === null ? 'Adicionar' : 'Salvar alterações' }}
+          </button>
+          @if (editingId !== null) {
+            <button
+              class="secondary-button"
+              type="button"
+              (click)="cancelEdit()"
+              [disabled]="saving()"
+            >
+              Cancelar
+            </button>
+          }
+        </div>
+      </form>
+
+      @if (error()) {
+        <p class="message error-message" role="alert">{{ error() }}</p>
+      }
+      @if (feedback()) {
+        <p class="message success-message" role="status">{{ feedback() }}</p>
+      }
+    </article>
+
+    <article class="panel list-panel">
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">Catálogo</p>
+          <h2>Lista de categorias</h2>
+        </div>
+        <span class="legend"><span class="legend-dot"></span> desativada</span>
+      </div>
+
+      @if (loading()) {
+        <p class="empty-state">Carregando categorias...</p>
+      } @else if (categories().length === 0) {
+        <p class="empty-state">Nenhuma categoria cadastrada.</p>
+      } @else {
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Nome</th>
+                <th scope="col">Status</th>
+                <th scope="col" class="actions-column">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (category of categories(); track category.id) {
+                <tr [class.inactive-row]="!category.ativo">
+                  <td>{{ category.nome }}</td>
+                  <td>
+                    <span class="status" [class.status-inactive]="!category.ativo">
+                      {{ category.ativo ? 'Ativa' : 'Desativada' }}
+                    </span>
+                  </td>
+                  <td class="actions-cell">
+                    <button class="table-button" type="button" (click)="startEdit(category)">
+                      Editar
+                    </button>
+                    @if (category.ativo) {
+                      <button
+                        class="table-button danger-button"
+                        type="button"
+                        (click)="deactivate(category)"
+                      >
+                        Desativar
+                      </button>
+                    } @else {
+                      <button class="table-button" type="button" (click)="activate(category)">
+                        Reativar
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </article>
+  </section>
+</main>
