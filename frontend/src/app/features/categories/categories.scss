@@ -124,6 +124,34 @@ h2 {
   background: #b3bdcf;
 }
 
+.refresh-button {
+  padding: 8px 12px;
+  color: #40527f;
+  background: #edf1f8;
+}
+
+.list-tools {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.list-tools label {
+  margin-bottom: 0;
+}
+
+.list-tools input {
+  padding: 11px 12px;
+}
+
+.list-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  color: #77829a;
+  font-size: 0.78rem;
+}
+
 form {
   display: flex;
   flex-direction: column;

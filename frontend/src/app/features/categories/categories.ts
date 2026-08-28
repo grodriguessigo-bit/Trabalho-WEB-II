@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
@@ -20,9 +20,28 @@ export class Categories implements OnInit {
   protected readonly saving = signal(false);
   protected readonly error = signal('');
   protected readonly feedback = signal('');
+  protected readonly searchTerm = signal('');
+  protected readonly filteredCategories = computed(() => {
+    const term = this.searchTerm().trim().toLocaleLowerCase();
+    if (!term) {
+      return this.categories();
+    }
+
+    return this.categories().filter((category) => category.nome.toLocaleLowerCase().includes(term));
+  });
 
   protected categoryName = '';
   protected editingId: number | null = null;
+
+  protected setSearchTerm(value: string): void {
+    this.searchTerm.set(value);
+  }
+
+  protected refreshList(): void {
+    this.feedback.set('');
+    this.error.set('');
+    this.loadCategories();
+  }
 
   ngOnInit(): void {
     this.loadCategories();
