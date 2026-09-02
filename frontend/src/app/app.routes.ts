@@ -4,7 +4,11 @@ export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   {
     path: 'login',
-    loadComponent: () => import('./features/login/login').then((m) => m.Login),
+    loadComponent: () => import('./pages/login/login').then((m) => m.LoginComponent),
+  },
+  {
+    path: 'autocadastro',
+    loadComponent: () => import('./pages/autocadastro/autocadastro').then((m) => m.AutocadastroComponent),
   },
   {
     path: 'categorias',
