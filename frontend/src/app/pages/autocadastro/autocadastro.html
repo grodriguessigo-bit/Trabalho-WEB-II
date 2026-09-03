@@ -1,0 +1,19 @@
+<form>
+    Nome completo:      <input #nome type="text"/><br/>
+    CPF:                <input #cpf type="text"/><br/>
+    E-mail:             <input #email type="text"/><br/>
+    <div>
+        CEP:            <input #cep type="text"/><br/>
+        <input type="button" value="Testar CEP" (click)="botaoBuscarCep(cep.value)" readonly>
+        CEP Status:     <input type="text" [value]="mensagemCep()"/>
+    </div>
+    Cidade:             <input #cidade type="text" [value]="enderecoViaCep()?.localidade" readonly/><br/>
+    Complemento:        <input #complemento type="text" [value]="enderecoViaCep()?.complemento" readonly/><br/>
+    Logradouro:         <input #logradouro type="text" [value]="enderecoViaCep()?.logradouro" readonly/><br/>
+    Bairro:             <input #bairro type="text" [value]="enderecoViaCep()?.bairro" readonly/><br/>
+    UF:                 <input #uf type="text" [value]="enderecoViaCep()?.uf" readonly/><br/>
+    Telefone:           <input #telefone type="text"/><br/>
+    <input type="button" value="Enviar"
+    (click)="botaoEnviarAutocadastro(nome.value, cpf.value, email.value, cep.value,cidade.value, logradouro.value, bairro.value, uf.value, telefone.value)"><br/>
+    Cadastro Status:     <input type="text" [value]="mensagemCadastro()"/>
+</form>

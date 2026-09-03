@@ -1,0 +1,13 @@
+package com.web2.trabalhoFinal.entities.enums;
+
+public enum HistoryActions {
+    REQUEST_CREATED,
+    QUOTE_CREATED,
+    QUOTE_APPROVED,
+    QUOTE_REJECTED,
+    REQUEST_RESCUED,
+    MAINTENANCE_REDIRECTED,
+    MAINTENANCE_COMPLETED,
+    PAYMENT_CONFIRMED,
+    REQUEST_FINALIZED
+}
