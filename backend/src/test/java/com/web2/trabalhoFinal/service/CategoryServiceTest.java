@@ -1,6 +1,6 @@
 package com.web2.trabalhoFinal.service;
 
-import com.web2.trabalhoFinal.entities.model.Category;
+import com.web2.trabalhoFinal.entities.Category;
 import com.web2.trabalhoFinal.repository.CategoryRepository;
 import org.junit.jupiter.api.Test;
 
@@ -24,13 +24,15 @@ class CategoryServiceTest {
     void createTrimsNameAndStartsCategoryAsActive() {
         Category category = categoryService.create("  Notebook  ");
 
-        assertEquals("Notebook", category.getNome());
-        assertTrue(category.isAtivo());
+        assertEquals("Notebook", category.getName());
+        assertTrue(category.isActive());
     }
 
     @Test
     void createRejectsDuplicateName() {
-        storedCategories.put(1L, new Category("Notebook"));
+        Category category = new Category();
+        category.setName("Notebook");
+        storedCategories.put(1L, category);
 
         assertThrows(CategoryService.CategoryAlreadyExistsException.class,
                 () -> categoryService.create("Notebook"));
@@ -38,12 +40,13 @@ class CategoryServiceTest {
 
     @Test
     void deactivateKeepsCategoryAndMarksItInactive() {
-        Category category = new Category("Notebook");
+        Category category = new Category();
+        category.setName("Notebook");
         storedCategories.put(1L, category);
 
         categoryService.deactivate(1L);
 
-        assertFalse(category.isAtivo());
+        assertFalse(category.isActive());
         assertEquals(category, storedCategories.get(1L));
     }
 
@@ -52,11 +55,11 @@ class CategoryServiceTest {
                 CategoryRepository.class.getClassLoader(),
                 new Class<?>[]{CategoryRepository.class},
                 (proxy, method, args) -> switch (method.getName()) {
-                    case "existsByNomeIgnoreCase" -> storedCategories.values().stream()
-                            .anyMatch(category -> category.getNome().equalsIgnoreCase((String) args[0]));
-                    case "existsByNomeIgnoreCaseAndIdNot" -> storedCategories.entrySet().stream()
+                    case "existsByNameIgnoreCase" -> storedCategories.values().stream()
+                            .anyMatch(category -> category.getName().equalsIgnoreCase((String) args[0]));
+                    case "existsByNameIgnoreCaseAndIdNot" -> storedCategories.entrySet().stream()
                             .anyMatch(entry -> !entry.getKey().equals(args[1])
-                                    && entry.getValue().getNome().equalsIgnoreCase((String) args[0]));
+                                    && entry.getValue().getName().equalsIgnoreCase((String) args[0]));
                     case "findById" -> Optional.ofNullable(storedCategories.get(args[0]));
                     case "save" -> {
                         Category category = (Category) args[0];
