@@ -1,50 +1,34 @@
 package com.web2.trabalhoFinal.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
+@Table(name="payment")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idPayment;
+    private Long id_payment;
+
+    private String description;
 
     private BigDecimal amount;
 
     private Instant paymentDateTime;
 
-    public Payment() {
-    }
-
-    public Payment(BigDecimal amount, Instant paymentDateTime) {
-        this.amount = amount;
-        this.paymentDateTime = paymentDateTime;
-    }
-
-    public Long getIdPayment() {
-        return idPayment;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public Instant getPaymentDateTime() {
-        return paymentDateTime;
-    }
-
-    public void setPaymentDateTime(Instant paymentDateTime) {
-        this.paymentDateTime = paymentDateTime;
-    }
+    @OneToOne
+    @JoinColumn(name = "id_quote", nullable = false, unique = true)
+    private Quote quote;
 
 }

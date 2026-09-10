@@ -1,38 +1,34 @@
-package com.web2.trabalhoFinal.entities.model;
+package com.web2.trabalhoFinal.entities;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name="person")
-
+@Inheritance(strategy = InheritanceType.JOINED)
+@Getter
+@Setter
+@NoArgsConstructor
 public abstract class Person {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id_person;
 
-    @Setter
     @Column(nullable = false)
     private String name;
 
-    @Getter
-    @Setter
     @Column(nullable = false)
-    private String cpf;
+    private String email;
 
-
-    @Getter
-    @Setter
-    @OneToOne
-    @JoinColumn(name = "id_address")
-    private com.web2.trabalhoFinal.entities.model.Address id_address; //chave estrangeira de address, fazendo o vinculo de cliente com endereço.
-
-    @Getter
-    @Setter
     @Column(nullable = false)
-    private String phone;
+    private String password;
 
+    private String salt;
+
+    @Column(nullable = false)
+    private boolean active;
 
 }

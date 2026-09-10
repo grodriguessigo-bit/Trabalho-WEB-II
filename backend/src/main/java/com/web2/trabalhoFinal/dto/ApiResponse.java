@@ -1,4 +1,4 @@
-package com.web2.trabalhoFinal.entities;
+package com.web2.trabalhoFinal.dto;
 
 public class ApiResponse<T> {
 
