@@ -1,14 +1,19 @@
-package com.web2.trabalhoFinal.entities.model;
+package com.web2.trabalhoFinal.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.List;
 
 @Entity
-@Table(name = "categories")
+@Table(name = "category")
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class Category {
 
     @Id
@@ -16,35 +21,12 @@ public class Category {
     private Long id;
 
     @Column(nullable = false, length = 100)
-    private String nome;
+    private String name;
 
-    private boolean ativo = true;
+    @Column(nullable = false)
+    private boolean active = true;
 
-    public Category() {
-    }
+    @OneToMany(mappedBy = "category")
+    private List<MaintenanceRequest> maintenanceRequests;
 
-    public Category(String nome) {
-        this.nome = nome;
-        this.ativo = true;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public boolean isAtivo() {
-        return ativo;
-    }
-
-    public void setAtivo(boolean ativo) {
-        this.ativo = ativo;
-    }
 }

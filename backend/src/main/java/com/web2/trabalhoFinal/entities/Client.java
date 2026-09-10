@@ -24,8 +24,7 @@ public class Client extends Person {
     @JoinColumn(name = "id_address")
     private Address address;
 
-    // criar classe MaintenanceRequest e mapear
-    // @OneToMany(mappedBy = "client")
-    // private List<MaintenanceRequest> maintenanceRequests;
+    @OneToMany(mappedBy = "client")
+    private List<MaintenanceRequest> maintenanceRequests;
 
 }
