@@ -1,6 +1,6 @@
 package com.web2.trabalhoFinal.service;
 
-import com.web2.trabalhoFinal.entities.model.Category;
+import com.web2.trabalhoFinal.entities.Category;
 import com.web2.trabalhoFinal.repository.CategoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +20,7 @@ public class CategoryService {
 
     @Transactional(readOnly = true)
     public List<Category> list() {
-        return categoryRepository.findAllByOrderByNomeAsc();
+        return categoryRepository.findAllByOrderByNameAsc();
     }
 
     @Transactional(readOnly = true)
@@ -34,7 +34,8 @@ public class CategoryService {
         String normalizedName = normalizeName(nome);
         ensureNameIsAvailable(normalizedName, null);
 
-        Category category = new Category(normalizedName);
+        Category category = new Category();
+        category.setName(normalizedName);
         return categoryRepository.save(category);
     }
 
@@ -44,30 +45,30 @@ public class CategoryService {
         Category category = findById(id);
         ensureNameIsAvailable(normalizedName, id);
 
-        category.setNome(normalizedName);
+        category.setName(normalizedName);
         return categoryRepository.save(category);
     }
 
     @Transactional
     public void deactivate(Long id) {
         Category category = findById(id);
-        category.setAtivo(false);
+        category.setActive(false);
         categoryRepository.save(category);
     }
 
     @Transactional
     public Category activate(Long id) {
         Category category = findById(id);
-        ensureNameIsAvailable(category.getNome(), id);
+        ensureNameIsAvailable(category.getName(), id);
 
-        category.setAtivo(true);
+        category.setActive(true);
         return categoryRepository.save(category);
     }
 
     private void ensureNameIsAvailable(String nome, Long ignoredId) {
         boolean alreadyExists = ignoredId == null
-                ? categoryRepository.existsByNomeIgnoreCase(nome)
-                : categoryRepository.existsByNomeIgnoreCaseAndIdNot(nome, ignoredId);
+                ? categoryRepository.existsByNameIgnoreCase(nome)
+                : categoryRepository.existsByNameIgnoreCaseAndIdNot(nome, ignoredId);
 
         if (alreadyExists) {
             throw new CategoryAlreadyExistsException(nome);
