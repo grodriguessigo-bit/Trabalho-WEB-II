@@ -1,0 +1,196 @@
+<div class="container">
+
+  <div class="col-md-12">
+
+    <h1>Novo Cliente</h1>
+
+    <div class="well">
+
+      <form #formClient="ngForm">
+
+        <div class="form-group row">
+          <label for="name" class="col-md-2 control-label">Nome:</label>
+
+          <div class="col-md-6">
+            <input type="text" class="form-control" id="name" name="name"
+            [(ngModel)]="client.name" #name="ngModel" minlength="2" required>
+
+            @if (name.errors && (name.dirty || name.touched)) {
+              <div class="alert alert-danger">
+                <div [hidden]="!name.errors['required']"> Digite o nome do cliente. </div>
+                <div [hidden]="!name.errors['minlength']"> O nome deve conter ao menos 2 caracteres. </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label for="cpf" class="col-md-2 control-label">CPF:</label>
+
+          <div class="col-md-4">
+            <input type="text" class="form-control" id="cpf" name="cpf"
+            [(ngModel)]="client.cpf" #cpf="ngModel" required>
+
+            @if (cpf.errors && (cpf.dirty || cpf.touched)) {
+              <div class="alert alert-danger">
+                <div [hidden]="!cpf.errors['required']"> Digite o CPF do cliente. </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label for="email" class="col-md-2 control-label">E-mail:</label>
+
+          <div class="col-md-6">
+            <input type="email" class="form-control" id="email" name="email"
+            [(ngModel)]="client.email" #email="ngModel" required>
+
+            @if (email.errors && (email.dirty || email.touched)) {
+              <div class="alert alert-danger">
+                <div [hidden]="!email.errors['required']"> Digite o e-mail do cliente. </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label for="phone" class="col-md-2 control-label">Telefone:</label>
+
+          <div class="col-md-4">
+            <input type="text" class="form-control" id="phone" name="phone"
+            [(ngModel)]="client.phone" #phone="ngModel" required>
+
+            @if (phone.errors && (phone.dirty || phone.touched)) {
+              <div class="alert alert-danger">
+                <div [hidden]="!phone.errors['required']"> Digite o telefone do cliente. </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label for="zipCode" class="col-md-2 control-label">CEP:</label>
+
+          <div class="col-md-4">
+            <input type="text" class="form-control" id="zipCode" name="zipCode"
+            [(ngModel)]="client.address.zipCode" #zipCode="ngModel" required>
+
+            <small class="help-block"> Use o CEP 82940290 para o protótipo. </small>
+          </div>
+
+          <div class="col-md-2">
+            <button type="button" class="btn btn-info" (click)="searchZipCode()">
+              <i class="fa fa-search"></i> Buscar CEP
+            </button>
+          </div>
+        </div>
+
+        @if (zipMessage) {
+          <div class="row">
+            <div class="col-md-4 col-md-offset-2">
+              <div class="alert alert-info"> {{ zipMessage }} </div>
+            </div>
+          </div>
+        }
+
+        <div class="form-group row">
+          <label for="street" class="col-md-2 control-label">Logradouro:</label>
+
+          <div class="col-md-6">
+            <input type="text" class="form-control" id="street" name="street"
+            [(ngModel)]="client.address.street" readonly>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label for="neighborhood" class="col-md-2 control-label">Bairro:</label>
+
+          <div class="col-md-4">
+            <input type="text" class="form-control" id="neighborhood" name="neighborhood"
+            [(ngModel)]="client.address.neighborhood" readonly>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label for="city" class="col-md-2 control-label">Cidade:</label>
+
+          <div class="col-md-4">
+            <input type="text" class="form-control" id="city" name="city"
+            [(ngModel)]="client.address.city" readonly>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label for="state" class="col-md-2 control-label">Estado:</label>
+
+          <div class="col-md-2">
+            <input type="text" class="form-control" id="state" name="state"
+            [(ngModel)]="client.address.state" readonly>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label for="number" class="col-md-2 control-label">Número:</label>
+
+          <div class="col-md-2">
+            <input type="text" class="form-control" id="number" name="number"
+            [(ngModel)]="client.address.number" #number="ngModel" required>
+
+            @if (number.errors && (number.dirty || number.touched)) {
+              <div class="alert alert-danger">
+                <div [hidden]="!number.errors['required']"> Digite o número. </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <label for="complement" class="col-md-2 control-label">Complemento:</label>
+
+          <div class="col-md-4">
+            <input type="text" class="form-control" id="complement" name="complement"
+            [(ngModel)]="client.address.complement">
+          </div>
+        </div>
+
+        @if (message) {
+          <div class="row">
+            <div class="col-md-6 col-md-offset-2">
+              <div class="alert alert-info"> {{ message }} </div>
+            </div>
+          </div>
+        }
+
+        @if (generatedPassword) {
+          <div class="row">
+            <div class="col-md-6 col-md-offset-2">
+              <div class="alert alert-success">
+                Senha gerada: <strong>{{ generatedPassword }}</strong>
+              </div>
+            </div>
+          </div>
+        }
+
+        <div class="form-group row">
+          <div class="col-md-6 col-md-offset-2">
+
+            <button type="button" class="btn btn-primary"
+            (click)="insert()" [disabled]="!formClient.form.valid">
+              <i class="fa fa-save"></i> Salvar
+            </button>
+
+            <a class="btn btn-default" [routerLink]="['/login']">
+              <i class="fa fa-arrow-left"></i> Voltar
+            </a>
+
+          </div>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</div>

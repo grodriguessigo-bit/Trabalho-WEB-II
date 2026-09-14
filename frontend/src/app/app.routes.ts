@@ -1,17 +1,30 @@
 import { Routes } from '@angular/router';
 
+import { LoginComponent } from './components/login/login.component';
+import { RegisterClientComponent } from './components/client/register-client/register-client.component';
+import { ClientHomeComponent } from './components/client/client-home/client-home.component';
+import { EmployeeHomeComponent } from './components/employee/employee-home/employee-home.component';
+
 export const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  {
+    path: '',
+    redirectTo: 'login',
+    pathMatch: 'full'
+  },
   {
     path: 'login',
-    loadComponent: () => import('./pages/login/login').then((m) => m.LoginComponent),
+    component: LoginComponent
   },
   {
-    path: 'autocadastro',
-    loadComponent: () => import('./pages/autocadastro/autocadastro').then((m) => m.AutocadastroComponent),
+    path: 'client/register',
+    component: RegisterClientComponent
   },
   {
-    path: 'categorias',
-    loadComponent: () => import('./features/categories/categories').then((m) => m.Categories),
+    path: 'client/home',
+    component: ClientHomeComponent
   },
+  {
+    path: 'employee/home',
+    component: EmployeeHomeComponent
+  }
 ];

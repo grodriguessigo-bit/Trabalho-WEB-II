@@ -1,0 +1,57 @@
+<div class="container">
+
+  <div class="col-md-12">
+
+    <h1>Área do Funcionário</h1>
+
+    @if (employee) {
+
+      <div class="well">
+
+        <div class="row">
+          <div class="col-md-6">
+            <strong>Funcionário:</strong> {{ employee.name }}
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <strong>E-mail:</strong> {{ employee.email }}
+          </div>
+        </div>
+
+      </div>
+
+    }
+
+    <h2>Solicitações Abertas</h2>
+
+    <table class="table table-striped table-bordered table-hover">
+
+      <tbody>
+
+        <tr>
+          <th>Data/Hora</th>
+          <th>Cliente</th>
+          <th>Equipamento</th>
+
+          <th class="text-center">
+            Ações
+          </th>
+        </tr>
+
+        <tr>
+          <td colspan="4">Nenhuma solicitação aberta.</td>
+        </tr>
+
+      </tbody>
+
+    </table>
+
+    <button type="button" class="btn btn-default" (click)="logout()">
+      <i class="fa fa-sign-out"></i> Sair
+    </button>
+
+  </div>
+
+</div>

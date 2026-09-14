@@ -1,0 +1,63 @@
+<div class="container">
+
+  <div class="col-md-12">
+
+    <h1>Área do Cliente</h1>
+
+    @if (client) {
+
+      <div class="well">
+
+        <div class="row">
+          <div class="col-md-6">
+            <strong>Cliente:</strong> {{ client.name }}
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <strong>E-mail:</strong> {{ client.email }}
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-8">
+            <strong>Endereço:</strong>
+            {{ client.address.street }}, {{ client.address.number }},
+            {{ client.address.neighborhood }} -
+            {{ client.address.city }}/{{ client.address.state }}
+          </div>
+        </div>
+
+      </div>
+
+    }
+
+    <h2>Solicitações</h2>
+
+    <table class="table table-striped table-bordered table-hover">
+
+      <tbody>
+
+        <tr>
+          <th>Data/Hora</th>
+          <th>Equipamento</th>
+          <th>Estado</th>
+          <th class="text-center">Ações</th>
+        </tr>
+
+        <tr>
+          <td colspan="4">Nenhuma solicitação cadastrada.</td>
+        </tr>
+
+      </tbody>
+
+    </table>
+
+    <button type="button" class="btn btn-default" (click)="logout()">
+      <i class="fa fa-sign-out"></i> Sair
+    </button>
+
+  </div>
+
+</div>

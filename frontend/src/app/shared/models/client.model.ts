@@ -1,17 +1,13 @@
 import { Address } from './address.model';
-import { Person } from './person.model';
 
-export class Client extends Person {
+export class Client {
   constructor(
-    id: number = 0,
-    name: string = '',
-    email: string = '',
-    password: string = '',
-    active: boolean = true,
+    public id: number = 0,
     public cpf: string = '',
+    public name: string = '',
+    public email: string = '',
     public phone: string = '',
-    public address: Address = new Address(),
-  ) {
-    super(id, name, email, password, active);
-  }
+    public password: string = '',
+    public address: Address = new Address()
+  ) {}
 }
