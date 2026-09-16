@@ -30,17 +30,79 @@
 
       <tbody>
 
-        <tr>
-          <th>Data/Hora</th>
-          <th>Equipamento</th>
-          <th>Estado</th>
-          <th class="text-center">Ações</th>
-        </tr>
+      <tr>
+        <th>Data/Hora</th>
+        <th>Equipamento</th>
+        <th>Estado</th>
+        <th class="text-center">Ações</th>
+      </tr>
 
-        <tr>
-          <td colspan="4">Nenhuma solicitação cadastrada.</td>
-        </tr>
+        @if (requests.length === 0) {
+          <tr>
+            <td colspan="4">Nenhuma solicitação cadastrada.</td>
+          </tr>
+        }
 
+      @else{
+        @for(request of requests; track request.id){
+          <tr>
+            <td>
+              {{ request.requestDateTime | date:'dd/MM/yyyy HH:mm' }}
+            </td>
+            <td>
+              {{request.equipmentDescription}}
+            </td>
+            <td>
+              {{getStatusLabel(request.status)}}
+            </td>
+
+
+            <td class="text-center">
+
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                (click)="openRequest(request.id)"
+              >
+                Visualizar
+              </button>
+
+              @switch (request.status) {
+
+                @case ('QUOTED') {
+                  <button
+                    type="button"
+                    class="btn btn-success btn-sm"
+                    (click)="openQuote(request.id)"
+                  >
+                    Aprovar/Rejeitar Serviço
+                  </button>
+                }
+
+                @case ('REJECTED') {
+                  <button
+                    type="button"
+                    class="btn btn-warning btn-sm"
+                    (click)="rescueRequest(request.id)"
+                  >
+                    Resgatar Serviço
+                  </button>
+                }
+
+                @case ('FIXED') {
+                  <button
+                    type="button"
+                    class="btn btn-success btn-sm"
+                    (click)="payRequest(request.id)"
+                  >
+                    Pagar Serviço
+                  </button>
+                }
+              }
+            </td>
+          </tr>
+        }
+      }
       </tbody>
 
     </table>
@@ -48,8 +110,8 @@
     <button type="button" class="btn btn-default" (click)="logout()">
       <i class="fa fa-sign-out"></i> Sair
     </button>
-        <button type="button" class="btn btn-default" (click)="OpenTicket()">
-        <i class="fa fa-ticket"></i> Abrir Chamado
+    <button type="button" class="btn btn-default" (click)="OpenTicket()">
+      <i class="fa fa-ticket"></i> Abrir Chamado
     </button>
 
   </div>
