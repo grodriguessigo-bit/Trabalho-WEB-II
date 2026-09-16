@@ -59,6 +59,7 @@ export class ClientEquipamentRepairComponent {
     if (
       !this.request.equipmentDescription ||
       !this.request.defectDescription ||
+      this.request.equipmentDescription.length > 30 ||
       !this.request.categoryId
     ) {
       // faz a validação dos campos antes de cadastrar o reparo

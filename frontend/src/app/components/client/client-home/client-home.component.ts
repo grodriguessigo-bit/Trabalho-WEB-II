@@ -4,24 +4,28 @@ import { Router } from '@angular/router';
 import { Client } from '../../../shared/models/client.model';
 import { ClientService } from '../../../services/client.service';
 import { LoginService } from '../../../services/login.service';
+import { MaintenanceRequest } from '../../../shared/models/maintenance-request';
+import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-client-home',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './client-home.component.html',
   styleUrl: './client-home.component.css',
 })
 export class ClientHomeComponent {
-
   client: Client | undefined;
+
+  requests: MaintenanceRequest[] = [];
 
   constructor(
     private clientService: ClientService,
     private loginService: LoginService,
-    private router: Router
+    private router: Router,
+    private maintenanceRequestService: MaintenanceRequestService,
   ) {
-
-    if (this.loginService.getLoggedUserType() !== "CLIENT") {
+    if (this.loginService.getLoggedUserType() !== 'CLIENT') {
       this.router.navigate(['/login']);
       return;
     }
@@ -29,6 +33,39 @@ export class ClientHomeComponent {
     const id = this.loginService.getLoggedUserId();
 
     this.client = this.clientService.findById(id);
+
+    this.requests = maintenanceRequestService.findByClientId(id);
+  }
+
+  getStatusLabel(status: string): string {
+    switch (status) {
+      case 'OPEN':
+        return 'ABERTA';
+
+      case 'QUOTED':
+        return 'ORÇADA';
+
+      case 'APPROVED':
+        return 'APROVADA';
+
+      case 'REJECTED':
+        return 'REJEITADA';
+
+      case 'REDIRECTED':
+        return 'REDIRECIONADA';
+
+      case 'FIXED':
+        return 'ARRUMADA';
+
+      case 'PAID':
+        return 'PAGA';
+
+      case 'FINALIZED':
+        return 'FINALIZADA';
+
+      default:
+        return status;
+    }
   }
 
   logout(): void {
@@ -40,4 +77,19 @@ export class ClientHomeComponent {
     this.router.navigate(['/client/equipament-repair']);
   }
 
+  openRequest(clientId: number): void {
+    this.router.navigate(['/client/equipament-repair']);
+  }
+
+  openQuote(clientId: number): void {
+    this.router.navigate(['/client/equipament-repair']);
+  }
+
+  rescueRequest(clientId: number): void {
+    this.router.navigate(['/client/equipament-repair']);
+  }
+
+  payRequest(clientId: number): void {
+    this.router.navigate(['/client/equipament-repair']);
+  }
 }

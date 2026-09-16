@@ -37,9 +37,13 @@ export class MaintenanceRequestService {
   }
 
   findByClientId(clientId: number):MaintenanceRequest[]{
-    return this.listAll().filter(
-      request => request.clientId === clientId
-    );
+    return this.listAll()
+      .filter((request) => request.clientId === clientId)
+      .sort(
+        (a, b) =>
+          new Date(a.requestDateTime).getTime() -
+          new Date(b.requestDateTime).getTime(),
+      );
   }
 
   findOpenRequest(): MaintenanceRequest[]{
