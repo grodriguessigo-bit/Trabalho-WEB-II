@@ -16,7 +16,7 @@ export class LoginService {
 
     const employee = this.employeeService.findByEmail(email);
 
-    if (employee && employee.password === password) {
+    if (employee && employee.active && employee.password === password) {
       localStorage["loggedUserId"] = employee.id.toString();
       localStorage["loggedUserType"] = "EMPLOYEE";
 

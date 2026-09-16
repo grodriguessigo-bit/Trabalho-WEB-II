@@ -7,22 +7,16 @@
     @if (employee) {
 
       <div class="well">
-
-        <div class="row">
-          <div class="col-md-6">
-            <strong>Funcionário:</strong> {{ employee.name }}
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-6">
-            <strong>E-mail:</strong> {{ employee.email }}
-          </div>
-        </div>
-
+        <strong>Funcionário:</strong> {{ employee.name }}
       </div>
 
     }
+
+    <p>
+
+      <a class="btn btn-primary" [routerLink]="['/employee/list']"> Funcionários </a>
+
+    </p>
 
     <h2>Solicitações Abertas</h2>
 
@@ -34,10 +28,7 @@
           <th>Data/Hora</th>
           <th>Cliente</th>
           <th>Equipamento</th>
-
-          <th class="text-center">
-            Ações
-          </th>
+          <th class="text-center">Ações</th>
         </tr>
 
         <tr>

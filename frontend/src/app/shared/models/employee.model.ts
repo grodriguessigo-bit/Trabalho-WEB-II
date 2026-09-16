@@ -4,6 +4,7 @@ export class Employee {
     public name: string = '',
     public email: string = '',
     public birthDate: string = '',
-    public password: string = ''
+    public password: string = '',
+    public active: boolean = true,
   ) {}
 }

@@ -1,0 +1,22 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { InsertEmployeeComponent } from './insert-employee.component';
+
+describe('InsertEmployeeComponent', () => {
+  let component: InsertEmployeeComponent;
+  let fixture: ComponentFixture<InsertEmployeeComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [InsertEmployeeComponent],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(InsertEmployeeComponent);
+    component = fixture.componentInstance;
+    await fixture.whenStable();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

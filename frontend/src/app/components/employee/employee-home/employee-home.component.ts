@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 import { Employee } from '../../../shared/models/employee.model';
 import { EmployeeService } from '../../../services/employee.service';
@@ -7,7 +7,7 @@ import { LoginService } from '../../../services/login.service';
 
 @Component({
   selector: 'app-employee-home',
-  imports: [],
+  imports: [RouterModule],
   templateUrl: './employee-home.component.html',
   styleUrl: './employee-home.component.css',
 })
@@ -20,6 +20,12 @@ export class EmployeeHomeComponent {
     private loginService: LoginService,
     private router: Router
   ) {
+
+    if (this.loginService.getLoggedUserType() !== "EMPLOYEE") {
+      this.router.navigate(['/login']);
+      return;
+    }
+
     const id = this.loginService.getLoggedUserId();
 
     this.employee = this.employeeService.findById(id);

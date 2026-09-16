@@ -27,7 +27,7 @@ export class ClientService {
         new Address(
           "82940-290",
           "Rua Hugo Cini",
-          "",
+          "100",
           "",
           "Cajuru",
           "Curitiba",

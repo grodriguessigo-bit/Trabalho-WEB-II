@@ -26,7 +26,10 @@ export class RegisterClientComponent {
   ) {}
 
   searchZipCode(): void {
-    if (this.client.address.zipCode === "82940290") {
+
+    const zipCode = this.client.address.zipCode.replace(/\D/g, '');
+
+    if (zipCode === "82940290") {
 
       this.client.address.zipCode = "82940-290";
       this.client.address.street = "Rua Hugo Cini";
@@ -37,13 +40,25 @@ export class RegisterClientComponent {
       this.zipMessage = "CEP encontrado.";
 
     } else {
+
+      this.client.address.street = "";
+      this.client.address.neighborhood = "";
+      this.client.address.city = "";
+      this.client.address.state = "";
+
       this.zipMessage = "CEP não encontrado.";
     }
+
   }
 
   insert(): void {
 
     if (this.formClient.form.valid) {
+
+      if (!this.client.address.street) {
+        this.message = "Busque o CEP antes de cadastrar.";
+        return;
+      }
 
       const clients = this.clientService.listAll();
 
@@ -70,12 +85,16 @@ export class RegisterClientComponent {
 
       this.formClient.reset();
     }
+
   }
 
   private generatePassword(): string {
-    return Math.floor(
+
+    let password = Math.floor(
       1000 + Math.random() * 9000
     ).toString();
+
+    return password;
   }
 
 }
