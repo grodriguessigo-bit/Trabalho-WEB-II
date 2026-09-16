@@ -1,0 +1,65 @@
+:host{
+    --color-primary: #007bff;
+    --color-sucess: #28a785;
+    --color-danger: #dc3550;
+
+    --border-input: #ced4da;
+    --bg-select: #f4f6f8;
+
+    --text-color: #495057;
+    --text-label: #6c757d;
+}
+
+.repair-form {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 2px solid var(--border-input);
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.repair-form__title {
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--text-color);
+}
+.repair-form__label{
+    display: block;
+    font-size: 16px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    color: var(--text-label);
+}
+.repair-form__buttton{
+    display: block;
+    margin: 0 auto;
+    margin-top: 20px;
+    padding: 10px 20px;
+    width: 200px;
+    font-size: 16px;
+    color: #fff;
+    background-color: var(--color-primary);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.repair-form__control{
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    color: var(--text-color);
+    background-color: var(--bg-select);
+    border: 1px solid var(--border-input);
+    border-radius: 5px;
+}
+.repair-form__controlSelect{
+    width: 25%;
+    padding: 10px;
+    font-size: 16px;
+    color: var(--text-color);
+    background-color: var(--bg-select);
+    border: 1px solid var(--border-input);
+    border-radius: 5px;
+}
+

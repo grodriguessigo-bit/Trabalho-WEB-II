@@ -1,0 +1,39 @@
+    
+
+<form id="repair-form" class="repair-form" #formRepair="ngForm">
+    <h1 class="repair-form__title">Cadastrar novo reparo</h1>
+
+    <label class="repair-form__label">Descrição do equipamento: </label>
+    <input type="text" class="repair-form__control" id="description" name="description"
+    [(ngModel)]="repair.description" #description="ngModel" required>
+
+    @if (description.errors && (description.dirty || description.touched)) {
+      <div class="alert alert-danger">
+        <div [hidden]="!description.errors['required']"> Digite a descrição do problema. </div>
+      </div>
+    }
+
+    <label class="repair-form__label" for="DescriptionDefect">Descrição do defeito:</label>
+    <input type="text" class="repair-form__control" id="DescriptionDefect" name="DescriptionDefect"
+    [(ngModel)]="repair.defectDescription" #DescriptionDefect="ngModel" required>
+
+    @if (DescriptionDefect.errors && (DescriptionDefect.dirty || DescriptionDefect.touched)) {
+    <div class="alert alert-danger">
+        <div [hidden]="!DescriptionDefect.errors['required']"> Digite a descrição do defeito. </div>
+    </div>
+    }
+
+    <label class="repair-form__label" for="equipamentCategory">Categoria do equipamento:</label>
+    <select class="repair-form__controlSelect" id="equipamentCategory" name="equipamentCategory" [(ngModel)]="repair.category" #equipamentCategory="ngModel" required>
+        <option class="repair-form_label" value="">Selecione uma categoria</option>
+        @for (cat of equipamentCategories; track cat.chave) {
+            <option [value]="cat.chave">{{ cat.rotulo }}</option>
+        }
+    </select>
+    <button type="submit" class="repair-form__buttton" (click)="cadastrateRepair()">Cadastrar</button>
+
+
+</form>
+
+    
+    
