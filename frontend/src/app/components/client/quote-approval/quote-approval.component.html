@@ -1,0 +1,53 @@
+<main class="quote-approval">
+	<h1>Mostrar orçamento</h1>
+
+	@if (request) {
+		<section class="request-details">
+			<h2>Dados da solicitação</h2>
+
+			<dl>
+				<div>
+					<dt>Equipamento</dt>
+					<dd>{{ request.equipmentDescription }}</dd>
+				</div>
+				<div>
+					<dt>Defeito</dt>
+					<dd>{{ request.defectDescription }}</dd>
+				</div>
+				<div>
+					<dt>Categoria</dt>
+					<dd>{{ categoryName || 'Não informada' }}</dd>
+				</div>
+				<div>
+					<dt>Data da solicitação</dt>
+					<dd>{{ request.requestDateTime | date: 'dd/MM/yyyy HH:mm' }}</dd>
+				</div>
+				<div>
+					<dt>Status</dt>
+					<dd>{{ request.status }}</dd>
+				</div>
+			</dl>
+		</section>
+
+		<section class="quote-highlight" aria-label="Preço orçado">
+			<span>Preço orçado</span>
+			<strong>{{ quotePrice | currency: 'BRL' }}</strong>
+		</section>
+
+		@if (message) {
+			<p class="message" role="alert">{{ message }}</p>
+		}
+
+		<div class="actions">
+			<button type="button" class="approve-button" (click)="approve()">
+				Aprovar o Serviço
+			</button>
+			<button type="button" class="reject-button" (click)="reject()">
+				Rejeitar o Serviço
+			</button>
+			<button type="button" class="back-button" (click)="goBack()">
+				Voltar
+			</button>
+		</div>
+	}
+</main>
