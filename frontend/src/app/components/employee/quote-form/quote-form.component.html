@@ -1,0 +1,90 @@
+<div class="container">
+
+  <div class="col-md-12">
+
+    <h1>Efetuar Orçamento</h1>
+
+    @if (request) {
+
+      <div class="well">
+
+        <h3>Dados da Solicitação</h3>
+
+        <p>
+          <strong>Equipamento:</strong>
+          {{ request.equipmentDescription }}
+        </p>
+
+        <p>
+          <strong>Defeito:</strong>
+          {{ request.defectDescription }}
+        </p>
+
+        <p>
+          <strong>Categoria:</strong>
+          {{ categoryName }}
+        </p>
+
+        <p>
+          <strong>Data/Hora:</strong>
+          {{ request.requestDateTime | date:'dd/MM/yyyy HH:mm' }}
+        </p>
+
+      </div>
+
+    }
+
+    @if (client) {
+
+      <div class="well">
+        <h3>Dados do Cliente</h3>
+        <p>
+          <strong>Nome:</strong>
+          {{ client.name }}
+        </p>
+
+        <p>
+          <strong>CPF:</strong>
+          {{ client.cpf }}
+        </p>
+
+        <p>
+          <strong>E-mail:</strong>
+          {{ client.email }}
+        </p>
+
+        <p>
+          <strong>Telefone:</strong>
+          {{ client.phone }}
+        </p>
+
+        <p>
+          <strong>Endereço:</strong>
+          {{ client.address.street }},
+          {{ client.address.number }} -
+          {{ client.address.neighborhood }},
+          {{ client.address.city }}/{{ client.address.state }}
+        </p>
+      </div>
+    }
+
+    <div class="well">
+
+      <div class="form-group">
+        <label for="price">Valor do Orçamento:</label>
+        <input type="number" class="form-control" id="price" name="price" [(ngModel)]="price" min="0.01" step="0.01">
+      </div>
+
+      @if (message) {
+        <div class="alert alert-danger">
+          {{ message }}
+        </div>
+      }
+
+      <button type="button" class="btn btn-primary" (click)="createQuote()"> Efetuar Orçamento </button>
+
+      <a class="btn btn-default" [routerLink]="['/employee/home']"> Voltar </a>
+
+    </div>
+  </div>
+</div>

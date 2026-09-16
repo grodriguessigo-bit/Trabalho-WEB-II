@@ -2,11 +2,9 @@
     <h1>Área do Funcionário</h1>
 
     @if (employee) {
-
       <div class="well">
         <strong>Funcionário:</strong> {{ employee.name }}
       </div>
-
     }
 
     <a class="btn btn-primary me-2 mt-3" type="button" [routerLink]="['/employee/list']">
