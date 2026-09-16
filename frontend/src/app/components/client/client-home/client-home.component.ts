@@ -74,22 +74,22 @@ export class ClientHomeComponent {
     this.router.navigate(['/login']);
   }
   OpenTicket(): void {
-    this.router.navigate(['/client/equipament-repair']);
+    this.router.navigate(['/client/equipment-repair']);
   }
 
   openRequest(clientId: number): void {
-    this.router.navigate(['/client/equipament-repair']);
+    this.router.navigate(['/client/equipment-repair']);
   }
 
   openQuote(clientId: number): void {
-    this.router.navigate(['/client/equipament-repair']);
+    this.router.navigate(['/client/equipment-repair']);
   }
 
   rescueRequest(clientId: number): void {
-    this.router.navigate(['/client/equipament-repair']);
+    this.router.navigate(['/client/equipment-repair']);
   }
 
   payRequest(clientId: number): void {
-    this.router.navigate(['/client/equipament-repair']);
+    this.router.navigate(['/client/equipment-repair']);
   }
 }
