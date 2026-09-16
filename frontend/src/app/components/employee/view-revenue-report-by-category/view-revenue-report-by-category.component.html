@@ -1,0 +1,21 @@
+<div class="container">
+    <div class="col-md-12">
+        <h1>Relatório de Receitas por Categoria</h1>
+
+        <div class="form-group row">
+          <label for="category" class="col-md-2 control-label">Categoria:</label>
+          <div class="col-md-6">
+            <input type="text" class="form-control" id="category" name="category" required>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-primary"> Filtrar </button>
+
+        <button type="button" class="btn btn-default"> Gerar PDF </button>
+
+        <p class="mt-2">Aqui vai aparecer a prévia do relatório pra baixar o PDF</p>
+
+        <a class="btn btn-default" [routerLink]="['/employee/home']"> Voltar </a>
+        
+    </div>
+</div>

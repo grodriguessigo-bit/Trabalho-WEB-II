@@ -22,7 +22,7 @@ export class ListEmployeeComponent {
     private router: Router
   ) {
 
-    if (this.loginService.getLoggedUserType() !== "EMPLOYEE") {
+  if (this.loginService.getLoggedUserType() !== "EMPLOYEE") {
       this.router.navigate(['/login']);
       return;
     }

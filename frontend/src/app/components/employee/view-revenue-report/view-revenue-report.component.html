@@ -1,0 +1,28 @@
+<div class="container">
+    <div class="col-md-12">
+        <h1>Relatório de Receitas</h1>
+
+        <div class="form-group row">
+            <label for="startDate" class="col-md-12 control-label"> Data Inicial: </label>
+            <div class="col-md-4">
+                <input type="date" id="startDate" class="form-control"> 
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label for="finalDate" class="col-md-12 control-label"> Data Final: </label>
+            <div class="col-md-4">
+                <input type="date" id="finalDate" class="form-control"> 
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-primary"> Filtrar </button>
+
+        <button type="button" class="btn btn-default"> Gerar PDF </button>
+
+        <p class="mt-2">Aqui vai aparecer a prévia do relatório pra baixar o PDF</p>
+
+        <a class="btn btn-default" [routerLink]="['/employee/home']"> Voltar </a>
+        
+    </div>
+</div>
