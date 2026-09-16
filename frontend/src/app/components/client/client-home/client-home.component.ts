@@ -84,8 +84,8 @@ export class ClientHomeComponent {
     this.router.navigate(['/client/equipment-repair']);
   }
 
-  openQuote(clientId: number): void {
-    this.router.navigate(['/client/quote-approval', clientId]);
+  openQuote(requestId: number): void {
+    this.router.navigate(['/client/quote-approval', requestId]);
   }
 
   rescueRequest(requestId: number): void {
