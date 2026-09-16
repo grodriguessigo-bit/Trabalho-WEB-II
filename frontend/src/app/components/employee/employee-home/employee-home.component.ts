@@ -26,7 +26,7 @@ export class EmployeeHomeComponent {
     private loginService: LoginService,
     private router: Router,
     private maintenanceRequestService: MaintenanceRequestService
-  ) 
+  )
   {
     this.clientRequest = this.maintenanceRequestService.findOpenRequest()[0]; //mockando cliente
 
@@ -38,7 +38,7 @@ export class EmployeeHomeComponent {
     const id = this.loginService.getLoggedUserId();
 
     this.employee = this.employeeService.findById(id);
-    
+
     this.clientRequest = this.maintenanceRequestService.findOpenRequest()[0];
   }
 

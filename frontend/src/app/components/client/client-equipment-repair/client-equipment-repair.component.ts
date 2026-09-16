@@ -7,6 +7,8 @@ import { HistoryActions } from '../../../shared/enum/history-actions.enum';
 import { RequestHistory } from '../../../shared/models/request-history.model';
 import { LoginService } from '../../../services/login.service';
 import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
+import { Category } from '../../../shared/models/category.model';
+import { CategoryService } from '../../../services/category.service';
 
 @Component({
   selector: 'app-client-equipament-repair',
@@ -16,14 +18,7 @@ import { MaintenanceRequestService } from '../../../services/maintenance-request
 })
 
 export class ClientEquipmentRepairComponent {
-  equipmentCategories = [
-    { id: 1, name: 'Celular' },
-    { id: 2, name: 'Tablet' },
-    { id: 3, name: 'Notebook' },
-    { id: 4, name: 'Computador' },
-    { id: 5, name: 'Televisão' },
-    { id: 6, name: 'Outros' },
-  ];
+  equipmentCategories: Category[] = [];
 
   request = new MaintenanceRequest();
 
@@ -31,7 +26,12 @@ export class ClientEquipmentRepairComponent {
     private router: Router,
     private loginService: LoginService,
     private maintenanceRequestService: MaintenanceRequestService,
-  ) {}
+    private categoryService: CategoryService,
+  ) {
+    this.equipmentCategories = this.categoryService
+      .listAll()
+      .filter(category => category.active);
+  }
 
   createRequest(): void {
     if (
@@ -79,4 +79,3 @@ export class ClientEquipmentRepairComponent {
     this.router.navigate(['/client/home']);
   }
 }
-
