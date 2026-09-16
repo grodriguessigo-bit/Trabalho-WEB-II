@@ -1,0 +1,149 @@
+<div class="container">
+
+  <div class="col-md-12">
+
+    <h1>Categorias</h1>
+
+    <p>
+      <button class="btn btn-primary" type="button" (click)="openCreateModal()">
+        Nova Categoria
+      </button>
+
+      <a class="btn btn-secondary ms-2" [routerLink]="['/employee/home']">
+        Voltar
+      </a>
+
+      <button class="btn btn-outline-primary ms-2" type="button" (click)="toggleActiveFilter()">
+        {{ showOnlyActive ? 'Mostrar Todas' : 'Mostrar Apenas Ativas' }}
+      </button>
+    </p>
+
+    <table class="table table-striped table-bordered table-hover">
+      <thead>
+        <tr>
+          <th class="text-center">Nome</th>
+          <th class="text-center">Status</th>
+          <th class="text-center">Ações</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (category of displayedCategories; track category.id) {
+          <tr>
+            <td class="text-center">{{ category.name }}</td>
+            <td class="text-center">
+              {{ category.active ? 'Ativa' : 'Inativa' }}
+            </td>
+            <td class="text-center">
+              <button class="btn btn-primary me-2" type="button" (click)="openEditModal(category)">
+                Editar
+              </button>
+
+              @if (category.active) {
+                <button class="btn btn-danger" type="button" (click)="openDeactivateModal(category)">
+                  Desativar
+                </button>
+              } @else {
+                <button class="btn btn-success" type="button" (click)="activate(category)">
+                  Ativar
+                </button>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="3">
+              {{ showOnlyActive ? 'Nenhuma categoria ativa cadastrada.' : 'Nenhuma categoria cadastrada.' }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+  </div>
+
+</div>
+
+@if (showDeactivateModal) {
+  <div class="modal-backdrop fade show" (click)="closeDeactivateModal()"></div>
+
+  <div class="modal fade show d-block" tabindex="-1" role="dialog" aria-modal="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirmar desativação</h5>
+          <button
+            type="button"
+            class="btn-close"
+            aria-label="Fechar"
+            (click)="closeDeactivateModal()"
+          ></button>
+        </div>
+
+        <div class="modal-body">
+          <p class="mb-0">
+            Deseja desativar a categoria
+            <strong>{{ categoryToDeactivate?.name }}</strong>?
+          </p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeDeactivateModal()">
+            Cancelar
+          </button>
+          <button type="button" class="btn btn-danger" (click)="confirmDeactivation()">
+            Desativar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showModal) {
+  <div class="modal-backdrop fade show" (click)="closeModal()"></div>
+
+  <div class="modal fade show d-block" tabindex="-1" role="dialog" aria-modal="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            {{ editingCategory ? 'Editar Categoria' : 'Nova Categoria' }}
+          </h5>
+          <button type="button" class="btn-close" aria-label="Fechar" (click)="closeModal()"></button>
+        </div>
+
+        <form (ngSubmit)="save()">
+          <div class="modal-body">
+            <label for="categoryName" class="form-label">Nome</label>
+            <input
+              id="categoryName"
+              name="categoryName"
+              class="form-control"
+              type="text"
+              [(ngModel)]="categoryName"
+              maxlength="100"
+              required
+              autofocus
+            >
+
+            @if (message) {
+              <div class="alert alert-danger mt-3 mb-0">
+                {{ message }}
+              </div>
+            }
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeModal()">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary">
+              Salvar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
