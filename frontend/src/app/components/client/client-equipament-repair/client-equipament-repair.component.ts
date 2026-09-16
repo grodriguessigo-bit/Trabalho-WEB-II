@@ -35,6 +35,10 @@ export class ClientEquipamentRepairComponent {
         this.router.navigate(['/client/home']);
     }
 
+    goBack(): void {
+        this.router.navigate(['/client/home']);
+    }
+
 }
 
 export enum EquipamentCategory {

@@ -36,5 +36,8 @@ export class ClientHomeComponent {
 
     this.router.navigate(['/login']);
   }
+  OpenTicket(): void {
+    this.router.navigate(['/client/equipament-repair']);
+  }
 
 }

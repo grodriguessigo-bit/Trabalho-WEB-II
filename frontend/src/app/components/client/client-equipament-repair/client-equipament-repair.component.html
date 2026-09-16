@@ -1,6 +1,6 @@
-    
-
 <form id="repair-form" class="repair-form" #formRepair="ngForm">
+    
+    
     <h1 class="repair-form__title">Cadastrar novo reparo</h1>
 
     <label class="repair-form__label">Descrição do equipamento: </label>
@@ -31,6 +31,7 @@
         }
     </select>
     <button type="submit" class="repair-form__buttton" (click)="cadastrateRepair()">Cadastrar</button>
+    <button type="submit" class="repair-form__buttton" (click)="goBack()">Voltar</button>
 
 
 </form>
