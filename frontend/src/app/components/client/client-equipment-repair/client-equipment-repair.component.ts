@@ -11,11 +11,11 @@ import { MaintenanceRequestService } from '../../../services/maintenance-request
 @Component({
   selector: 'app-client-equipament-repair',
   imports: [FormsModule],
-  templateUrl: './client-equipament-repair.component.html',
-  styleUrls: ['./client-equipament-repair.component.css'],
+  templateUrl: './client-equipment-repair.component.html',
+  styleUrls: ['./client-equipment-repair.component.css'],
 })
 
-export class ClientEquipamentRepairComponent {
+export class ClientEquipmentRepairComponent {
   equipmentCategories = [
     { id: 1, name: 'Celular' },
     { id: 2, name: 'Tablet' },
