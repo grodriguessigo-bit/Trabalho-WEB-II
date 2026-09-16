@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterClientComponent } from './components/client/register-client/register-client.component';
-import { ClientEquipamentRepairComponent } from './components/client/client-equipament-repair/client-equipament-repair.component';
+import { ClientEquipmentRepairComponent } from './components/client/client-equipment-repair/client-equipment-repair.component';
 import { ClientHomeComponent } from './components/client/client-home/client-home.component';
 import { EmployeeHomeComponent } from './components/employee/employee-home/employee-home.component';
 import { ListEmployeeComponent } from './components/employee/list-employee/list-employee.component';
@@ -31,8 +31,8 @@ export const routes: Routes = [
   },
 
   {
-    path: 'client/equipament-repair',
-    component: ClientEquipamentRepairComponent
+    path: 'client/equipment-repair',
+    component: ClientEquipmentRepairComponent
   },
   {
     path: 'client/home',
