@@ -25,28 +25,6 @@ export class ClientEquipmentRepairComponent {
     { id: 6, name: 'Outros' },
   ];
 
-  //MOCK para teste
-  mockRequest = new MaintenanceRequest(
-    0,
-    1,
-    3,
-    'Notebook Dell Inspiron',
-    'O equipamento não liga',
-    new Date().toISOString(),
-    RequestStatus.OPEN,
-    [
-      new RequestHistory(
-        0,
-        HistoryActions.REQUEST_CREATED,
-        null,
-        RequestStatus.OPEN,
-        new Date().toISOString(),
-        'Maintenance request created',
-        'João',
-      ),
-    ],
-  );
-
   request = new MaintenanceRequest();
 
   constructor(

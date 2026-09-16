@@ -7,6 +7,9 @@ import { LoginService } from '../../../services/login.service';
 import { MaintenanceRequest } from '../../../shared/models/maintenance-request';
 import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
 import { CommonModule } from '@angular/common';
+import { RequestStatus } from '../../../shared/enum/request-status.enum';
+import { RequestHistory } from '../../../shared/models/request-history.model';
+import { HistoryActions } from '../../../shared/enum/history-actions.enum';
 
 @Component({
   selector: 'app-client-home',
@@ -85,9 +88,7 @@ export class ClientHomeComponent {
     this.router.navigate(['/client/equipment-repair']);
   }
 
-  rescueRequest(clientId: number): void {
-    this.router.navigate(['/client/equipment-repair']);
-  }
+  rescueRequest(requestId: number): void {}
 
   payRequest(clientId: number): void {
     this.router.navigate(['/client/equipment-repair']);
