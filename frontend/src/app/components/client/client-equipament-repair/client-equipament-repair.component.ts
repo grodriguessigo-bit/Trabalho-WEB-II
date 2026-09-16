@@ -1,52 +1,103 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { MaintenanceRequest } from '../../../shared/models/maintenance-request';
+import { RequestStatus } from '../../../shared/enum/request-status.enum';
+import { HistoryActions } from '../../../shared/enum/history-actions.enum';
+import { RequestHistory } from '../../../shared/models/request-history.model';
+import { LoginService } from '../../../services/login.service';
+import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
 
 @Component({
   selector: 'app-client-equipament-repair',
   imports: [FormsModule],
   templateUrl: './client-equipament-repair.component.html',
-  styleUrls: ['./client-equipament-repair.component.css']
+  styleUrls: ['./client-equipament-repair.component.css'],
 })
 
 export class ClientEquipamentRepairComponent {
+  equipmentCategories = [
+    { id: 1, name: 'Celular' },
+    { id: 2, name: 'Tablet' },
+    { id: 3, name: 'Notebook' },
+    { id: 4, name: 'Computador' },
+    { id: 5, name: 'Televisão' },
+    { id: 6, name: 'Outros' },
+  ];
 
-    repair = {
-        description: '',
-        defectDescription: '',
-        category: '',
-        localDate  : new Date().toISOString().split('T')[0] // Inicializa com a data atual no formato YYYY-MM-DD
-    };
+  //MOCK para teste
+  mockRequest = new MaintenanceRequest(
+    0,
+    1,
+    3,
+    'Notebook Dell Inspiron',
+    'O equipamento não liga',
+    new Date().toISOString(),
+    RequestStatus.OPEN,
+    [
+      new RequestHistory(
+        0,
+        HistoryActions.REQUEST_CREATED,
+        null,
+        RequestStatus.OPEN,
+        new Date().toISOString(),
+        'Maintenance request created',
+        'João',
+      ),
+    ],
+  );
 
-    equipamentCategories = Object.keys(EquipamentCategory).map(key => ({
-        chave: key,
-        rotulo: EquipamentCategory[key as keyof typeof EquipamentCategory]
-    }));
-    
-    constructor(private router: Router) {}
+  request = new MaintenanceRequest();
 
-    cadastrateRepair(): void {
-        if(!this.repair.description || !this.repair.defectDescription || !this.repair.category) { // faz a validação dos campos antes de cadastrar o reparo
-            alert('Por favor, preencha todos os campos antes de cadastrar o reparo.');
-            return;
-        }
-        console.log('Reparo cadastrado:', this.repair);
-        this.repair.localDate = new Date().toISOString().split('T')[0]; // Atualiza a data para o formato YYYY-MM-DD
-        this.router.navigate(['/client/home']);
+  constructor(
+    private router: Router,
+    private loginService: LoginService,
+    private maintenanceRequestService: MaintenanceRequestService,
+  ) {}
+
+  createRequest(): void {
+    if (
+      !this.request.equipmentDescription ||
+      !this.request.defectDescription ||
+      !this.request.categoryId
+    ) {
+      // faz a validação dos campos antes de cadastrar o reparo
+      alert('Por favor, preencha todos os campos antes de cadastrar o reparo.');
+      return;
     }
 
-    goBack(): void {
-        this.router.navigate(['/client/home']);
+    const clientId = this.loginService.getLoggedUserId();
+
+    if (!clientId) {
+      alert('Cliente não identificado.');
+      this.router.navigate(['/login']);
+      return;
     }
 
-}
+    this.request.clientId = clientId;
 
-export enum EquipamentCategory {
-    CELULAR = 'Celular',
-    TABLET = 'Tablet',
-    NOTEBOOK = 'Notebook',
-    COMPUTADOR = 'Computador',
-    TELEVISAO = 'Televisão',
-    OUTROS = 'Outros'
+    this.request.requestDateTime = new Date().toISOString();
+
+    this.request.status = RequestStatus.OPEN;
+
+    const history = new RequestHistory(
+      0,
+      HistoryActions.REQUEST_CREATED,
+      null,
+      RequestStatus.OPEN,
+      new Date().toISOString(),
+      'Solicitação de manutenção criada',
+    );
+
+    this.request.requestHistory.push(history);
+
+    this.maintenanceRequestService.insert(this.request);
+
+    this.router.navigate(['/client/home']);
+  }
+
+  goBack(): void {
+    this.router.navigate(['/client/home']);
+  }
 }
 
