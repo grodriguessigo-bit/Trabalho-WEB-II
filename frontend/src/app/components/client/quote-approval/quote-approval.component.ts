@@ -80,6 +80,7 @@ export class QuoteApprovalComponent {
 
 		const changeDateTime = new Date().toISOString();
 		const previousStatus = this.request.status;
+		this.request.requestHistory ??= [];
 
 		this.request.status = status;
 		this.request.requestHistory.push(
