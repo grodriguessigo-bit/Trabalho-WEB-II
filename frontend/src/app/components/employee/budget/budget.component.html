@@ -1,13 +1,15 @@
-<h1 class="page-header" class="text-center" style="color: grey;">Gerar Orçamento</h1>
+<h1 class="page-header text-center" style="color: grey;">Gerar Orçamento</h1>
 
 <div class="text-center">
 
+    <div style="width: 50%; margin: 0 auto; text-align: left;">
+        <p>Cliente ID: {{ client?.clientId }}</p>
+        <p>Equipamento: {{ client?.equipmentDescription }}</p>
+        <p>Descrição: {{ client?.defectDescription }}</p>
+        <p>Data Solicitação: {{ client?.requestDateTime }}</p>
+    </div>
 
-    <p style="font-weight: bold; font-size: 20px;">Cliente: {{ client.clientName }}</p>
-    <p style="font-weight: bold; font-size: 20px;">Equipamento: {{ client.clientEquipament }}</p>
-    <p style="font-weight: bold; font-size: 20px;">Descrição: {{ client.clientDescription }}</p>
-    <p style="font-weight: bold; font-size: 20px;">Data Solicitação: {{ client.dateRequested }}</p>
-    <div style="display: flex; justify-content: center; align-items: center;">
+    <div style="display: flex; justify-content: center; align-items: center; margin-top: 15px;">
         <textarea class="form-control" rows="5" placeholder="Digite a descrição do orçamento..." style="width: 50%;"></textarea>
     </div>
 

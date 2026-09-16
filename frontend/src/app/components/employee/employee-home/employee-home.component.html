@@ -1,7 +1,4 @@
-<div class="container">
-
-  <div class="col-md-12">
-
+<div class="container mt-4">    
     <h1>Área do Funcionário</h1>
 
     @if (employee) {
@@ -12,9 +9,17 @@
 
     }
 
-      <a class="btn btn-primary me-2 mt-3" type="button" [routerLink]="['/employee/list']"> Funcionários </a>
-      <a class="btn btn-primary me-2 mt-3" type="button" [routerLink]="['/employee/revenue-report']"> Relatório de Receita por Data </a>
-      <a class="btn btn-primary me-2 mt-3" type="button" [routerLink]="['/employee/revenue-report-category']"> Relatório de Receita por Categoria </a>
+    <a class="btn btn-primary me-2 mt-3" type="button" [routerLink]="['/employee/list']">
+      Funcionários
+    </a>
+
+    <a class="btn btn-primary me-2 mt-3" type="button" [routerLink]="['/employee/revenue-report']">
+      Relatório de Receita por Data
+    </a>
+
+    <a class="btn btn-primary me-2 mt-3" type="button" [routerLink]="['/employee/revenue-report-category']">
+      Relatório de Receita por Categoria
+    </a>
 
     <h2 class="mt-4">Solicitações Abertas</h2>
 
@@ -29,14 +34,31 @@
           <th class="text-center">Ações</th>
         </tr>
 
-        <tr>
-          <th class="text-center">{{clientRequest.dateRequested}}</th>
-          <th class="text-center">{{clientRequest.clientName}}</th>
-          <th class="text-center">{{clientRequest.equipamentName}}</th>
-          <th class="text-center">
-            <a class="btn btn-primary" [routerLink]="['/employee/budget']"> Gerar Orçamento </a>
-          </th>
-        </tr>
+        @if (clientRequest) {
+
+          <tr>
+            <td class="text-center">
+              {{ clientRequest.requestDateTime }}
+            </td>
+
+            <td class="text-center">
+              {{ clientRequest.clientId }}
+            </td>
+
+            <td class="text-center">
+              {{ clientRequest.equipmentDescription }}
+            </td>
+
+            <td class="text-center">
+              <a
+                class="btn btn-primary"
+                [routerLink]="['/employee/budget', clientRequest.id]">
+                Gerar Orçamento
+              </a>
+            </td>
+          </tr>
+
+        }
 
       </tbody>
 

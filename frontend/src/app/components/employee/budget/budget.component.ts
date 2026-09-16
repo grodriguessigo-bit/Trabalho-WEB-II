@@ -1,4 +1,8 @@
 import { Component } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+
+import { MaintenanceRequest } from '../../../shared/models/maintenance-request';
+import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
 
 @Component({
   selector: 'app-budget',
@@ -7,16 +11,21 @@ import { Component } from '@angular/core';
 })
 export class BudgetComponent {
 
-  client = {
-    dateRequested: '01/01/2024',
-    clientName: 'João da silva',
-    clientEquipament: 'Notebook Dell',
-    clientDescription: 'Notebook Dell com problema na tela'
+  client: MaintenanceRequest | undefined;
+
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private maintenanceRequestService: MaintenanceRequestService
+  ) {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+
+    this.client = this.maintenanceRequestService.findById(id);
   }
 
   generateBudget() {
-    // Lógica para gerar o orçamento
-    console.log('Orçamento gerado para o cliente:', this.client.clientName);
-  }
+    console.log('Orçamento gerado para a solicitação:', this.client);
 
+    this.router.navigate(['/employee/home']);
+  }
 }
