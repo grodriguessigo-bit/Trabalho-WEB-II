@@ -4,7 +4,7 @@
     <h1 class="repair-form__title">Cadastrar novo reparo</h1>
 
     <label class="repair-form__label">Descrição do equipamento: </label>
-    <input type="text" class="repair-form__control" id="description" name="description"
+    <input type="text" class="repair-form__control" id="description" name="description" maxlength="30"
     [(ngModel)]="request.equipmentDescription" #description="ngModel" required>
 
     @if (description.errors && (description.dirty || description.touched)) {
