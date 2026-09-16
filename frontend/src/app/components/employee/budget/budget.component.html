@@ -1,0 +1,15 @@
+<h1 class="page-header" class="text-center" style="color: grey;">Gerar Orçamento</h1>
+
+<div class="text-center">
+
+
+    <p style="font-weight: bold; font-size: 20px;">Cliente: {{ client.clientName }}</p>
+    <p style="font-weight: bold; font-size: 20px;">Equipamento: {{ client.clientEquipament }}</p>
+    <p style="font-weight: bold; font-size: 20px;">Descrição: {{ client.clientDescription }}</p>
+    <p style="font-weight: bold; font-size: 20px;">Data Solicitação: {{ client.dateRequested }}</p>
+    <div style="display: flex; justify-content: center; align-items: center;">
+        <textarea class="form-control" rows="5" placeholder="Digite a descrição do orçamento..." style="width: 50%;"></textarea>
+    </div>
+
+    <button type="button" class="btn btn-primary" (click)="generateBudget()" style="margin-top: 20px;">Gerar Orçamento</button>
+</div>

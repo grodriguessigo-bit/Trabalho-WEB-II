@@ -14,6 +14,11 @@ import { LoginService } from '../../../services/login.service';
 export class EmployeeHomeComponent {
 
   employee: Employee | undefined;
+  clientRequest = {
+    dateRequested: '01/01/2024',
+    clientName: 'João da silva',
+    equipamentName: 'Notebook Dell',
+  };
 
   constructor(
     private employeeService: EmployeeService,

@@ -9,6 +9,8 @@ import { InsertEmployeeComponent } from './components/employee/insert-employee/i
 import { EditEmployeeComponent } from './components/employee/edit-employee/edit-employee.component';
 import { ViewRevenueReportByCategoryComponent } from './components/employee/view-revenue-report-by-category/view-revenue-report-by-category.component';
 import { ViewRevenueReportComponent } from './components/employee/view-revenue-report/view-revenue-report.component';
+import{ BudgetComponent } from './components/employee/budget/budget.component';
+
 
 export const routes: Routes = [
 
@@ -56,15 +58,20 @@ export const routes: Routes = [
     path: 'employee/edit/:id',
     component: EditEmployeeComponent
   },
-
-    {
+  
+  {
     path: 'employee/revenue-report',
     component: ViewRevenueReportComponent
   },
 
-    {
+  {
     path: 'employee/revenue-report-category',
     component: ViewRevenueReportByCategoryComponent
+  },
+  
+  {
+    path: 'employee/budget',
+    component: BudgetComponent
   }
 
 ];

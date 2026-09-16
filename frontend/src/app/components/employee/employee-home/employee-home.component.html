@@ -30,7 +30,12 @@
         </tr>
 
         <tr>
-          <td colspan="4">Nenhuma solicitação aberta.</td>
+          <th class="text-center">{{clientRequest.dateRequested}}</th>
+          <th class="text-center">{{clientRequest.clientName}}</th>
+          <th class="text-center">{{clientRequest.equipamentName}}</th>
+          <th class="text-center">
+            <a class="btn btn-primary" [routerLink]="['/employee/budget']"> Gerar Orçamento </a>
+          </th>
         </tr>
 
       </tbody>
