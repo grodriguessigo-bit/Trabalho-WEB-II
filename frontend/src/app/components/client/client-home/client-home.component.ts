@@ -88,7 +88,17 @@ export class ClientHomeComponent {
     this.router.navigate(['/client/equipment-repair']);
   }
 
-  rescueRequest(requestId: number): void {}
+  rescueRequest(requestId: number): void {
+    const rescued = this.maintenanceRequestService.rescueRequest(requestId);
+
+    if(!rescued){
+      return;
+    }
+
+    const clientId = this.loginService.getLoggedUserId();
+
+    this.requests = this.maintenanceRequestService.findByClientId(clientId);
+  }
 
   payRequest(clientId: number): void {
     this.router.navigate(['/client/equipment-repair']);
