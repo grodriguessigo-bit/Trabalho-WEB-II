@@ -4,6 +4,7 @@ import { Router, RouterModule } from '@angular/router';
 import { Employee } from '../../../shared/models/employee.model';
 import { EmployeeService } from '../../../services/employee.service';
 import { LoginService } from '../../../services/login.service';
+import { ClientService } from '../../../services/client.service';
 
 import { MaintenanceRequest } from '../../../shared/models/maintenance-request';
 import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
@@ -16,16 +17,15 @@ import { MaintenanceRequestService } from '../../../services/maintenance-request
   styleUrl: './employee-home.component.css',
 })
 export class EmployeeHomeComponent {
-
   employee: Employee | undefined;
-
   clientRequest: MaintenanceRequest | undefined;
 
   constructor(
     private employeeService: EmployeeService,
     private loginService: LoginService,
     private router: Router,
-    private maintenanceRequestService: MaintenanceRequestService
+    private maintenanceRequestService: MaintenanceRequestService,
+    private clientService: ClientService
   )
   {
     this.clientRequest = this.maintenanceRequestService.findOpenRequest()[0]; //mockando cliente
@@ -40,6 +40,19 @@ export class EmployeeHomeComponent {
     this.employee = this.employeeService.findById(id);
 
     this.clientRequest = this.maintenanceRequestService.findOpenRequest()[0];
+  }
+
+
+  getClientName(clientId: number): string {
+
+    const client =
+      this.clientService.findById(clientId);
+
+    if (client) {
+      return client.name;
+    }
+
+    return '';
   }
 
   logout(): void {

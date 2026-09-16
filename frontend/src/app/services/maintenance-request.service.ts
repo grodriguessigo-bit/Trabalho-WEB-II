@@ -29,6 +29,19 @@ export class MaintenanceRequestService {
     this.saveAll(requests);
   }
 
+  update(request: MaintenanceRequest) {
+    const requests = this.listAll();
+    const index = requests.findIndex(
+      item => item.id === request.id
+    );
+
+    if (index !== -1) {
+      requests[index] = request;
+
+      this.saveAll(requests);
+    }
+  }
+
   findById(id: number): MaintenanceRequest | undefined {
     return this.listAll().find((request) => request.id === id);
   }
