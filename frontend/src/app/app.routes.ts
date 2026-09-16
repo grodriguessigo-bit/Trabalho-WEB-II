@@ -68,9 +68,9 @@ export const routes: Routes = [
     path: 'employee/revenue-report-category',
     component: ViewRevenueReportByCategoryComponent
   },
-  
+
   {
-    path: 'employee/budget',
+    path: 'employee/budget/:id',
     component: BudgetComponent
   }
 
