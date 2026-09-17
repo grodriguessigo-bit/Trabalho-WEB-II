@@ -12,7 +12,15 @@ export class QuoteService {
     const quotes = localStorage.getItem(LS_KEY);
 
     if (!quotes) {
-      return [];
+      return [
+        new Quote(
+          1,
+          5,
+          1,
+          450,
+          '2026-09-15T10:00:00',
+        ),
+      ];
     }
 
     return JSON.parse(quotes);

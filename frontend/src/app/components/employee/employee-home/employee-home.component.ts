@@ -18,7 +18,7 @@ import { MaintenanceRequestService } from '../../../services/maintenance-request
 })
 export class EmployeeHomeComponent {
   employee: Employee | undefined;
-  clientRequest: MaintenanceRequest | undefined;
+  clientRequests: MaintenanceRequest[] = [];
 
   constructor(
     private employeeService: EmployeeService,
@@ -28,7 +28,7 @@ export class EmployeeHomeComponent {
     private clientService: ClientService
   )
   {
-    this.clientRequest = this.maintenanceRequestService.findOpenRequest()[0]; //mockando cliente
+    this.clientRequests = this.maintenanceRequestService.findOpenRequest();
 
     if (this.loginService.getLoggedUserType() !== "EMPLOYEE") {
       this.router.navigate(['/login']);
@@ -39,7 +39,7 @@ export class EmployeeHomeComponent {
 
     this.employee = this.employeeService.findById(id);
 
-    this.clientRequest = this.maintenanceRequestService.findOpenRequest()[0];
+    this.clientRequests = this.maintenanceRequestService.findOpenRequest();
   }
 
 
