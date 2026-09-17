@@ -1,0 +1,103 @@
+<div class="container">
+
+  <div class="col-md-12">
+
+    <h1>Efetuar Manutenção</h1>
+
+    <p>
+      <a class="btn btn-default" [routerLink]="['/employee/home']">
+        Voltar
+      </a>
+    </p>
+
+    @if (request) {
+      <div class="well">
+
+        <h3>Dados do Cliente</h3>
+        <table class="table table-bordered">
+          <tr>
+            <th style="width: 20%;">Nome:</th>
+            <td>{{ request.client.name }}</td>
+          </tr>
+          <tr>
+            <th>E-mail:</th>
+            <td>{{ request.client.email }}</td>
+          </tr>
+          <tr>
+            <th>Telefone:</th>
+            <td>{{ request.client.phone }}</td>
+          </tr>
+        </table>
+
+        <h3>Dados da Solicitação</h3>
+        <table class="table table-bordered">
+          <tr>
+            <th style="width: 20%;">ID da Solicitação:</th>
+            <td>#{{ request.id }}</td>
+          </tr>
+          <tr>
+            <th>Equipamento:</th>
+            <td>{{ request.equipment }}</td>
+          </tr>
+          <tr>
+            <th>Defeito Relatado:</th>
+            <td>{{ request.defect }}</td>
+          </tr>
+          <tr>
+            <th>Estado Atual:</th>
+            <td><span class="label label-info">{{ request.status }}</span></td>
+          </tr>
+        </table>
+
+        <hr>
+
+        <form>
+
+          <div class="form-group row">
+            <label for="maintenanceDescription" class="col-md-3 control-label">Descrição da Manutenção:</label>
+            <div class="col-md-9">
+              <textarea class="form-control" id="maintenanceDescription" name="maintenanceDescription" rows="4" [(ngModel)]="maintenanceDescription" placeholder="Descreva o serviço executado..."></textarea>
+            </div>
+          </div>
+
+          <div class="form-group row" style="margin-top: 15px;">
+            <label for="clientGuidelines" class="col-md-3 control-label">Orientações para o Cliente:</label>
+            <div class="col-md-9">
+              <textarea class="form-control" id="clientGuidelines" name="clientGuidelines" rows="4" [(ngModel)]="clientGuidelines" placeholder="Orientações de uso ou cuidados pós-conserto..."></textarea>
+            </div>
+          </div>
+
+          @if (message) {
+            <div class="row" style="margin-top: 15px;">
+              <div class="col-md-9 col-md-offset-3">
+                <div class="alert alert-danger">{{ message }}</div>
+              </div>
+            </div>
+          }
+
+          <div class="form-group row" style="margin-top: 20px;">
+            <div class="col-md-9 col-md-offset-3">
+              <button type="button" class="btn btn-success" (click)="performMaintenance()">
+                Efetuar Manutenção
+              </button>
+
+              <button type="button" class="btn btn-warning" (click)="redirect()" style="margin-left: 10px;">
+                Redirecionar Manutenção
+              </button>
+
+              <a class="btn btn-default" [routerLink]="['/employee/home']" style="margin-left: 10px;">
+                Cancelar
+              </a>
+            </div>
+          </div>
+
+        </form>
+
+      </div>
+    } @else {
+      <div class="alert alert-warning">Carregando dados da solicitação ou registro não encontrado.</div>
+    }
+
+  </div>
+
+</div>

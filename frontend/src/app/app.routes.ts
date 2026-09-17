@@ -12,6 +12,7 @@ import { ViewRevenueReportByCategoryComponent } from './components/employee/view
 import { ViewRevenueReportComponent } from './components/employee/view-revenue-report/view-revenue-report.component';
 import { CategoriesComponent } from './components/employee/categories/categories.component';
 import{ BudgetComponent } from './components/employee/budget/budget.component';
+import { PerformMaintenanceComponent } from './components/employee/perform-maintenance/perform-maintenance.component';
 
 export const routes: Routes = [
 
@@ -82,6 +83,11 @@ export const routes: Routes = [
   {
     path: 'employee/budget/:id',
     component: BudgetComponent
+  },
+
+  {
+    path: 'employee/request/maintenance/:id',
+    component: PerformMaintenanceComponent
   }
 
 ];
