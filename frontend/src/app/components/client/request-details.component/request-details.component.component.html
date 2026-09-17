@@ -1,1 +1,87 @@
-<p>request-details.component works!</p>
+<main class="request-details-page">
+  <div class="page-header">
+    <h1>Detalhes da Solicitação</h1>
+    <button type="button" class="back-button" (click)="goBack()">
+      Voltar para solicitações
+    </button>
+  </div>
+
+  @if (request) {
+    <section class="details-card">
+      <div class="card-heading">
+        <h2>{{ request.equipmentDescription }}</h2>
+        <span class="status-badge" [ngClass]="'status-' + request.status.toLowerCase()">
+          {{ getStatusLabel(request.status) }}
+        </span>
+      </div>
+
+      <dl class="request-data">
+        <div>
+          <dt>Equipamento</dt>
+          <dd>{{ request.equipmentDescription }}</dd>
+        </div>
+        <div>
+          <dt>Categoria</dt>
+          <dd>{{ categoryName || 'Não informada' }}</dd>
+        </div>
+        <div>
+          <dt>Data da solicitação</dt>
+          <dd>{{ request.requestDateTime | date: 'dd/MM/yyyy HH:mm' }}</dd>
+        </div>
+        <div class="full-width">
+          <dt>Descrição do defeito</dt>
+          <dd>{{ request.defectDescription }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    @if (quote) {
+      <section class="quote-card">
+        <div>
+          <p class="section-label">Orçamento</p>
+          <h2>{{ quote.price | currency: 'BRL' }}</h2>
+        </div>
+        <div class="quote-description">
+          <h3>Descrição do orçamento</h3>
+          <p>{{ quote.description || 'Não informada' }}</p>
+        </div>
+        <p class="quote-date">
+          Criado em {{ quote.quoteDateTime | date: 'dd/MM/yyyy HH:mm' }}
+        </p>
+
+        @if (canReviewQuote()) {
+          <button type="button" class="review-button" (click)="openQuote()">
+            Aprovar ou rejeitar orçamento
+          </button>
+        }
+      </section>
+    }
+
+    <section class="history-card">
+      <h2>Histórico</h2>
+
+      @if (historyEntries.length > 0) {
+        <ol class="history-list">
+          @for (history of historyEntries; track history.id) {
+            <li>
+              <div class="history-heading">
+                <strong>{{ getActionLabel(history.action) }}</strong>
+                <time>{{ history.changeDateTime | date: 'dd/MM/yyyy HH:mm' }}</time>
+              </div>
+              <p>{{ history.description }}</p>
+              <small>
+                {{ getStatusLabel(history.previousStatus ?? history.newStatus) }}
+                → {{ getStatusLabel(history.newStatus) }}
+                @if (history.performedByName) {
+                  · {{ history.performedByName }}
+                }
+              </small>
+            </li>
+          }
+        </ol>
+      } @else {
+        <p class="empty-history">Nenhum histórico disponível.</p>
+      }
+    </section>
+  }
+</main>

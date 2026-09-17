@@ -12,6 +12,7 @@ import { ViewRevenueReportByCategoryComponent } from './components/employee/view
 import { ViewRevenueReportComponent } from './components/employee/view-revenue-report/view-revenue-report.component';
 import { CategoriesComponent } from './components/employee/categories/categories.component';
 import { QuoteFormComponent } from './components/employee/quote-form/quote-form.component';
+import { RequestDetailsComponentComponent } from './components/client/request-details.component/request-details.component.component';
 
 export const routes: Routes = [
 
@@ -38,6 +39,10 @@ export const routes: Routes = [
   {
     path: 'client/home',
     component: ClientHomeComponent
+  },
+  {
+    path: 'client/request-details/:id',
+    component: RequestDetailsComponentComponent
   },
   {
     path: 'client/quote-approval/:id',
