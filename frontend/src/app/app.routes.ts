@@ -13,6 +13,7 @@ import { ViewRevenueReportComponent } from './components/employee/view-revenue-r
 import { CategoriesComponent } from './components/employee/categories/categories.component';
 import { QuoteFormComponent } from './components/employee/quote-form/quote-form.component';
 import { RequestDetailsComponentComponent } from './components/client/request-details.component/request-details.component.component';
+import { BudgetComponent } from './components/employee/budget/budget.component';
 
 export const routes: Routes = [
 
@@ -86,7 +87,11 @@ export const routes: Routes = [
 
   {
     path: 'employee/budget/:id',
+    component: BudgetComponent
+  },
+
+  { 
+    path: 'employee/quote-form/:id',
     component: QuoteFormComponent
   }
-
 ];
