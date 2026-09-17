@@ -19,6 +19,9 @@ import { MaintenanceRequestService } from '../../../services/maintenance-request
 export class EmployeeHomeComponent {
   employee: Employee | undefined;
   clientRequests: MaintenanceRequest[] = [];
+  filterType: 'TODAS' | 'HOJE' | 'PERIODO' = 'TODAS';
+  startDate = '';
+  endDate = '';
 
   constructor(
     private employeeService: EmployeeService,
@@ -28,7 +31,7 @@ export class EmployeeHomeComponent {
     private clientService: ClientService
   )
   {
-    this.clientRequests = this.maintenanceRequestService.findOpenRequest();
+    this.loadClientRequests();
 
     if (this.loginService.getLoggedUserType() !== "EMPLOYEE") {
       this.router.navigate(['/login']);
@@ -39,9 +42,49 @@ export class EmployeeHomeComponent {
 
     this.employee = this.employeeService.findById(id);
 
-    this.clientRequests = this.maintenanceRequestService.findOpenRequest();
+    this.loadClientRequests();
   }
 
+  loadClientRequests(): void {
+    const requests = this.maintenanceRequestService.findOpenRequest()
+      .sort((a, b) => new Date(a.requestDateTime).getTime() - new Date(b.requestDateTime).getTime());
+
+    switch (this.filterType) {
+      case 'HOJE':
+        this.clientRequests = requests.filter((request) => this.isSameDay(new Date(request.requestDateTime), new Date()));
+        break;
+      case 'PERIODO':
+        this.clientRequests = requests.filter((request) => this.isInPeriod(new Date(request.requestDateTime)));
+        break;
+      default:
+        this.clientRequests = requests;
+        break;
+    }
+  }
+
+  private isSameDay(dateA: Date, dateB: Date): boolean {
+    return dateA.getFullYear() === dateB.getFullYear()
+      && dateA.getMonth() === dateB.getMonth()
+      && dateA.getDate() === dateB.getDate();
+  }
+
+  private isInPeriod(requestDate: Date): boolean {
+    if (this.startDate) {
+      const start = new Date(`${this.startDate}T00:00:00`);
+      if (requestDate < start) {
+        return false;
+      }
+    }
+
+    if (this.endDate) {
+      const end = new Date(`${this.endDate}T23:59:59`);
+      if (requestDate > end) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 
   getClientName(clientId: number): string {
 
