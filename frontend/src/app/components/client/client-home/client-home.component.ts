@@ -6,6 +6,7 @@ import { ClientService } from '../../../services/client.service';
 import { LoginService } from '../../../services/login.service';
 import { MaintenanceRequest } from '../../../shared/models/maintenance-request';
 import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
+import { QuoteService } from '../../../services/quote.service';
 import { CommonModule } from '@angular/common';
 import { RequestStatus } from '../../../shared/enum/request-status.enum';
 import { RequestHistory } from '../../../shared/models/request-history.model';
@@ -27,6 +28,7 @@ export class ClientHomeComponent {
     private loginService: LoginService,
     private router: Router,
     private maintenanceRequestService: MaintenanceRequestService,
+    private quoteService: QuoteService,
   ) {
     if (this.loginService.getLoggedUserType() !== 'CLIENT') {
       this.router.navigate(['/login']);
@@ -86,6 +88,15 @@ export class ClientHomeComponent {
 
   openQuote(requestId: number): void {
     this.router.navigate(['/client/quote-approval', requestId]);
+  }
+
+  canReviewQuote(request: MaintenanceRequest): boolean {
+    if (request.status === RequestStatus.APPROVED || request.status === RequestStatus.REJECTED) {
+      return false;
+    }
+
+    return request.status === RequestStatus.QUOTED ||
+      this.quoteService.findByRequestId(request.id) !== undefined;
   }
 
   rescueRequest(requestId: number): void {

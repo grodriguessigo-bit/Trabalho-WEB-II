@@ -6,21 +6,21 @@
 
     @if (client) {
 
-      <div class="well">
+    <div class="well">
 
-        <div class="/">
-          <div class="col-md-6">
-            <strong>Cliente:</strong> {{ client.name }}
-          </div>
+      <div class="/">
+        <div class="col-md-6">
+          <strong>Cliente:</strong> {{ client.name }}
         </div>
-
-        <div class="row">
-          <div class="col-md-6">
-            <strong>E-mail:</strong> {{ client.email }}
-          </div>
-        </div>
-
       </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <strong>E-mail:</strong> {{ client.email }}
+        </div>
+      </div>
+
+    </div>
     }
 
     <h2>Solicitações</h2>
@@ -29,79 +29,63 @@
 
       <tbody>
 
-      <tr>
-        <th>Data/Hora</th>
-        <th>Equipamento</th>
-        <th>Estado</th>
-        <th class="text-center">Ações</th>
-      </tr>
+        <tr>
+          <th>Data/Hora</th>
+          <th>Equipamento</th>
+          <th>Estado</th>
+          <th class="text-center">Ações</th>
+        </tr>
 
         @if (requests.length === 0) {
-          <tr>
-            <td colspan="4">Nenhuma solicitação cadastrada.</td>
-          </tr>
+        <tr>
+          <td colspan="4">Nenhuma solicitação cadastrada.</td>
+        </tr>
         }
 
-      @else{
+        @else{
         @for(request of requests; track request.id){
-          <tr>
-            <td>
-              {{ request.requestDateTime | date:'dd/MM/yyyy HH:mm' }}
-            </td>
-            <td>
-              {{request.equipmentDescription}}
-            </td>
-            <td>
-              {{getStatusLabel(request.status)}}
-            </td>
+        <tr>
+          <td>
+            {{ request.requestDateTime | date:'dd/MM/yyyy HH:mm' }}
+          </td>
+          <td>
+            {{request.equipmentDescription}}
+          </td>
+          <td>
+            {{getStatusLabel(request.status)}}
+          </td>
 
 
-            <td class="text-center">
+          <td class="text-center">
 
-              <button
-                type="button"
-                class="btn btn-primary btn-sm"
-                (click)="openRequest(request.id)"
-              >
-                Visualizar
-              </button>
+            <button type="button" class="btn btn-primary btn-sm" (click)="openRequest(request.id)">
+              Visualizar
+            </button>
 
-              @switch (request.status) {
+            @if (canReviewQuote(request)) {
+            <button type="button" class="btn btn-success btn-sm" (click)="openQuote(request.id)">
+              Aprovar/Rejeitar Serviço
+            </button>
+            }
 
-                @case ('QUOTED') {
-                  <button
-                    type="button"
-                    class="btn btn-success btn-sm"
-                    (click)="openQuote(request.id)"
-                  >
-                    Aprovar/Rejeitar Serviço
-                  </button>
-                }
+            @switch (request.status) {
 
-                @case ('REJECTED') {
-                  <button
-                    type="button"
-                    class="btn btn-warning btn-sm"
-                    (click)="rescueRequest(request.id)"
-                  >
-                    Resgatar Serviço
-                  </button>
-                }
+            @case ('REJECTED') {
+            <button type="button" class="btn btn-warning btn-sm" (click)="rescueRequest(request.id)">
+              Resgatar Serviço
+            </button>
+            }
 
-                @case ('FIXED') {
-                  <button
-                    type="button"
-                    class="btn btn-success btn-sm"
-                    (click)="payRequest(request.id)"
-                  >
-                    Pagar Serviço
-                  </button>
-                }
-              }
-            </td>
-          </tr>
+            @case ('FIXED') {
+            <button type="button" class="btn btn-success btn-sm" (click)="payRequest(request.id)">
+              Pagar Serviço
+            </button>
+            }
+            }
+          </td>
+        </tr>
         }
-      }
+        }
       </tbody>
 
     </table>
