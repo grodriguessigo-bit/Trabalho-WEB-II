@@ -1,0 +1,95 @@
+.quote-approval {
+	max-width: 900px;
+	margin: 0 auto;
+	padding: 24px;
+}
+
+h1,
+h2 {
+	color: #343a40;
+	text-align: center;
+}
+
+.request-details {
+	margin-top: 24px;
+	padding: 20px;
+	border: 1px solid #ced4da;
+	border-radius: 5px;
+	background: #fff;
+}
+
+dl {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 16px;
+	margin: 0;
+}
+
+dt {
+	color: #6c757d;
+	font-size: 0.9rem;
+}
+
+dd {
+	margin: 4px 0 0;
+	color: #212529;
+}
+
+.quote-highlight {
+	margin: 24px 0;
+	padding: 24px;
+	border: 2px solid #198754;
+	border-radius: 5px;
+	color: #155724;
+	text-align: center;
+	background: #d1e7dd;
+}
+
+.quote-highlight span,
+.quote-highlight strong {
+	display: block;
+}
+
+.quote-highlight strong {
+	margin-top: 8px;
+	font-size: 2rem;
+}
+
+.message {
+	color: #842029;
+	text-align: center;
+}
+
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 12px;
+}
+
+.actions button {
+	min-width: 180px;
+	padding: 10px 16px;
+	border: 0;
+	border-radius: 5px;
+	color: #fff;
+	cursor: pointer;
+}
+
+.approve-button {
+	background: #198754;
+}
+
+.reject-button {
+	background: #dc3545;
+}
+
+.back-button {
+	background: #6c757d;
+}
+
+@media (max-width: 600px) {
+	dl {
+		grid-template-columns: 1fr;
+	}
+}

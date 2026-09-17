@@ -3,6 +3,7 @@ import { LoginComponent } from './components/login/login.component';
 import { RegisterClientComponent } from './components/client/register-client/register-client.component';
 import { ClientEquipmentRepairComponent } from './components/client/client-equipment-repair/client-equipment-repair.component';
 import { ClientHomeComponent } from './components/client/client-home/client-home.component';
+import { QuoteApprovalComponent } from './components/client/quote-approval/quote-approval.component';
 import { EmployeeHomeComponent } from './components/employee/employee-home/employee-home.component';
 import { ListEmployeeComponent } from './components/employee/list-employee/list-employee.component';
 import { InsertEmployeeComponent } from './components/employee/insert-employee/insert-employee.component';
@@ -37,6 +38,10 @@ export const routes: Routes = [
   {
     path: 'client/home',
     component: ClientHomeComponent
+  },
+  {
+    path: 'client/quote-approval/:id',
+    component: QuoteApprovalComponent
   },
 
   {
