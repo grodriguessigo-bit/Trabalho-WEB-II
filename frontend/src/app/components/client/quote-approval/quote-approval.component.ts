@@ -20,6 +20,7 @@ import { RequestHistory } from '../../../shared/models/request-history.model';
 export class QuoteApprovalComponent {
 	request: MaintenanceRequest | undefined;
 	quotePrice: number | undefined;
+	quoteDescription = '';
 	categoryName = '';
 	message = '';
 
@@ -53,6 +54,7 @@ export class QuoteApprovalComponent {
 
 		this.request = request;
 		this.quotePrice = quote.price;
+		this.quoteDescription = quote.description ?? '';
 		this.categoryName = this.categoryService.findById(request.categoryId)?.name ?? '';
 	}
 

@@ -55,6 +55,19 @@ dd {
 	font-size: 2rem;
 }
 
+.quote-description {
+	margin-top: 20px;
+	padding-top: 16px;
+	border-top: 1px solid rgba(21, 87, 36, 0.25);
+	text-align: left;
+}
+
+.quote-description p {
+	margin: 8px 0 0;
+	color: #212529;
+	white-space: pre-wrap;
+}
+
 .message {
 	color: #842029;
 	text-align: center;

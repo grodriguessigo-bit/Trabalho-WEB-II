@@ -32,6 +32,10 @@
 		<section class="quote-highlight" aria-label="Preço orçado">
 			<span>Preço orçado</span>
 			<strong>{{ quotePrice | currency: 'BRL' }}</strong>
+			<div class="quote-description">
+				<span>Descrição do orçamento</span>
+				<p>{{ quoteDescription || 'Não informada' }}</p>
+			</div>
 		</section>
 
 		@if (message) {

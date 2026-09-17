@@ -52,7 +52,9 @@
             {{request.equipmentDescription}}
           </td>
           <td>
-            {{getStatusLabel(request.status)}}
+            <span class="status-badge" [ngClass]="'status-' + request.status.toLowerCase()">
+              {{getStatusLabel(request.status)}}
+            </span>
           </td>
 
 

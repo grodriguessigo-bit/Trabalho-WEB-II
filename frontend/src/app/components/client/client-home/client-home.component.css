@@ -1,0 +1,31 @@
+.status-badge {
+  display: inline-block;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.status-open {
+  color: #084298;
+  background: #cfe2ff;
+}
+
+.status-quoted {
+  color: #664d03;
+  background: #fff3cd;
+}
+
+.status-approved,
+.status-fixed,
+.status-paid,
+.status-finalized {
+  color: #0f5132;
+  background: #d1e7dd;
+}
+
+.status-rejected {
+  color: #842029;
+  background: #f8d7da;
+}

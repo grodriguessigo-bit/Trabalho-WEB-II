@@ -34,6 +34,8 @@ export class QuoteFormComponent {
 
   price: number = 0;
 
+  quoteDescription: string = '';
+
   message: string = '';
 
   constructor(
@@ -90,6 +92,11 @@ export class QuoteFormComponent {
       return;
     }
 
+    if (!this.quoteDescription.trim()) {
+      this.message = 'Informe a descrição do orçamento.';
+      return;
+    }
+
     if (this.request.status !== RequestStatus.OPEN) {
       this.message = 'Esta solicitação não está aberta.';
       return;
@@ -109,6 +116,7 @@ export class QuoteFormComponent {
       this.request.id,
       employeeId,
       this.price,
+      this.quoteDescription.trim(),
       quoteDateTime
     );
 

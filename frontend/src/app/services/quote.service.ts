@@ -18,12 +18,20 @@ export class QuoteService {
           5,
           1,
           450,
+          'Orçamento inicial da solicitação.',
           '2026-09-15T10:00:00',
         ),
       ];
     }
 
-    return JSON.parse(quotes);
+    return JSON.parse(quotes).map((quote: Quote) => new Quote(
+      quote.id,
+      quote.requestId,
+      quote.employeeId,
+      quote.price,
+      quote.description ?? '',
+      quote.quoteDateTime,
+    ));
   }
 
   insert(quote: Quote): void {
