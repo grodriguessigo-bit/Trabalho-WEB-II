@@ -11,15 +11,9 @@ import { EditEmployeeComponent } from './components/employee/edit-employee/edit-
 import { ViewRevenueReportByCategoryComponent } from './components/employee/view-revenue-report-by-category/view-revenue-report-by-category.component';
 import { ViewRevenueReportComponent } from './components/employee/view-revenue-report/view-revenue-report.component';
 import { CategoriesComponent } from './components/employee/categories/categories.component';
-<<<<<<< Updated upstream
 import { QuoteFormComponent } from './components/employee/quote-form/quote-form.component';
 import { RequestDetailsComponentComponent } from './components/client/request-details.component/request-details.component.component';
 import { BudgetComponent } from './components/employee/budget/budget.component';
-=======
-import{ BudgetComponent } from './components/employee/budget/budget.component';
-import { PerformMaintenanceComponent } from './components/employee/perform-maintenance/perform-maintenance.component';
-import { RedirectMaintenanceComponent } from './components/employee/redirect-maintenance/redirect-maintenance.component';
->>>>>>> Stashed changes
 
 export const routes: Routes = [
 
