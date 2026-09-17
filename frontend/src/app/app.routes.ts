@@ -14,6 +14,9 @@ import { CategoriesComponent } from './components/employee/categories/categories
 import { QuoteFormComponent } from './components/employee/quote-form/quote-form.component';
 import { RequestDetailsComponentComponent } from './components/client/request-details.component/request-details.component.component';
 import { BudgetComponent } from './components/employee/budget/budget.component';
+import { PerformMaintenanceComponent } from './components/employee/perform-maintenance/perform-maintenance.component';
+import { RedirectMaintenanceComponent } from './components/employee/redirect-maintenance/redirect-maintenance.component';
+
 
 export const routes: Routes = [
 
@@ -90,8 +93,13 @@ export const routes: Routes = [
     component: BudgetComponent
   },
 
-  { 
-    path: 'employee/quote-form/:id',
-    component: QuoteFormComponent
+  {
+    path: 'employee/request/maintenance/:id',
+    component: PerformMaintenanceComponent
+  },
+    
+  {    
+  path: 'employee/request/redirect/:id', 
+  component: RedirectMaintenanceComponent 
   }
 ];
