@@ -1,0 +1,74 @@
+<div class="container">
+
+  <div class="col-md-12">
+
+    <h1>Redirecionar Manutenção</h1>
+
+    <div class="well">
+
+      @if (request) {
+        <div class="panel panel-default">
+          <div class="panel-heading"><strong>Dados da Solicitação</strong></div>
+          <div class="panel-body">
+            <p><strong>Cliente:</strong> {{ request.clientName || request.client?.name }}</p>
+            <p><strong>Equipamento:</strong> {{ request.equipment }}</p>
+            <p><strong>Defeito Relatado:</strong> {{ request.defect }}</p>
+            <p><strong>Estado Atual:</strong> {{ request.status }}</p>
+          </div>
+        </div>
+      }
+
+      <form #formRedirect="ngForm">
+
+        <div class="form-group row">
+          <label for="targetEmployeeId" class="col-md-2 control-label">Redirecionar para:</label>
+
+          <div class="col-md-6">
+            <select class="form-control" id="targetEmployeeId" name="targetEmployeeId"
+            [(ngModel)]="targetEmployeeId" #target="ngModel" required>
+              <option value="">Selecione um funcionário...</option>
+              @for (emp of employees; track emp.id) {
+                <option [value]="emp.id">{{ emp.name }} ({{ emp.email }})</option>
+              }
+            </select>
+
+            @if (target.errors && (target.dirty || target.touched)) {
+              <div class="alert alert-danger">
+                <div [hidden]="!target.errors['required']">
+                  Selecione o funcionário de destino.
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (message) {
+          <div class="row">
+            <div class="col-md-6 col-md-offset-2">
+              <div class="alert alert-danger">
+                {{ message }}
+              </div>
+            </div>
+          </div>
+        }
+
+        <div class="form-group row">
+          <div class="col-md-6 col-md-offset-2">
+
+            <button type="button" class="btn btn-primary"
+            (click)="redirectMaintenance()" [disabled]="!formRedirect.form.valid">
+              Confirmar Redirecionamento
+            </button>
+
+            <a class="btn btn-default" [routerLink]="['/employee/home']"> Cancelar </a>
+
+          </div>
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</div>

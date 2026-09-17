@@ -4,99 +4,88 @@
 
     <h1>Efetuar Manutenção</h1>
 
-    <p>
-      <a class="btn btn-default" [routerLink]="['/employee/home']">
-        Voltar
-      </a>
-    </p>
+    <div class="well">
 
-    @if (request) {
-      <div class="well">
-
-        <h3>Dados do Cliente</h3>
-        <table class="table table-bordered">
-          <tr>
-            <th style="width: 20%;">Nome:</th>
-            <td>{{ request.client.name }}</td>
-          </tr>
-          <tr>
-            <th>E-mail:</th>
-            <td>{{ request.client.email }}</td>
-          </tr>
-          <tr>
-            <th>Telefone:</th>
-            <td>{{ request.client.phone }}</td>
-          </tr>
-        </table>
-
-        <h3>Dados da Solicitação</h3>
-        <table class="table table-bordered">
-          <tr>
-            <th style="width: 20%;">ID da Solicitação:</th>
-            <td>#{{ request.id }}</td>
-          </tr>
-          <tr>
-            <th>Equipamento:</th>
-            <td>{{ request.equipment }}</td>
-          </tr>
-          <tr>
-            <th>Defeito Relatado:</th>
-            <td>{{ request.defect }}</td>
-          </tr>
-          <tr>
-            <th>Estado Atual:</th>
-            <td><span class="label label-info">{{ request.status }}</span></td>
-          </tr>
-        </table>
-
-        <hr>
-
-        <form>
-
-          <div class="form-group row">
-            <label for="maintenanceDescription" class="col-md-3 control-label">Descrição da Manutenção:</label>
-            <div class="col-md-9">
-              <textarea class="form-control" id="maintenanceDescription" name="maintenanceDescription" rows="4" [(ngModel)]="maintenanceDescription" placeholder="Descreva o serviço executado..."></textarea>
-            </div>
+      @if (request) {
+        <div class="panel panel-default">
+          <div class="panel-heading"><strong>Dados do Cliente e Solicitação</strong></div>
+          <div class="panel-body">
+            <p><strong>Cliente:</strong> {{ request.client.name }}</p>
+            <p><strong>E-mail:</strong> {{ request.client.email }}</p>
+            <p><strong>Telefone:</strong> {{ request.client.phone }}</p>
+            <p><strong>Equipamento:</strong> {{ request.equipment }}</p>
+            <p><strong>Defeito Relatado:</strong> {{ request.defect }}</p>
+            <p><strong>Estado Atual:</strong> {{ request.status }}</p>
           </div>
+        </div>
+      }
 
-          <div class="form-group row" style="margin-top: 15px;">
-            <label for="clientGuidelines" class="col-md-3 control-label">Orientações para o Cliente:</label>
-            <div class="col-md-9">
-              <textarea class="form-control" id="clientGuidelines" name="clientGuidelines" rows="4" [(ngModel)]="clientGuidelines" placeholder="Orientações de uso ou cuidados pós-conserto..."></textarea>
-            </div>
+      <form #formMaintenance="ngForm">
+
+        <div class="form-group row">
+          <label for="maintenanceDescription" class="col-md-2 control-label">Descrição da Manutenção:</label>
+
+          <div class="col-md-6">
+            <textarea class="form-control" id="maintenanceDescription" name="maintenanceDescription"
+            rows="4" [(ngModel)]="maintenanceDescription" #desc="ngModel" required placeholder="Descreva o serviço executado..."></textarea>
+
+            @if (desc.errors && (desc.dirty || desc.touched)) {
+              <div class="alert alert-danger">
+                <div [hidden]="!desc.errors['required']">
+                  Digite a descrição da manutenção.
+                </div>
+              </div>
+            }
           </div>
+        </div>
 
-          @if (message) {
-            <div class="row" style="margin-top: 15px;">
-              <div class="col-md-9 col-md-offset-3">
-                <div class="alert alert-danger">{{ message }}</div>
+        <div class="form-group row">
+          <label for="clientGuidelines" class="col-md-2 control-label">Orientações para o Cliente:</label>
+
+          <div class="col-md-6">
+            <textarea class="form-control" id="clientGuidelines" name="clientGuidelines"
+            rows="4" [(ngModel)]="clientGuidelines" #guidelines="ngModel" required placeholder="Orientações de uso ou cuidados pós-conserto..."></textarea>
+
+            @if (guidelines.errors && (guidelines.dirty || guidelines.touched)) {
+              <div class="alert alert-danger">
+                <div [hidden]="!guidelines.errors['required']">
+                  Digite as orientações para o cliente.
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (message) {
+          <div class="row">
+            <div class="col-md-6 col-md-offset-2">
+              <div class="alert alert-danger">
+                {{ message }}
               </div>
             </div>
-          }
-
-          <div class="form-group row" style="margin-top: 20px;">
-            <div class="col-md-9 col-md-offset-3">
-              <button type="button" class="btn btn-success" (click)="performMaintenance()">
-                Efetuar Manutenção
-              </button>
-
-              <button type="button" class="btn btn-warning" (click)="redirect()" style="margin-left: 10px;">
-                Redirecionar Manutenção
-              </button>
-
-              <a class="btn btn-default" [routerLink]="['/employee/home']" style="margin-left: 10px;">
-                Cancelar
-              </a>
-            </div>
           </div>
+        }
 
-        </form>
+        <div class="form-group row">
+          <div class="col-md-6 col-md-offset-2">
 
-      </div>
-    } @else {
-      <div class="alert alert-warning">Carregando dados da solicitação ou registro não encontrado.</div>
-    }
+            <button type="button" class="btn btn-primary"
+            (click)="performMaintenance()" [disabled]="!formMaintenance.form.valid">
+              Efetuar Manutenção
+            </button>
+
+            <button type="button" class="btn btn-primary" (click)="redirect()">
+              Redirecionar Manutenção
+            </button>
+
+            <a class="btn btn-default" [routerLink]="['/employee/home']"> Cancelar </a>
+
+          </div>
+        </div>
+
+      </form>
+
+    </div>
 
   </div>
 

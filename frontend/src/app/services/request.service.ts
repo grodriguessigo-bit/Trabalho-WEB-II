@@ -9,6 +9,8 @@ export interface RequestItem {
   clientGuidelines?: string;
   maintenanceDate?: string;
   employeeId?: number;
+  sourceEmployeeId?: number;
+  targetEmployeeId?: number;
   client: {
     id: number;
     name: string;
@@ -27,11 +29,11 @@ export class RequestService {
       id: 1,
       equipment: 'Notebook Dell Inspiron',
       defect: 'Não liga após queda de energia',
-      status: 'EM_ANDAMENTO',
+      status: 'EM ANDAMENTO',
       client: {
         id: 10,
-        name: 'Maria Oliveira',
-        email: 'maria@email.com',
+        name: 'Joao Oliveira',
+        email: 'joao@email.com',
         phone: '(41) 98888-8888'
       }
     }
@@ -46,11 +48,26 @@ export class RequestService {
   performMaintenance(id: number, description: string, guidelines: string, employeeId: number): boolean {
     const request = this.findById(id);
     if (request) {
-      request.status = 'ARRUMADA';
+      request.status = 'ARRUMADO';
       request.maintenanceDescription = description;
       request.clientGuidelines = guidelines;
       request.maintenanceDate = new Date().toISOString();
       request.employeeId = employeeId;
+      return true;
+    }
+    return false;
+  }
+
+  redirectMaintenance(redirectionData: any): boolean {
+    const numericId = typeof redirectionData.requestId === 'string' 
+      ? parseInt(redirectionData.requestId, 10) 
+      : redirectionData.requestId;
+      
+    const request = this.findById(numericId);
+    if (request) {
+      request.status = 'REDIRECIONADA';
+      request.sourceEmployeeId = redirectionData.sourceEmployeeId;
+      request.targetEmployeeId = redirectionData.targetEmployeeId;
       return true;
     }
     return false;
