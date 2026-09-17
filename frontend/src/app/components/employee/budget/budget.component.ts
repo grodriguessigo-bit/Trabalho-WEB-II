@@ -8,10 +8,12 @@ import { Quote } from '../../../shared/models/quote';
 import { RequestHistory } from '../../../shared/models/request-history.model';
 import { HistoryActions } from '../../../shared/enum/history-actions.enum';
 import { RequestStatus } from '../../../shared/enum/request-status.enum';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-budget',
   templateUrl: './budget.component.html',
+  imports: [ FormsModule ],
   styleUrls: ['./budget.component.css']
 })
 export class BudgetComponent {
