@@ -149,7 +149,7 @@ export class EmployeeHomeComponent {
       case RequestStatus.APPROVED:
       case RequestStatus.REDIRECTED:
       case RequestStatus.PAID:
-        return ['/employee/home'];
+        return ['/employee/request/maintenance', request.id];
       default:
         return null;
     }
