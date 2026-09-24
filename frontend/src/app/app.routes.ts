@@ -17,6 +17,7 @@ import { BudgetComponent } from './components/employee/budget/budget.component';
 import { PerformMaintenanceComponent } from './components/employee/perform-maintenance/perform-maintenance.component';
 import { RedirectMaintenanceComponent } from './components/employee/redirect-maintenance/redirect-maintenance.component';
 import { FinalizeRequestComponent } from './components/employee/finalize-request/finalize-request.component';
+import { PayRequestComponent } from './components/client/pay-request/pay-request.component';
 
 
 export const routes: Routes = [
@@ -52,6 +53,10 @@ export const routes: Routes = [
   {
     path: 'client/quote-approval/:id',
     component: QuoteApprovalComponent
+  },
+  {
+    path: 'client/pay-request/:id',
+    component: PayRequestComponent
   },
 
   {

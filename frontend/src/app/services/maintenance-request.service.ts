@@ -153,6 +153,36 @@ export class MaintenanceRequestService {
     return true;
   }
 
+  payRequest(requestId: number): boolean {
+    const requests = this.listAll();
+    const request = requests.find((item) => item.id === requestId);
+
+    if (!request || request.status !== RequestStatus.FIXED) {
+      return false;
+    }
+
+    const previousStatus = request.status;
+    const paymentDateTime = new Date().toISOString();
+
+    request.status = RequestStatus.PAID;
+    request.requestHistory ??= [];
+    request.requestHistory.push(
+      new RequestHistory(
+        request.requestHistory.length + 1,
+        HistoryActions.PAYMENT_CONFIRMED,
+        previousStatus,
+        RequestStatus.PAID,
+        paymentDateTime,
+        'Pagamento confirmado pelo cliente.',
+        'Cliente',
+      ),
+    );
+
+    this.saveAll(requests);
+
+    return true;
+  }
+
   private saveAll(requests: MaintenanceRequest[]): void {
     localStorage.setItem(LS_KEY, JSON.stringify(requests));
   }
