@@ -16,6 +16,7 @@ import { RequestDetailsComponentComponent } from './components/client/request-de
 import { BudgetComponent } from './components/employee/budget/budget.component';
 import { PerformMaintenanceComponent } from './components/employee/perform-maintenance/perform-maintenance.component';
 import { RedirectMaintenanceComponent } from './components/employee/redirect-maintenance/redirect-maintenance.component';
+import { FinalizeRequestComponent } from './components/employee/finalize-request/finalize-request.component';
 
 
 export const routes: Routes = [
@@ -99,7 +100,12 @@ export const routes: Routes = [
   },
     
   {    
-  path: 'employee/request/redirect/:id', 
-  component: RedirectMaintenanceComponent 
+    path: 'employee/request/redirect/:id', 
+    component: RedirectMaintenanceComponent 
+  },
+
+  {
+    path: 'employee/finalize-request/:id',
+    component: FinalizeRequestComponent
   }
 ];
