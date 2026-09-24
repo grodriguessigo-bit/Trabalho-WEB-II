@@ -8,4 +8,5 @@ import org.springframework.web.bind.annotation.RestController;
 @Repository
 public interface ClientRepository extends JpaRepository<Client, Long> {
 
+
 }

@@ -6,6 +6,7 @@ import br.com.caelum.stella.validation.InvalidStateException;
 import com.web2.trabalhoFinal.repository.ClientRepository;
 import org.springframework.stereotype.Service;
 
+// aqui onde vão ficar todas as validações da classe cliente.
 @Service
 public class ClientService {
 
