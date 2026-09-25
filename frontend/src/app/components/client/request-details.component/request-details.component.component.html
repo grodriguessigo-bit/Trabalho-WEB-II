@@ -1,10 +1,36 @@
 <main class="request-details-page">
   <div class="page-header">
+
     <h1>Detalhes da Solicitação</h1>
-    <button type="button" class="back-button" (click)="goBack()">
-      Voltar para solicitações
-    </button>
+
+
+    <div class="buttons d-flex gap-2">
+      @if (request) {
+        @switch (request.status) {
+
+          @case ('REJECTED') {
+            <button type="button" class="btn btn-warning btn-size" (click)="rescueRequest(request.id)">
+              Resgatar Serviço
+            </button>
+          }
+          @case ('FIXED') {
+            <button type="button" class="btn btn-success btn-size" (click)="payRequest(request.id)">
+              Pagar Serviço
+            </button>
+          }
+          @default {
+
+          }
+        }
+      }
+      <button type="button" class="btn btn-secondary btn-size" (click)="goBack()">
+        Voltar para solicitações
+      </button>
+
+    </div>
   </div>
+
+
 
   @if (request) {
     <section class="details-card">
@@ -56,6 +82,12 @@
         }
       </section>
     }
+    <!--    @if (canReviewQuote(request)) {-->
+      <!--      <button type="button" class="btn btn-success btn-sm" (click)="openQuote(request.id)">-->
+      <!--        Aprovar/Rejeitar Serviço-->
+      <!--      </button>-->
+      <!--    }-->
+
 
     <section class="history-card">
       <h2>Histórico</h2>
