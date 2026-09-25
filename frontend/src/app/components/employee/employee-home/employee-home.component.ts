@@ -145,9 +145,10 @@ export class EmployeeHomeComponent {
   getActionRoute(request: MaintenanceRequest): any[] | null {
     switch (request.status) {
       case RequestStatus.OPEN:
-        return ['/employee/quote-form', request.id];
+        return ['/employee/budget', request.id];
       case RequestStatus.APPROVED:
       case RequestStatus.REDIRECTED:
+        return ['employee/budget', request.id];
       case RequestStatus.PAID:
         return ['/employee/request/maintenance', request.id];
       default:
