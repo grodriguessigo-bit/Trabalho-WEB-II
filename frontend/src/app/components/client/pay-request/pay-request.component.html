@@ -1,0 +1,65 @@
+<div class="container mt-4">
+  <div class="col-md-12">
+    <h1>Pagar Serviço</h1>
+
+    @if (request) {
+      <div class="card mb-4">
+        <div class="card-header">
+          <h2 class="h5 mb-0">Dados da Solicitação</h2>
+        </div>
+
+        <div class="card-body">
+          <dl class="row mb-0">
+            <dt class="col-md-3">Equipamento</dt>
+            <dd class="col-md-9">{{ request.equipmentDescription }}</dd>
+
+            <dt class="col-md-3">Categoria</dt>
+            <dd class="col-md-9">{{ categoryName || 'Não informada' }}</dd>
+
+            <dt class="col-md-3">Defeito</dt>
+            <dd class="col-md-9">{{ request.defectDescription }}</dd>
+
+            <dt class="col-md-3">Data da solicitação</dt>
+            <dd class="col-md-9">{{ request.requestDateTime | date:'dd/MM/yyyy HH:mm' }}</dd>
+
+            <dt class="col-md-3">Estado</dt>
+            <dd class="col-md-9">{{ paymentConfirmed ? 'PAGA' : 'ARRUMADA' }}</dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="card border-success mb-4">
+        <div class="card-body text-center">
+          <p class="text-muted mb-1">Valor do serviço</p>
+
+          @if (quote) {
+            <p class="display-5 fw-bold text-success mb-0">
+              {{ quote.price | currency:'BRL' }}
+            </p>
+          } @else {
+            <p class="h4 text-danger mb-0">Valor não informado</p>
+          }
+        </div>
+      </div>
+
+      @if (message) {
+        <div class="alert" [ngClass]="paymentConfirmed ? 'alert-success' : 'alert-danger'">
+          {{ message }}
+        </div>
+      }
+
+      <button
+        type="button"
+        class="btn btn-success me-2"
+        (click)="confirmPayment()"
+        [disabled]="paymentConfirmed || !quote"
+      >
+        {{ paymentConfirmed ? 'Pagamento Confirmado' : 'Confirmar Pagamento' }}
+      </button>
+
+      <a class="btn btn-secondary" [routerLink]="['/client/home']">
+        Voltar
+      </a>
+    }
+  </div>
+</div>

@@ -1,73 +1,79 @@
-import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
-import { RequestService, RequestItem } from '../../../services/request.service';
+import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
+import { ClientService } from '../../../services/client.service';
 import { LoginService } from '../../../services/login.service';
+
+import { MaintenanceRequest } from '../../../shared/models/maintenance-request';
+import { Client } from '../../../shared/models/client.model';
+import { RequestStatus } from '../../../shared/enum/request-status.enum';
 
 @Component({
   selector: 'app-perform-maintenance',
+  standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './perform-maintenance.component.html',
-  styleUrl: './perform-maintenance.component.css',
+  styleUrl: './perform-maintenance.component.css'
 })
 export class PerformMaintenanceComponent implements OnInit {
+  requestId!: number;
+  request?: MaintenanceRequest;
+  client?: Client;
 
-  request!: RequestItem;
-  maintenanceDescription: string = "";
-  clientGuidelines: string = "";
-  message: string = "";
+  maintenanceDescription: string = '';
+  clientGuidelines: string = '';
+  message: string = '';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private requestService: RequestService,
+    private requestService: MaintenanceRequestService,
+    private clientService: ClientService,
     private loginService: LoginService
-  ) {
-    if (this.loginService.getLoggedUserType() !== "EMPLOYEE") {
+  ) {}
+
+  ngOnInit(): void {
+    if (this.loginService.getLoggedUserType() !== 'EMPLOYEE') {
       this.router.navigate(['/login']);
       return;
     }
+
+    const idParam = this.route.snapshot.paramMap.get('id');
+    
+    if (idParam) {
+      this.requestId = Number(idParam);
+      this.loadData();
+    } else {
+      this.router.navigate(['/employee/home']);
+    }
   }
 
-  ngOnInit(): void {
-    const idParam = this.route.snapshot.paramMap.get('id');
-    if (idParam) {
-      const found = this.requestService.findById(Number(idParam));
-      if (found) {
-        this.request = found;
-      } else {
-        this.message = "Solicitação não encontrada.";
+  loadData(): void {
+    const req = this.requestService.findById(this.requestId);
+    
+    if (req) {
+      this.request = req;      
+      if (req.clientId) {
+        this.client = this.clientService.findById(req.clientId);
       }
+    } else {
+      this.message = 'Solicitação não encontrada.';
     }
   }
 
   performMaintenance(): void {
-    if (!this.maintenanceDescription || !this.clientGuidelines) {
-      this.message = "Preencha a descrição da manutenção e as orientações para o cliente.";
-      return;
-    }
+    if (!this.request) return;
 
-    const employeeId = this.loginService.getLoggedUserId();
-
-    const success = this.requestService.performMaintenance(
-      this.request.id,
-      this.maintenanceDescription,
-      this.clientGuidelines,
-      employeeId
-    );
-
-    if (success) {
-      alert("Manutenção registrada com sucesso! Estado alterado para ARRUMADA.");
-      this.router.navigate(['/employee/home']);
-    } else {
-      this.message = "Erro ao registrar a manutenção.";
-    }
+    this.request.status = RequestStatus.FIXED; 
+    this.requestService.update(this.request);
+    this.router.navigate(['/employee/home']);
   }
 
   redirect(): void {
+    if (!this.request) return;
     this.router.navigate(['/employee/request/redirect', this.request.id]);
   }
-
 }

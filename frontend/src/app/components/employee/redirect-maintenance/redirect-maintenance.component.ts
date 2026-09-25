@@ -25,18 +25,26 @@ export class RedirectMaintenanceComponent implements OnInit {
     private requestService: RequestService,
     private employeeService: EmployeeService,
     private loginService: LoginService
-  ) {}
+  ) {
+    if (this.loginService.getLoggedUserType() !== "EMPLOYEE") {
+      this.router.navigate(['/login']);
+      return;
+    }
+  }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.loadRequest(id);
       this.loadEmployees();
+    } else {
+      this.message = 'ID da solicitação não fornecido na URL.';
     }
   }
 
   loadRequest(id: string): void {
-    const found = this.requestService.findById(Number(id));
+    const numericId = Number(id);
+    const found = this.requestService.findById(numericId);
     if (found) {
       this.request = found;
     } else {
@@ -46,7 +54,6 @@ export class RedirectMaintenanceComponent implements OnInit {
 
   loadEmployees(): void {
     const loggedUserId = this.loginService.getLoggedUserId();
-    
     const empList: any = this.employeeService.listAll ? this.employeeService.listAll() : [];
 
     if (Array.isArray(empList)) {
@@ -57,6 +64,11 @@ export class RedirectMaintenanceComponent implements OnInit {
   }
 
   redirectMaintenance(): void {
+    if (!this.request) {
+      this.message = 'Solicitação inválida.';
+      return;
+    }
+
     if (!this.targetEmployeeId) {
       this.message = 'Selecione o funcionário de destino.';
       return;

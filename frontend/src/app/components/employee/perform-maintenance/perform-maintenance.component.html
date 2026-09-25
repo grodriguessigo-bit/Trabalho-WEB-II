@@ -1,92 +1,93 @@
-<div class="container">
-
+<div class="container mt-4">
   <div class="col-md-12">
-
     <h1>Efetuar Manutenção</h1>
 
     <div class="well">
-
       @if (request) {
-        <div class="panel panel-default">
-          <div class="panel-heading"><strong>Dados do Cliente e Solicitação</strong></div>
+        <div class="panel panel-default border p-3 mb-3">
+          <div class="panel-heading mb-2"><strong>Dados do Cliente e Solicitação</strong></div>
           <div class="panel-body">
-            <p><strong>Cliente:</strong> {{ request.client.name }}</p>
-            <p><strong>E-mail:</strong> {{ request.client.email }}</p>
-            <p><strong>Telefone:</strong> {{ request.client.phone }}</p>
-            <p><strong>Equipamento:</strong> {{ request.equipment }}</p>
-            <p><strong>Defeito Relatado:</strong> {{ request.defect }}</p>
+            <p><strong>Cliente:</strong> {{ client?.name || 'Cliente não encontrado' }}</p>
+            <p><strong>E-mail:</strong> {{ client?.email || 'N/A' }}</p>
+            <p><strong>Telefone:</strong> {{ client?.phone || 'N/A' }}</p>
+
+            <p><strong>Equipamento:</strong> {{ request.equipmentDescription }}</p>
+            <p><strong>Defeito Relatado:</strong> {{ request.defectDescription }}</p>
             <p><strong>Estado Atual:</strong> {{ request.status }}</p>
           </div>
         </div>
       }
 
       <form #formMaintenance="ngForm">
-
-        <div class="form-group row">
-          <label for="maintenanceDescription" class="col-md-2 control-label">Descrição da Manutenção:</label>
-
-          <div class="col-md-6">
-            <textarea class="form-control" id="maintenanceDescription" name="maintenanceDescription"
-            rows="4" [(ngModel)]="maintenanceDescription" #desc="ngModel" required placeholder="Descreva o serviço executado..."></textarea>
-
+        <div class="form-group row mb-3">
+          <label for="maintenanceDescription" class="col-md-3 col-form-label">Descrição da Manutenção:</label>
+          <div class="col-md-9">
+            <textarea 
+              class="form-control" 
+              id="maintenanceDescription" 
+              name="maintenanceDescription"
+              rows="4" 
+              [(ngModel)]="maintenanceDescription" 
+              #desc="ngModel" 
+              required 
+              placeholder="Descreva o serviço executado...">
+            </textarea>
             @if (desc.errors && (desc.dirty || desc.touched)) {
-              <div class="alert alert-danger">
-                <div [hidden]="!desc.errors['required']">
-                  Digite a descrição da manutenção.
-                </div>
+              <div class="alert alert-danger mt-1">
+                Digite a descrição da manutenção.
               </div>
             }
           </div>
         </div>
 
-        <div class="form-group row">
-          <label for="clientGuidelines" class="col-md-2 control-label">Orientações para o Cliente:</label>
-
-          <div class="col-md-6">
-            <textarea class="form-control" id="clientGuidelines" name="clientGuidelines"
-            rows="4" [(ngModel)]="clientGuidelines" #guidelines="ngModel" required placeholder="Orientações de uso ou cuidados pós-conserto..."></textarea>
-
+        <div class="form-group row mb-3">
+          <label for="clientGuidelines" class="col-md-3 col-form-label">Orientações para o Cliente:</label>
+          <div class="col-md-9">
+            <textarea 
+              class="form-control" 
+              id="clientGuidelines" 
+              name="clientGuidelines"
+              rows="4" 
+              [(ngModel)]="clientGuidelines" 
+              #guidelines="ngModel" 
+              required 
+              placeholder="Orientações de uso ou cuidados pós-conserto...">
+            </textarea>
             @if (guidelines.errors && (guidelines.dirty || guidelines.touched)) {
-              <div class="alert alert-danger">
-                <div [hidden]="!guidelines.errors['required']">
-                  Digite as orientações para o cliente.
-                </div>
+              <div class="alert alert-danger mt-1">
+                Digite as orientações para o cliente.
               </div>
             }
           </div>
         </div>
 
         @if (message) {
-          <div class="row">
-            <div class="col-md-6 col-md-offset-2">
-              <div class="alert alert-danger">
-                {{ message }}
-              </div>
-            </div>
+          <div class="alert alert-danger">
+            {{ message }}
           </div>
         }
 
-        <div class="form-group row">
-          <div class="col-md-6 col-md-offset-2">
-
-            <button type="button" class="btn btn-primary"
-            (click)="performMaintenance()" [disabled]="!formMaintenance.form.valid">
+        <div class="form-group row mt-4">
+          <div class="col-md-9 offset-md-3">
+            <button 
+              type="button" 
+              class="btn btn-primary me-2"
+              (click)="performMaintenance()" 
+              [disabled]="!formMaintenance.form.valid">
               Efetuar Manutenção
             </button>
 
-            <button type="button" class="btn btn-primary" (click)="redirect()">
+            <button 
+              type="button" 
+              class="btn btn-warning me-2" 
+              (click)="redirect()">
               Redirecionar Manutenção
             </button>
 
-            <a class="btn btn-default" [routerLink]="['/employee/home']"> Cancelar </a>
-
+            <a class="btn btn-secondary" [routerLink]="['/employee/home']">Cancelar</a>
           </div>
         </div>
-
       </form>
-
     </div>
-
   </div>
-
 </div>

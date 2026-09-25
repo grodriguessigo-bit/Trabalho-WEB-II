@@ -111,7 +111,7 @@ export class ClientHomeComponent {
     this.requests = this.maintenanceRequestService.findByClientId(clientId);
   }
 
-  payRequest(clientId: number): void {
-    this.router.navigate(['/client/equipment-repair']);
+  payRequest(requestId: number): void {
+    this.router.navigate(['/client/pay-request', requestId]);
   }
 }
