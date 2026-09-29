@@ -23,6 +23,7 @@ export class QuoteApprovalComponent {
 	quoteDescription = '';
 	categoryName = '';
 	message = '';
+	quoteObservations = '';
 
 	constructor(
 		private route: ActivatedRoute,
@@ -56,6 +57,7 @@ export class QuoteApprovalComponent {
 		this.quotePrice = quote.price;
 		this.quoteDescription = quote.description ?? '';
 		this.categoryName = this.categoryService.findById(request.categoryId)?.name ?? '';
+		this.quoteObservations = quote.observations ?? '';
 	}
 
 	approve(): void {

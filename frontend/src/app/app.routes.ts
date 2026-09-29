@@ -55,6 +55,10 @@ export const routes: Routes = [
     component: QuoteApprovalComponent
   },
   {
+    path: 'employee/quote-form/:id',
+    component: QuoteFormComponent
+  },
+  {
     path: 'client/pay-request/:id',
     component: PayRequestComponent
   },

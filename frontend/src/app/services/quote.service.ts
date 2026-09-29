@@ -39,6 +39,7 @@ export class QuoteService {
       quote.price,
       quote.description ?? '',
       quote.quoteDateTime,
+      quote.observations ?? '',
     ));
   }
 
