@@ -5,6 +5,7 @@ export class Quote {
     public employeeId: number = 0,
     public price: number = 0,
     public description: string = '',
-    public quoteDateTime: string = ''
+    public quoteDateTime: string = '',
+    public observations: string = '',
   ) {}
 }

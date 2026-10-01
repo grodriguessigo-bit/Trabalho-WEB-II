@@ -9,8 +9,7 @@ import { MaintenanceRequestService } from '../../../services/maintenance-request
 import { QuoteService } from '../../../services/quote.service';
 import { CommonModule } from '@angular/common';
 import { RequestStatus } from '../../../shared/enum/request-status.enum';
-import { RequestHistory } from '../../../shared/models/request-history.model';
-import { HistoryActions } from '../../../shared/enum/history-actions.enum';
+
 
 @Component({
   selector: 'app-client-home',
@@ -111,7 +110,7 @@ export class ClientHomeComponent {
     this.requests = this.maintenanceRequestService.findByClientId(clientId);
   }
 
-  payRequest(clientId: number): void {
-    this.router.navigate(['/client/equipment-repair']);
+  payRequest(requestId: number): void {
+    this.router.navigate(['/client/pay-request', requestId]);
   }
 }

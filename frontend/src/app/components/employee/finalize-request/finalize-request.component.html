@@ -1,0 +1,56 @@
+<div class="container">
+
+  <h1>Finalizar Solicitação</h1>
+
+  @if (request) {
+
+    <div class="well">
+
+      <p>
+        <strong>Equipamento:</strong>
+        {{ request.equipmentDescription }}
+      </p>
+
+      <p>
+        <strong>Defeito:</strong>
+        {{ request.defectDescription }}
+      </p>
+
+      <p>
+        <strong>Data/Hora:</strong>
+        {{ request.requestDateTime | date:'dd/MM/yyyy HH:mm' }}
+      </p>
+
+      <p>
+        <strong>Status:</strong>
+        {{ request.status }}
+      </p>
+
+    </div>
+
+    @if (message) {
+
+      <div class="alert alert-danger">
+        {{ message }}
+      </div>
+
+    }
+
+    <button
+      type="button"
+      class="btn btn-success"
+      (click)="finalizeRequest()"
+    >
+      Finalizar Solicitação
+    </button>
+
+  }
+
+  <a
+    class="btn btn-default"
+    [routerLink]="['/employee/home']"
+  >
+    Voltar
+  </a>
+
+</div>

@@ -172,7 +172,6 @@ dd {
   color: #6c757d;
 }
 
-.back-button,
 .review-button {
   padding: 10px 16px;
   border: 0;
@@ -181,8 +180,10 @@ dd {
   cursor: pointer;
 }
 
-.back-button {
-  background: #6c757d;
+.btn-size {
+  padding: 0.6rem 1.5rem;
+  font-size: 1.07rem;
+  border-radius: 7px;
 }
 
 .review-button {

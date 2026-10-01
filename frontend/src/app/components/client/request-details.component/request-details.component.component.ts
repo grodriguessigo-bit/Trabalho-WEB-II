@@ -93,6 +93,31 @@ export class RequestDetailsComponentComponent {
     }
   }
 
+  rescueRequest(requestId: number): void {
+    const rescued = this.maintenanceRequestService.rescueRequest(requestId);
+
+    if (!rescued) {
+      return;
+    }
+    else{
+      const requests = this.maintenanceRequestService.listAll();
+
+      // 2. Encontra este request específico dentro da lista atualizada
+      const updatedRequest = this.maintenanceRequestService.findById(requestId);
+
+      // 3. Atualiza a variável da tela com uma cópia nova ({ ... })
+      // Isso força o Angular a atualizar o HTML e sumir com o botão na hora!
+      if (updatedRequest) {
+        this.request = { ...updatedRequest };
+      }
+
+    }
+  }
+
+  payRequest(clientId: number): void {
+    this.router.navigate(['/client/equipment-repair']);
+  }
+
   goBack(): void {
     this.router.navigate(['/client/home']);
   }

@@ -37,12 +37,19 @@
 				<p>{{ quoteDescription || 'Não informada' }}</p>
 			</div>
 		</section>
+		<textarea 
+			style="margin-top: 20px;"
+			readonly
+			class="form-control"
+			rows="4"
+			placeholder="Observações do orçamento"
+		>{{ quoteObservations}}</textarea>
 
 		@if (message) {
 			<p class="message" role="alert">{{ message }}</p>
 		}
 
-		<div class="actions">
+		<div class="actions" style="margin-top: 20px;">
 			<button type="button" class="approve-button" (click)="approve()">
 				Aprovar o Serviço
 			</button>

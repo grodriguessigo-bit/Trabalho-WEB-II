@@ -21,6 +21,14 @@ export class QuoteService {
           'Orçamento inicial da solicitação.',
           '2026-09-15T10:00:00',
         ),
+        new Quote(
+          2,
+          4,
+          1,
+          320,
+          'Manutenção do equipamento.',
+          '2026-09-13T18:00:00',
+        ),
       ];
     }
 
@@ -31,6 +39,7 @@ export class QuoteService {
       quote.price,
       quote.description ?? '',
       quote.quoteDateTime,
+      quote.observations ?? '',
     ));
   }
 
