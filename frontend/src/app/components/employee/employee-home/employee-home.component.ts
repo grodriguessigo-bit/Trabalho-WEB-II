@@ -149,12 +149,15 @@ export class EmployeeHomeComponent {
     switch (request.status) {
       case RequestStatus.OPEN:
         return ['/employee/quote-form', request.id];
+      
       case RequestStatus.APPROVED:
-      case RequestStatus.REJECTED:
-        
+      case RequestStatus.REJECTED:  
       case RequestStatus.REDIRECTED:
-      case RequestStatus.PAID:
         return ['/employee/request/maintenance', request.id];
+
+      case RequestStatus.PAID:
+        return ['/employee/finalize-request', request.id];
+      
       default:
         return null;
     }

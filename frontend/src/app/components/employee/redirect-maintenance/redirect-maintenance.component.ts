@@ -2,9 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { RequestService } from '../../../services/request.service';
-import { EmployeeService } from '../../../services/employee.service';
+import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
+import { ClientService } from '../../../services/client.service';
+import { Client } from '../../../shared/models/client.model';
+import { EmployeeService } from '../../../services/employee.service'; 
 import { LoginService } from '../../../services/login.service';
+import { RequestStatus } from '../../../shared/enum/request-status.enum';
 
 @Component({
   selector: 'app-redirect-maintenance',
@@ -15,6 +18,7 @@ import { LoginService } from '../../../services/login.service';
 })
 export class RedirectMaintenanceComponent implements OnInit {
   request: any = null;
+  client?: Client;
   employees: any[] = [];
   targetEmployeeId: string = '';
   message: string = '';
@@ -22,7 +26,8 @@ export class RedirectMaintenanceComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private requestService: RequestService,
+    private requestService: MaintenanceRequestService,
+    private clientService: ClientService,
     private employeeService: EmployeeService,
     private loginService: LoginService
   ) {
@@ -47,17 +52,22 @@ export class RedirectMaintenanceComponent implements OnInit {
     const found = this.requestService.findById(numericId);
     if (found) {
       this.request = found;
-    } else {
-      this.message = 'Solicitação não encontrada.';
+      this.message = '';     
+      if (found.clientId) {
+      this.client = this.clientService.findById(found.clientId);
     }
+  }   else {
+      this.request = null; 
+      this.message = 'Solicitação não encontrada.';
   }
+}
 
   loadEmployees(): void {
     const loggedUserId = this.loginService.getLoggedUserId();
     const empList: any = this.employeeService.listAll ? this.employeeService.listAll() : [];
 
-    if (Array.isArray(empList)) {
-      this.employees = empList.filter((emp: any) => emp.id !== loggedUserId);
+    if (Array.isArray(empList) && empList.length > 0) {
+      this.employees = empList.filter((emp: any) => Number(emp.id) !== loggedUserId);
     } else {
       this.employees = [];
     }
@@ -65,7 +75,7 @@ export class RedirectMaintenanceComponent implements OnInit {
 
   redirectMaintenance(): void {
     if (!this.request) {
-      this.message = 'Solicitação inválida.';
+      this.request.status = 'Solicitação inválida.';
       return;
     }
 
@@ -73,21 +83,12 @@ export class RedirectMaintenanceComponent implements OnInit {
       this.message = 'Selecione o funcionário de destino.';
       return;
     }
-
-    const sourceEmployeeId = this.loginService.getLoggedUserId();
-    const redirectionData = {
-      requestId: this.request.id,
-      sourceEmployeeId: sourceEmployeeId,
-      targetEmployeeId: Number(this.targetEmployeeId),
-      dateTime: new Date().toISOString(),
-      status: 'REDIRECIONADA'
-    };
-
-    if (this.requestService.redirectMaintenance) {
-      this.requestService.redirectMaintenance(redirectionData);
-    } else {
-      this.request.status = 'REDIRECIONADA';
+    this.request.status = RequestStatus.REDIRECTED;
+    if ('assignedEmployeeId' in this.request) {
+    this.request.assignedEmployeeId = Number(this.targetEmployeeId);
     }
+
+    this.requestService.update(this.request);
 
     alert('Solicitação redirecionada com sucesso!');
     this.router.navigate(['/employee/home']);

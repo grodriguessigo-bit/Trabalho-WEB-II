@@ -10,9 +10,9 @@
         <div class="panel panel-default">
           <div class="panel-heading"><strong>Dados da Solicitação</strong></div>
           <div class="panel-body">
-            <p><strong>Cliente:</strong> {{ request.clientName || request.client?.name }}</p>
-            <p><strong>Equipamento:</strong> {{ request.equipment }}</p>
-            <p><strong>Defeito Relatado:</strong> {{ request.defect }}</p>
+            <p><strong>Cliente:</strong> {{ client?.name || 'Cliente não encontrado' }}</p>
+            <p><strong>Equipamento:</strong> {{ request.equipmentDescription }}</p>
+            <p><strong>Defeito Relatado:</strong> {{ request.defectDescription }}</p>
             <p><strong>Estado Atual:</strong> {{ request.status }}</p>
           </div>
         </div>
