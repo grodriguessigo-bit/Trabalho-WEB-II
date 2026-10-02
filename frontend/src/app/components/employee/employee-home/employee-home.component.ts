@@ -133,8 +133,11 @@ export class EmployeeHomeComponent {
       case RequestStatus.OPEN:
         return 'Efetuar Orçamento';
       case RequestStatus.APPROVED:
+
+      case RequestStatus.REJECTED:
+        return 'Visualizar';
       case RequestStatus.REDIRECTED:
-        return 'Efetuar Manutenção';
+        return 'Efetuar manutenção';
       case RequestStatus.PAID:
         return 'Finalizar Solicitação';
       default:
@@ -145,10 +148,11 @@ export class EmployeeHomeComponent {
   getActionRoute(request: MaintenanceRequest): any[] | null {
     switch (request.status) {
       case RequestStatus.OPEN:
-        return ['/employee/budget', request.id];
+        return ['/employee/quote-form', request.id];
       case RequestStatus.APPROVED:
+      case RequestStatus.REJECTED:
+        
       case RequestStatus.REDIRECTED:
-        return ['employee/budget', request.id];
       case RequestStatus.PAID:
         return ['/employee/request/maintenance', request.id];
       default:
