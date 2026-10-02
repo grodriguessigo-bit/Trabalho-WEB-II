@@ -1,9 +1,12 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './auth/auth.guard';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterClientComponent } from './components/client/register-client/register-client.component';
 import { ClientEquipmentRepairComponent } from './components/client/client-equipment-repair/client-equipment-repair.component';
 import { ClientHomeComponent } from './components/client/client-home/client-home.component';
 import { QuoteApprovalComponent } from './components/client/quote-approval/quote-approval.component';
+import { RequestDetailsComponentComponent } from './components/client/request-details.component/request-details.component.component';
+import { PayRequestComponent } from './components/client/pay-request/pay-request.component';
 import { EmployeeHomeComponent } from './components/employee/employee-home/employee-home.component';
 import { ListEmployeeComponent } from './components/employee/list-employee/list-employee.component';
 import { InsertEmployeeComponent } from './components/employee/insert-employee/insert-employee.component';
@@ -12,13 +15,10 @@ import { ViewRevenueReportByCategoryComponent } from './components/employee/view
 import { ViewRevenueReportComponent } from './components/employee/view-revenue-report/view-revenue-report.component';
 import { CategoriesComponent } from './components/employee/categories/categories.component';
 import { QuoteFormComponent } from './components/employee/quote-form/quote-form.component';
-import { RequestDetailsComponentComponent } from './components/client/request-details.component/request-details.component.component';
 import { BudgetComponent } from './components/employee/budget/budget.component';
 import { PerformMaintenanceComponent } from './components/employee/perform-maintenance/perform-maintenance.component';
 import { RedirectMaintenanceComponent } from './components/employee/redirect-maintenance/redirect-maintenance.component';
 import { FinalizeRequestComponent } from './components/employee/finalize-request/finalize-request.component';
-import { PayRequestComponent } from './components/client/pay-request/pay-request.component';
-
 
 export const routes: Routes = [
 
@@ -40,81 +40,155 @@ export const routes: Routes = [
 
   {
     path: 'client/equipment-repair',
-    component: ClientEquipmentRepairComponent
+    component: ClientEquipmentRepairComponent,
+    canActivate: [authGuard],
+    data: {
+      role: 'CLIENT'
+    }
   },
+
   {
     path: 'client/home',
-    component: ClientHomeComponent
+    component: ClientHomeComponent,
+    canActivate: [authGuard],
+    data: {
+      role: 'CLIENT'
+    }
   },
+
   {
     path: 'client/request-details/:id',
-    component: RequestDetailsComponentComponent
+    component: RequestDetailsComponentComponent,
+    canActivate: [authGuard],
+    data: {
+      role: 'CLIENT'
+    }
   },
+
   {
     path: 'client/quote-approval/:id',
-    component: QuoteApprovalComponent
+    component: QuoteApprovalComponent,
+    canActivate: [authGuard],
+    data: {
+      role: 'CLIENT'
+    }
   },
-  {
-    path: 'employee/quote-form/:id',
-    component: QuoteFormComponent
-  },
+
   {
     path: 'client/pay-request/:id',
-    component: PayRequestComponent
+    component: PayRequestComponent,
+    canActivate: [authGuard],
+    data: {
+      role: 'CLIENT'
+    }
   },
 
   {
     path: 'employee/home',
-    component: EmployeeHomeComponent
+    component: EmployeeHomeComponent,
+    canActivate: [authGuard],
+    data: {
+      role: 'EMPLOYEE'
+    }
   },
 
   {
     path: 'employee/list',
-    component: ListEmployeeComponent
+    component: ListEmployeeComponent,
+    canActivate: [authGuard],
+    data: {
+      role: 'EMPLOYEE'
+    }
   },
 
   {
     path: 'employee/insert',
-    component: InsertEmployeeComponent
+    component: InsertEmployeeComponent,
+    canActivate: [authGuard],
+    data: {
+      role: 'EMPLOYEE'
+    }
   },
 
   {
     path: 'employee/edit/:id',
-    component: EditEmployeeComponent
+    component: EditEmployeeComponent,
+    canActivate: [authGuard],
+    data: {
+      role: 'EMPLOYEE'
+    }
   },
 
   {
     path: 'employee/revenue-report',
-    component: ViewRevenueReportComponent
+    component: ViewRevenueReportComponent,
+    canActivate: [authGuard],
+    data: {
+      role: 'EMPLOYEE'
+    }
   },
 
   {
     path: 'employee/revenue-report-category',
-    component: ViewRevenueReportByCategoryComponent
+    component: ViewRevenueReportByCategoryComponent,
+    canActivate: [authGuard],
+    data: {
+      role: 'EMPLOYEE'
+    }
   },
 
   {
     path: 'employee/categories',
-    component: CategoriesComponent
+    component: CategoriesComponent,
+    canActivate: [authGuard],
+    data: {
+      role: 'EMPLOYEE'
+    }
+  },
+
+  {
+    path: 'employee/quote-form/:id',
+    component: QuoteFormComponent,
+    canActivate: [authGuard],
+    data: {
+      role: 'EMPLOYEE'
+    }
   },
 
   {
     path: 'employee/budget/:id',
-    component: BudgetComponent
+    component: BudgetComponent,
+    canActivate: [authGuard],
+    data: {
+      role: 'EMPLOYEE'
+    }
   },
 
   {
     path: 'employee/request/maintenance/:id',
-    component: PerformMaintenanceComponent
+    component: PerformMaintenanceComponent,
+    canActivate: [authGuard],
+    data: {
+      role: 'EMPLOYEE'
+    }
   },
-    
-  {    
-    path: 'employee/request/redirect/:id', 
-    component: RedirectMaintenanceComponent 
+
+  {
+    path: 'employee/request/redirect/:id',
+    component: RedirectMaintenanceComponent,
+    canActivate: [authGuard],
+    data: {
+      role: 'EMPLOYEE'
+    }
   },
 
   {
     path: 'employee/finalize-request/:id',
-    component: FinalizeRequestComponent
+    component: FinalizeRequestComponent,
+    canActivate: [authGuard],
+    data: {
+      role: 'EMPLOYEE'
+    }
   }
+
 ];
