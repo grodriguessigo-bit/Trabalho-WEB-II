@@ -1,22 +1,26 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule} from '@angular/router';
-
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { LoginService } from '../../services/login.service';
+import { Login } from '../../shared/models/login.model';
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, RouterModule],
+  imports: [
+    FormsModule,
+    RouterModule
+  ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
 export class LoginComponent implements OnInit {
 
-  email: string = '';
-
-  password: string = '';
+  loginData: Login =
+    new Login();
 
   message: string = '';
+
+  loading: boolean = false;
 
   constructor(
     private loginService: LoginService,
@@ -30,12 +34,18 @@ export class LoginComponent implements OnInit {
       this.loginService.getLoggedUserType();
 
     if (userType === 'CLIENT') {
-      this.router.navigate(['/client/home']);
+      this.router.navigate([
+        '/client/home'
+      ]);
+
       return;
     }
 
     if (userType === 'EMPLOYEE') {
-      this.router.navigate(['/employee/home']);
+      this.router.navigate([
+        '/employee/home'
+      ]);
+
       return;
     }
 
@@ -53,23 +63,44 @@ export class LoginComponent implements OnInit {
 
   login(): void {
 
-    const userType =
-      this.loginService.login(
-        this.email,
-        this.password
-      );
+    this.loading = true;
 
-    if (userType === 'CLIENT') {
-      this.router.navigate(['/client/home']);
-      return;
-    }
+    this.message = '';
 
-    if (userType === 'EMPLOYEE') {
-      this.router.navigate(['/employee/home']);
-      return;
-    }
+    this.loginService
+      .login(this.loginData)
+      .subscribe(user => {
 
-    this.message ='E-mail ou senha inválidos.';
+        this.loading = false;
+
+        if (!user) {
+
+          this.message =
+            'E-mail ou senha inválidos.';
+
+          return;
+        }
+
+        this.loginService
+          .setLoggedUser(user);
+
+        if (user.type === 'CLIENT') {
+
+          this.router.navigate([
+            '/client/home'
+          ]);
+
+          return;
+        }
+
+        if (user.type === 'EMPLOYEE') {
+
+          this.router.navigate([
+            '/employee/home'
+          ]);
+        }
+
+      });
   }
 
 }
