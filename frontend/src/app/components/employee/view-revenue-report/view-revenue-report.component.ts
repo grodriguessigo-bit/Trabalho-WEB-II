@@ -3,9 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-
 import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
 import { ClientService } from '../../../services/client.service';
 import { EmployeeService } from '../../../services/employee.service';
@@ -87,7 +84,11 @@ ngOnInit(): void {
     return emp ? emp.name : 'Não atribuído';
   }
 
-  generatePDF(): void {
+  async generatePDF(): Promise<void> {
+    const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
+      import('jspdf'),
+      import('jspdf-autotable'),
+    ]);
     const doc = new jsPDF();
 
     doc.setFontSize(18);

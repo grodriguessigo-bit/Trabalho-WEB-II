@@ -1,0 +1,50 @@
+<main class="container mt-4">
+  <header class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h2 mb-1">Orçamento rejeitado</h1>
+      <p class="text-muted mb-0">Detalhes da solicitação e do orçamento enviado.</p>
+    </div>
+    <button type="button" class="btn btn-outline-secondary" (click)="goBack()">
+      Voltar
+    </button>
+  </header>
+
+  @if (request && quote) {
+    <div class="alert alert-danger" role="status">
+      Este orçamento foi rejeitado pelo cliente.
+    </div>
+
+    <section class="card mb-4">
+      <div class="card-header"><h2 class="h5 mb-0">Solicitação</h2></div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-sm-4">Número</dt><dd class="col-sm-8">#{{ request.id }}</dd>
+          <dt class="col-sm-4">Equipamento</dt>
+          <dd class="col-sm-8">{{ request.equipmentDescription }}</dd>
+          <dt class="col-sm-4">Descrição do defeito</dt>
+          <dd class="col-sm-8">{{ request.defectDescription }}</dd>
+          <dt class="col-sm-4">Data da solicitação</dt>
+          <dd class="col-sm-8">{{ request.requestDateTime | date:'dd/MM/yyyy HH:mm' }}</dd>
+        </dl>
+      </div>
+    </section>
+
+    <section class="card mb-4">
+      <div class="card-header"><h2 class="h5 mb-0">Orçamento enviado</h2></div>
+      <div class="card-body">
+        <p class="fs-4 fw-bold text-primary mb-3">{{ quote.price | currency:'BRL' }}</p>
+        <h3 class="h6">Descrição</h3>
+        <p>{{ quote.description || 'Nenhuma descrição informada.' }}</p>
+        <h3 class="h6">Observações</h3>
+        <p>{{ quote.observations || 'Nenhuma observação informada.' }}</p>
+        <p class="text-muted mb-0">
+          Enviado em {{ quote.quoteDateTime | date:'dd/MM/yyyy HH:mm' }}
+        </p>
+      </div>
+    </section>
+  } @else {
+    <div class="alert alert-warning" role="alert">
+      Não foi possível encontrar os dados desta solicitação ou do orçamento.
+    </div>
+  }
+</main>
