@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 
 @Service
 public class MaintenanceRequestService {
@@ -24,6 +25,17 @@ public class MaintenanceRequestService {
         this.requestRepository = requestRepository;
         this.clientRepository = clientRepository;
         this.categoryRepository = categoryRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public List<MaintenanceRequest> list() {
+        return requestRepository.findAllByOrderByRequestDateTimeAscIdAsc();
+    }
+
+    @Transactional(readOnly = true)
+    public MaintenanceRequest findById(Long id) {
+        return requestRepository.findById(id)
+                .orElseThrow(() -> new MaintenanceRequestNotFoundException(id));
     }
 
     @Transactional
@@ -56,5 +68,11 @@ public class MaintenanceRequestService {
     private Long requiredId(Long value, String message) {
         if (value == null) throw new IllegalArgumentException(message);
         return value;
+    }
+
+    public static class MaintenanceRequestNotFoundException extends RuntimeException {
+        public MaintenanceRequestNotFoundException(Long id) {
+            super("Solicitação não encontrada: " + id);
+        }
     }
 }

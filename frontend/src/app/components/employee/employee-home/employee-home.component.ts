@@ -133,7 +133,6 @@ export class EmployeeHomeComponent {
       case RequestStatus.OPEN:
         return 'Efetuar Orçamento';
       case RequestStatus.APPROVED:
-
       case RequestStatus.REJECTED:
         return 'Visualizar';
       case RequestStatus.REDIRECTED:
