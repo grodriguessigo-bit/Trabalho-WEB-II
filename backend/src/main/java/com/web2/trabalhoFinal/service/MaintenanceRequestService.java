@@ -33,6 +33,14 @@ public class MaintenanceRequestService {
     }
 
     @Transactional(readOnly = true)
+    public List<MaintenanceRequest> findByClientId(Long clientId) {
+        if (clientId == null || clientId <= 0) {
+            throw new IllegalArgumentException("O identificador do cliente deve ser positivo.");
+        }
+        return requestRepository.findAllByClientId(clientId);
+    }
+
+    @Transactional(readOnly = true)
     public MaintenanceRequest findById(Long id) {
         return requestRepository.findById(id)
                 .orElseThrow(() -> new MaintenanceRequestNotFoundException(id));

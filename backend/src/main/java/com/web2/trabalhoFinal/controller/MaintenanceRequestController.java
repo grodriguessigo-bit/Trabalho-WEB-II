@@ -35,6 +35,13 @@ public class MaintenanceRequestController {
                 .toList();
     }
 
+    @GetMapping("/client/{clientId}")
+    public List<MaintenanceRequestResponse> findByClientId(@PathVariable Long clientId) {
+        return requestService.findByClientId(clientId).stream()
+                .map(MaintenanceRequestResponse::from)
+                .toList();
+    }
+
     @GetMapping("/{id}")
     public MaintenanceRequestResponse findById(@PathVariable Long id) {
         return MaintenanceRequestResponse.from(requestService.findById(id));
