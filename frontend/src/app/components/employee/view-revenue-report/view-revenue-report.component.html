@@ -1,28 +1,208 @@
 <div class="container">
-    <div class="col-md-12">
-        <h1>Relatório de Receitas</h1>
 
-        <div class="form-group row">
-            <label for="startDate" class="col-md-12 control-label"> Data Inicial: </label>
-            <div class="col-md-4">
-                <input type="date" id="startDate" class="form-control"> 
-            </div>
-        </div>
+  <h1>
+    Relatório de Receitas
+  </h1>
 
-        <div class="form-group row">
-            <label for="finalDate" class="col-md-12 control-label"> Data Final: </label>
-            <div class="col-md-4">
-                <input type="date" id="finalDate" class="form-control"> 
-            </div>
-        </div>
+  <div class="no-print">
 
-        <button type="button" class="btn btn-primary"> Filtrar </button>
+    <div class="form-group row">
 
-        <button type="button" class="btn btn-default"> Gerar PDF </button>
+      <label
+        for="startDate"
+        class="col-md-12 control-label">
 
-        <p class="mt-2">Aqui vai aparecer a prévia do relatório pra baixar o PDF</p>
+        Data Inicial:
 
-        <a class="btn btn-default" [routerLink]="['/employee/home']"> Voltar </a>
-        
+      </label>
+
+      <div class="col-md-4">
+
+        <input
+          type="date"
+          id="startDate"
+          name="startDate"
+          class="form-control"
+          [(ngModel)]="startDate">
+
+      </div>
+
     </div>
+
+    <div class="form-group row">
+
+      <label
+        for="endDate"
+        class="col-md-12 control-label">
+
+        Data Final:
+
+      </label>
+
+      <div class="col-md-4">
+
+        <input
+          type="date"
+          id="endDate"
+          name="endDate"
+          class="form-control"
+          [(ngModel)]="endDate">
+
+      </div>
+
+    </div>
+
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="filterReport()">
+
+      Filtrar
+
+    </button>
+
+  </div>
+
+  @if (message) {
+
+    <div class="alert alert-info">
+
+      {{ message }}
+
+    </div>
+
+  }
+
+  @if (dailyRevenue.length > 0) {
+
+    <div class="report">
+
+      <h2>
+        Receitas por Dia
+      </h2>
+
+      <p>
+
+        <strong>
+          Período:
+        </strong>
+
+        {{
+          startDate
+            | date:'dd/MM/yyyy':'UTC'
+        }}
+
+        até
+
+        {{
+          endDate
+            | date:'dd/MM/yyyy':'UTC'
+        }}
+
+      </p>
+
+      <table
+        class="table table-striped table-bordered">
+
+        <thead>
+
+          <tr>
+
+            <th>
+              Data
+            </th>
+
+            <th>
+              Receita
+            </th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          @for (
+            item of dailyRevenue;
+            track item.date
+          ) {
+
+            <tr>
+
+              <td>
+
+                {{
+                  item.date
+                    | date:'dd/MM/yyyy'
+                }}
+
+              </td>
+
+              <td>
+
+                {{
+                  item.total
+                    | currency:'BRL'
+                }}
+
+              </td>
+
+            </tr>
+
+          }
+
+        </tbody>
+
+        <tfoot>
+
+          <tr>
+
+            <th>
+              Total
+            </th>
+
+            <th>
+
+              {{
+                totalRevenue
+                  | currency:'BRL'
+              }}
+
+            </th>
+
+          </tr>
+
+        </tfoot>
+
+      </table>
+
+    </div>
+
+    <div class="no-print">
+
+      <button
+        type="button"
+        class="btn btn-success"
+        (click)="printReport()">
+
+        Imprimir / Salvar PDF
+
+      </button>
+
+    </div>
+
+  }
+
+  <div class="no-print">
+
+    <a
+      class="btn btn-default"
+      [routerLink]="['/employee/home']">
+
+      Voltar
+
+    </a>
+
+  </div>
+
 </div>

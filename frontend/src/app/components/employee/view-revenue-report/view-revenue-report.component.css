@@ -1,0 +1,35 @@
+.report {
+  margin-top: 20px;
+}
+
+.table {
+  margin-top: 15px;
+}
+
+.no-print {
+  margin-top: 15px;
+}
+
+@media print {
+
+  .no-print {
+    display: none !important;
+  }
+
+  .container {
+    width: 100%;
+  }
+
+  h1 {
+    text-align: center;
+  }
+
+  h2 {
+    margin-top: 20px;
+  }
+
+  .table {
+    width: 100%;
+  }
+
+}
