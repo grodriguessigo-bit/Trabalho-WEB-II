@@ -1,11 +1,17 @@
 package com.web2.trabalhoFinal.service;
 
 import com.web2.trabalhoFinal.dto.MaintenanceRequestRequest;
+import com.web2.trabalhoFinal.dto.RedirectRequest;
 import com.web2.trabalhoFinal.entities.Category;
+import com.web2.trabalhoFinal.entities.Employee;
 import com.web2.trabalhoFinal.entities.MaintenanceRequest;
+import com.web2.trabalhoFinal.entities.Redirect;
+import com.web2.trabalhoFinal.entities.RequestHistory;
+import com.web2.trabalhoFinal.entities.enums.HistoryActions;
 import com.web2.trabalhoFinal.entities.enums.RequestStatus;
 import com.web2.trabalhoFinal.repository.CategoryRepository;
 import com.web2.trabalhoFinal.repository.ClientRepository;
+import com.web2.trabalhoFinal.repository.EmployeeRepository;
 import com.web2.trabalhoFinal.repository.MaintenanceRequestRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,12 +25,16 @@ public class MaintenanceRequestService {
     private final MaintenanceRequestRepository requestRepository;
     private final ClientRepository clientRepository;
     private final CategoryRepository categoryRepository;
+    private final EmployeeRepository employeeRepository;
 
     public MaintenanceRequestService(MaintenanceRequestRepository requestRepository,
-                                     ClientRepository clientRepository, CategoryRepository categoryRepository) {
+                                     ClientRepository clientRepository,
+                                     CategoryRepository categoryRepository,
+                                     EmployeeRepository employeeRepository) {
         this.requestRepository = requestRepository;
         this.clientRepository = clientRepository;
         this.categoryRepository = categoryRepository;
+        this.employeeRepository = employeeRepository;
     }
 
     @Transactional(readOnly = true)
@@ -66,6 +76,36 @@ public class MaintenanceRequestService {
         MaintenanceRequest entity = new MaintenanceRequest(null, equipment, defect, Instant.now(),
                 RequestStatus.OPEN, client, category, null, null, null);
         return requestRepository.save(entity);
+    }
+
+    @Transactional
+    public MaintenanceRequest redirect(Long requestId, RedirectRequest redirectDto) {
+        if (redirectDto == null) {
+            throw new IllegalArgumentException("Os dados do redirecionamento são obrigatórios.");
+        }
+
+        MaintenanceRequest request = findById(requestId);
+
+        Long employeeId = requiredId(redirectDto.destinationEmployeeId(), "O funcionário de destino é obrigatório.");
+        Employee newEmployee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new IllegalArgumentException("Funcionário de destino não encontrado."));
+
+        String reason = required(redirectDto.reason(), "A justificativa do redirecionamento é obrigatória.");
+
+        Redirect redirect = new Redirect();
+        redirect.setReason(reason);
+        redirect.setDestinationEmployee(newEmployee);
+
+        request.getRedirects().add(redirect);
+        request.setStatus(RequestStatus.REDIRECTED); // Ajuste o valor do Enum de acordo com o seu RequestStatus
+
+        RequestHistory history = new RequestHistory();
+        history.setAction(HistoryActions.REDIRECTED); // Ajuste o valor do Enum de acordo com o seu HistoryActions
+        history.setTimestamp(Instant.now());
+        history.setMaintenanceRequest(request);
+        request.getHistory().add(history);
+
+        return requestRepository.save(request);
     }
 
     private String required(String value, String message) {
