@@ -1,0 +1,40 @@
+<section class="checklist-card" aria-labelledby="checklist-title">
+  <div class="checklist-header">
+    <div>
+      <h2 id="checklist-title">Antes de abrir um chamado</h2>
+      <p>Confira estas informações para ajudar no atendimento.</p>
+    </div>
+    <span class="progress-label">{{ completedCount }} de {{ items.length }}</span>
+  </div>
+
+  <div
+    class="progress-track"
+    role="progressbar"
+    [attr.aria-valuenow]="completedCount"
+    [attr.aria-valuemin]="0"
+    [attr.aria-valuemax]="items.length"
+    aria-label="Progresso do checklist"
+  >
+    <div class="progress-fill" [style.width.%]="progressPercentage"></div>
+  </div>
+
+  <ul class="checklist-items">
+    @for (item of items; track item.label) {
+      <li>
+        <label>
+          <input type="checkbox" [(ngModel)]="item.completed" />
+          <span [class.completed]="item.completed">{{ item.label }}</span>
+        </label>
+      </li>
+    }
+  </ul>
+
+  <div class="checklist-footer">
+    <p aria-live="polite">
+      {{ isComplete ? 'Tudo pronto para registrar sua solicitação.' : 'Você pode atualizar esta lista a qualquer momento.' }}
+    </p>
+    <button type="button" class="btn btn-default btn-sm" (click)="resetChecklist()">
+      Reiniciar checklist
+    </button>
+  </div>
+</section>
