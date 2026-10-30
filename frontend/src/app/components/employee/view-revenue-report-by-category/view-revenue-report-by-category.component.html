@@ -44,23 +44,48 @@
 
     <button
       type="button"
-      class="btn btn-primary">
+      class="btn btn-primary"
+      (click)="filterReport()">
 
       Filtrar
 
     </button>
 
-    <button
-      type="button"
-      class="btn btn-default">
+    @if (message) {
 
-      Gerar PDF
+      <div class="alert alert-info">
+        {{ message }}
+      </div>
 
-    </button>
+    }
 
-    <p class="mt-2">
-      Aqui vai aparecer a prévia do relatório para baixar o PDF.
-    </p>
+    @if (showResult) {
+
+      <div class="mt-3">
+
+        <h2>
+          Resultado
+        </h2>
+
+        <p>
+          <strong>
+            Solicitações pagas:
+          </strong>
+
+          {{ requestsCount }}
+        </p>
+
+        <p>
+          <strong>
+            Receita total:
+          </strong>
+
+          {{ totalRevenue | currency:'BRL' }}
+        </p>
+
+      </div>
+
+    }
 
     <a
       class="btn btn-default"
