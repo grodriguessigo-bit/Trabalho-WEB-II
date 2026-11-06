@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
 import { CategoryService } from '../../../services/category.service';
@@ -14,7 +13,6 @@ import { RequestStatus } from '../../../shared/enum/request-status.enum';
   selector: 'app-view-revenue-report-by-category',
   imports: [
     CommonModule,
-    FormsModule,
     RouterModule
   ],
   templateUrl: './view-revenue-report-by-category.component.html',
@@ -22,17 +20,15 @@ import { RequestStatus } from '../../../shared/enum/request-status.enum';
 })
 export class ViewRevenueReportByCategoryComponent implements OnInit {
 
-  categories: Category[] = [];
-
-  selectedCategoryId: number | null = null;
+  revenueByCategory: {
+    category: Category;
+    requestsCount: number;
+    total: number;
+  }[] = [];
 
   totalRevenue: number = 0;
 
-  requestsCount: number = 0;
-
   message: string = '';
-
-  showResult: boolean = false;
 
   constructor(
     private categoryService: CategoryService,
@@ -41,55 +37,74 @@ export class ViewRevenueReportByCategoryComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.categories =
-      this.categoryService
-        .listAll()
-        .filter(category => category.active);
+    this.generateReport();
   }
 
-  filterReport(): void {
+  generateReport(): void {
 
-    this.message = '';
+    this.revenueByCategory = [];
     this.totalRevenue = 0;
-    this.requestsCount = 0;
-    this.showResult = false;
+    this.message = '';
 
-    if (this.selectedCategoryId === null) {
-      this.message = 'Selecione uma categoria.';
-      return;
-    }
+    const categories =
+      this.categoryService.listAll();
 
     const requests =
       this.maintenanceRequestService
         .listAll()
         .filter(request =>
-          request.categoryId === this.selectedCategoryId &&
-          (
-            request.status === RequestStatus.PAID ||
-            request.status === RequestStatus.FINALIZED
-          )
+          request.status === RequestStatus.PAID ||
+          request.status === RequestStatus.FINALIZED
         );
 
-    this.requestsCount = requests.length;
+    categories.forEach(category => {
 
-    requests.forEach(request => {
-
-      const quote =
-        this.quoteService.findByRequestId(
-          request.id
+      const categoryRequests =
+        requests.filter(
+          request =>
+            request.categoryId === category.id
         );
 
-      if (quote) {
-        this.totalRevenue += quote.price;
-      }
+      let categoryRevenue = 0;
 
+      categoryRequests.forEach(request => {
+
+        const quote =
+          this.quoteService.findByRequestId(
+            request.id
+          );
+
+        if (quote) {
+          categoryRevenue += quote.price;
+        }
+
+      });
+
+      this.revenueByCategory.push({
+        category: category,
+        requestsCount: categoryRequests.length,
+        total: categoryRevenue
+      });
+
+      this.totalRevenue += categoryRevenue;
     });
 
-    this.showResult = true;
-
-    if (this.requestsCount === 0) {
+    if (this.totalRevenue === 0) {
       this.message =
-        'Nenhuma receita encontrada para esta categoria.';
+        'Nenhuma receita encontrada.';
     }
+  }
+
+  printReport(): void {
+
+    if (this.totalRevenue === 0) {
+
+      this.message =
+        'Não existem receitas para gerar o relatório.';
+
+      return;
+    }
+
+    window.print();
   }
 }
