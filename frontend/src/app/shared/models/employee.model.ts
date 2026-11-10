@@ -1,10 +1,16 @@
-export class Employee {
+import { Person } from "./person";
+
+export class Employee extends Person {
+
   constructor(
-    public id: number = 0,
-    public name: string = '',
-    public email: string = '',
-    public birthDate: string = '',
-    public password: string = '',
-    public active: boolean = true,
-  ) {}
+    id: number = 0,
+    name: string = '',
+    email: string = '',
+    password: string = '',
+    active: boolean = true,
+    public birthDate: string = ''
+  ) {
+    super(id, name, email, password, active);
+  }
+
 }

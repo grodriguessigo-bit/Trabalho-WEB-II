@@ -1,9 +1,9 @@
 import { Component, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-
 import { Client } from '../../../shared/models/client.model';
 import { ClientService } from '../../../services/client.service';
+import { ViaCepService } from '../../../services/via-cep.service';
 
 @Component({
   selector: 'app-register-client',
@@ -22,33 +22,23 @@ export class RegisterClientComponent {
   generatedPassword: string = "";
 
   constructor(
-    private clientService: ClientService
+    private clientService: ClientService,
+    private viaCepService: ViaCepService
   ) {}
 
   searchZipCode(): void {
 
     const zipCode = this.client.address.zipCode.replace(/\D/g, '');
 
-    if (zipCode === "82940290") {
-
-      this.client.address.zipCode = "82940-290";
-      this.client.address.street = "Rua Hugo Cini";
-      this.client.address.neighborhood = "Cajuru";
-      this.client.address.city = "Curitiba";
-      this.client.address.state = "PR";
+    this.viaCepService.getZipCode(this.client.address.zipCode).subscribe((data) => {
+      this.client.address.zipCode = data.cep;
+      this.client.address.street = data.logradouro;
+      this.client.address.neighborhood = data.bairro;
+      this.client.address.city = data.localidade;
+      this.client.address.state = data.uf;
 
       this.zipMessage = "CEP encontrado.";
-
-    } else {
-
-      this.client.address.street = "";
-      this.client.address.neighborhood = "";
-      this.client.address.city = "";
-      this.client.address.state = "";
-
-      this.zipMessage = "CEP não encontrado.";
-    }
-
+    });
   }
 
   insert(): void {
@@ -60,33 +50,15 @@ export class RegisterClientComponent {
         return;
       }
 
-      const clients = this.clientService.listAll();
-
-      const exists = clients.find(
-        client =>
-          client.cpf === this.client.cpf ||
-          client.email === this.client.email
-      );
-
-      if (exists) {
-        this.message = "CPF ou e-mail já cadastrado.";
-        return;
-      }
-
-      this.client.password = this.generatePassword();
-
-      this.generatedPassword = this.client.password;
-
-      this.clientService.insert(this.client);
-
-      this.message = "Cliente cadastrado com sucesso.";
-
-      this.client = new Client();
-
-      this.formClient.reset();
+      this.clientService.insert(this.client).subscribe(
+        client => {
+          this.message = "Cliente cadastrado com sucesso.";
+          this.client = new Client();
+          this.formClient.reset()
+        }
+      )
     }
-
-  }
+  };
 
   private generatePassword(): string {
 
