@@ -13,7 +13,7 @@
 
           <div class="col-md-6">
             <input type="text" class="form-control" id="name" name="name"
-            [(ngModel)]="client.name" #name="ngModel" minlength="2" required>
+            [(ngModel)]="client().name" #name="ngModel" minlength="2" required>
 
             @if (name.errors && (name.dirty || name.touched)) {
               <div class="alert alert-danger">
@@ -29,7 +29,7 @@
 
           <div class="col-md-4">
             <input type="text" class="form-control" id="cpf" name="cpf"
-            [(ngModel)]="client.cpf" #cpf="ngModel" required>
+            [(ngModel)]="client().cpf" #cpf="ngModel" required>
 
             @if (cpf.errors && (cpf.dirty || cpf.touched)) {
               <div class="alert alert-danger">
@@ -44,7 +44,7 @@
 
           <div class="col-md-6">
             <input type="email" class="form-control" id="email" name="email"
-            [(ngModel)]="client.email" #email="ngModel" required>
+            [(ngModel)]="client().email" #email="ngModel" required>
 
             @if (email.errors && (email.dirty || email.touched)) {
               <div class="alert alert-danger">
@@ -59,7 +59,7 @@
 
           <div class="col-md-4">
             <input type="text" class="form-control" id="phone" name="phone"
-            [(ngModel)]="client.phone" #phone="ngModel" required>
+            [(ngModel)]="client().phone" #phone="ngModel" required>
 
             @if (phone.errors && (phone.dirty || phone.touched)) {
               <div class="alert alert-danger">
@@ -74,7 +74,7 @@
 
           <div class="col-md-4">
             <input type="text" class="form-control" id="zipCode" name="zipCode"
-            [(ngModel)]="client.address.zipCode" #zipCode="ngModel" required>
+            [(ngModel)]="client().address.zipCode" #zipCode="ngModel" required>
 
             <small class="help-block"> Use o CEP 82940290 para o protótipo. </small>
           </div>
@@ -99,7 +99,7 @@
 
           <div class="col-md-6">
             <input type="text" class="form-control" id="street" name="street"
-            [(ngModel)]="client.address.street" readonly>
+            [(ngModel)]="client().address.street" readonly>
           </div>
         </div>
 
@@ -108,7 +108,7 @@
 
           <div class="col-md-4">
             <input type="text" class="form-control" id="neighborhood" name="neighborhood"
-            [(ngModel)]="client.address.neighborhood" readonly>
+            [(ngModel)]="client().address.neighborhood" readonly>
           </div>
         </div>
 
@@ -117,7 +117,7 @@
 
           <div class="col-md-4">
             <input type="text" class="form-control" id="city" name="city"
-            [(ngModel)]="client.address.city" readonly>
+            [(ngModel)]="client().address.city" readonly>
           </div>
         </div>
 
@@ -126,7 +126,7 @@
 
           <div class="col-md-2">
             <input type="text" class="form-control" id="state" name="state"
-            [(ngModel)]="client.address.state" readonly>
+            [(ngModel)]="client().address.state" readonly>
           </div>
         </div>
 
@@ -135,7 +135,7 @@
 
           <div class="col-md-2">
             <input type="text" class="form-control" id="number" name="number"
-            [(ngModel)]="client.address.number" #number="ngModel" required>
+            [(ngModel)]="client().address.number" #number="ngModel" required>
 
             @if (number.errors && (number.dirty || number.touched)) {
               <div class="alert alert-danger">
@@ -150,7 +150,7 @@
 
           <div class="col-md-4">
             <input type="text" class="form-control" id="complement" name="complement"
-            [(ngModel)]="client.address.complement">
+            [(ngModel)]="client().address.complement">
           </div>
         </div>
 
