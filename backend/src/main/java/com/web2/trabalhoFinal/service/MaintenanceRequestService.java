@@ -6,7 +6,7 @@ import com.web2.trabalhoFinal.entities.*;
 import com.web2.trabalhoFinal.entities.enums.HistoryActions;
 import com.web2.trabalhoFinal.entities.enums.RequestStatus;
 import com.web2.trabalhoFinal.repository.CategoryRepository;
-import com.web2.trabalhoFinal.repository.ClienteRepository;
+import com.web2.trabalhoFinal.repository.ClientRepository;
 import com.web2.trabalhoFinal.repository.MaintenanceRequestRepository;
 import com.web2.trabalhoFinal.repository.RequestHistoryRepository;
 import org.springframework.stereotype.Service;
@@ -18,11 +18,11 @@ import java.time.Instant;
 public class MaintenanceRequestService {
 
     private final MaintenanceRequestRepository maintenanceRequestRepository;
-    private final ClienteRepository clientRepository;
+    private final ClientRepository clientRepository;
     private final CategoryRepository categoryRepository;
     private final RequestHistoryRepository requestHistoryRepository;
 
-    public MaintenanceRequestService(MaintenanceRequestRepository maintenanceRequestRepository, ClienteRepository clientRepository, CategoryRepository categoryRepository, RequestHistoryRepository requestHistoryRepository) {
+    public MaintenanceRequestService(MaintenanceRequestRepository maintenanceRequestRepository, ClientRepository clientRepository, CategoryRepository categoryRepository, RequestHistoryRepository requestHistoryRepository) {
         this.maintenanceRequestRepository = maintenanceRequestRepository;
         this.clientRepository = clientRepository;
         this.categoryRepository = categoryRepository;
