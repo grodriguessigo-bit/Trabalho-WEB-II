@@ -3,21 +3,21 @@ package com.web2.trabalhoFinal.dto;
 public class ApiResponse<T> {
 
     private T data;
-    private String mensage;
-    private boolean sucess;
+    private String message;
+    private boolean success;
 
     public ApiResponse(){
     }
 
-    public ApiResponse(T data, String mensage, boolean sucess){
+    public ApiResponse(T data, String message, boolean success){
         this.data = data;
-        this.mensage = mensage;
-        this.sucess = sucess;
+        this.message = message;
+        this.success = success;
     }
 
-    public ApiResponse(String mensage, boolean sucess){
-        this.mensage = mensage;
-        this.sucess = sucess;
+    public ApiResponse(String message, boolean success){
+        this.message = message;
+        this.success = success;
     }
 
     public T getData(){
@@ -28,24 +28,24 @@ public class ApiResponse<T> {
         this.data = data;
     }
 
-    public String getMensage(){
-        return this.mensage;
+    public String getMessage(){
+        return this.message;
     }
 
-    public void setMessage(String mensage) {
-        this.mensage = mensage;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
-    public boolean isSucess() {
-        return sucess;
+    public boolean isSuccess() {
+        return success;
     }
 
-    public void setSucess(boolean sucess)
+    public void setSuccess(boolean success)
     {
-        this.sucess = sucess;
+        this.success = success;
     }
 
 }
 // Api para padronizar as resposas enviadas para o front, retonar o objeto e true
-// se a ação foi feita corretamente, e mensagem e false explicando porque deu
+// se a ação foi feita corretamente, e messagem e false explicando porque deu
 // errado caso ação não tenha sido concluida.
