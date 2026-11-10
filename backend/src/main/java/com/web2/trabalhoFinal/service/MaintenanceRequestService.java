@@ -5,6 +5,7 @@ import com.web2.trabalhoFinal.dto.CreateMaintenanceRequest;
 import com.web2.trabalhoFinal.entities.*;
 import com.web2.trabalhoFinal.entities.enums.HistoryActions;
 import com.web2.trabalhoFinal.entities.enums.RequestStatus;
+import com.web2.trabalhoFinal.exception.InvalidMaintenanceRequestException;
 import com.web2.trabalhoFinal.repository.CategoryRepository;
 import com.web2.trabalhoFinal.repository.ClientRepository;
 import com.web2.trabalhoFinal.repository.MaintenanceRequestRepository;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 
 @Service
 public class MaintenanceRequestService {
@@ -33,33 +35,33 @@ public class MaintenanceRequestService {
     public ApiResponse<MaintenanceRequest> save(CreateMaintenanceRequest maintenanceRequestDto, Long clienteId) {
 
         if(maintenanceRequestDto == null){
-            throw new IllegalArgumentException("Informe dos dados da solicitação");
+            throw new InvalidMaintenanceRequestException("Informe dos dados da solicitação");
         }
 
         if(maintenanceRequestDto.equipmentDescription() == null || maintenanceRequestDto.equipmentDescription().isBlank()){
-            throw new IllegalArgumentException("Informe a descrição do equipamento.");
+            throw new InvalidMaintenanceRequestException("Informe a descrição do equipamento.");
         }
 
         if(maintenanceRequestDto.defectDescription() == null || maintenanceRequestDto.defectDescription().isBlank()){
-            throw new IllegalArgumentException("Informe a descrição do defeito.");
+            throw new InvalidMaintenanceRequestException("Informe a descrição do defeito.");
         }
 
         if(maintenanceRequestDto.categoryId() == null || maintenanceRequestDto.categoryId() <= 0){
-            throw new IllegalArgumentException("Selecione uma categoria válida.");
+            throw new InvalidMaintenanceRequestException("Selecione uma categoria válida.");
         }
 
         if (clienteId == null || clienteId <= 0) {
-            throw new IllegalArgumentException("O cliente não foi identificado.");
+            throw new InvalidMaintenanceRequestException("O cliente não foi identificado.");
         }
 
         Client client = clientRepository.findById(clienteId).
-                orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado."));
+                orElseThrow(() -> new InvalidMaintenanceRequestException("Cliente não encontrado."));
 
         Category category = categoryRepository.findById(maintenanceRequestDto.categoryId()).
-                orElseThrow(() -> new IllegalArgumentException("Categoria não encontrada."));
+                orElseThrow(() -> new InvalidMaintenanceRequestException("Categoria não encontrada."));
 
         if(!category.isActive()){
-            throw new IllegalArgumentException("A categoria está desativada.");
+            throw new InvalidMaintenanceRequestException("A categoria está desativada.");
         }
 
         MaintenanceRequest maintenance = new MaintenanceRequest();
@@ -73,13 +75,12 @@ public class MaintenanceRequestService {
 
         MaintenanceRequest saveMaintenance = maintenanceRequestRepository.save(maintenance);
 
-
         RequestHistory history = new RequestHistory();
         history.setMaintenanceRequest(saveMaintenance);
         history.setActions(HistoryActions.REQUEST_CREATED);
         history.setPreviousStatus(null);
         history.setNewStatus(RequestStatus.OPEN);
-        history.setChangeDateTime(Instant.now());
+        history.setChangeDateTime(maintenance.getRequestDateTime());
         history.setPerformedBy(client);
 
         requestHistoryRepository.save(history);
@@ -87,6 +88,11 @@ public class MaintenanceRequestService {
         return new ApiResponse<>(saveMaintenance, "Solicitação de manutenção salva com sucesso", true);
     }
 
+//
+//    public ApiResponse<List<MaintenanceRequest>> findAllClientRequest(){
+//
+//
+//    }
 
 
 

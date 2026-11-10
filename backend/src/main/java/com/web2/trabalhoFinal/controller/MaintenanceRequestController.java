@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/maintenance-requests")
 @CrossOrigin(origins = "http://localhost:4200")
@@ -19,6 +21,14 @@ public class MaintenanceRequestController {
     public MaintenanceRequestController(MaintenanceRequestService maintenanceRequestService) {
         this.maintenanceRequestService = maintenanceRequestService;
     }
+//
+//    @GetMapping
+//    public ResponseEntity<List<ClientRequestSummaryDTO>> findAllClient(){
+//
+//        maintenanceRequestService.
+//
+//
+//    }
 
     @PostMapping
     public ResponseEntity<ApiResponse<ClientRequestSummaryDTO>> insert(
