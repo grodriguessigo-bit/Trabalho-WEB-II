@@ -1,0 +1,39 @@
+.status-open {
+  background-color: gray;
+  color: white;
+}
+
+.status-quoted {
+  background-color: brown;
+  color: white;
+}
+
+.status-rejected {
+  background-color: red;
+  color: white;
+}
+
+.status-approved {
+  background-color: yellow;
+  color: black;
+}
+
+.status-redirected {
+  background-color: purple;
+  color: white;
+}
+
+.status-fixed {
+  background-color: blue;
+  color: white;
+}
+
+.status-paid {
+  background-color: orange;
+  color: black;
+}
+
+.status-finalized {
+  background-color: green;
+  color: white;
+}

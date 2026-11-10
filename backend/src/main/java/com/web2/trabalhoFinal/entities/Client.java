@@ -20,7 +20,7 @@ public class Client extends Person {
     @Column(nullable = false)
     private String phone;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_address")
     private Address address;
 

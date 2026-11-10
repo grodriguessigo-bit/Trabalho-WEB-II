@@ -2,14 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-
 import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
 import { QuoteService } from '../../../services/quote.service';
-
 import { MaintenanceRequest } from '../../../shared/models/maintenance-request';
-
 import { RequestStatus } from '../../../shared/enum/request-status.enum';
 import { HistoryActions } from '../../../shared/enum/history-actions.enum';
+import { jsPDF } from 'jspdf';
+import { autoTable } from 'jspdf-autotable';
 
 @Component({
   selector: 'app-view-revenue-report',
@@ -60,25 +59,22 @@ export class ViewRevenueReportComponent implements OnInit {
     this.dailyRevenue = [];
     this.totalRevenue = 0;
 
-    if (!this.startDate || !this.endDate) {
-      this.message = 'Informe a data inicial e a data final.';
-      return;
-    }
 
-    const start = new Date(
-      this.startDate + 'T00:00:00'
-    );
+      let start: Date | null = null;
+      let end: Date | null = null;
 
-    const end = new Date(
-      this.endDate + 'T23:59:59'
-    );
+      if (this.startDate) {
+        start = new Date(this.startDate + 'T00:00:00');
+      }
 
-    if (start > end) {
-      this.message =
-        'A data inicial não pode ser maior que a data final.';
+      if (this.endDate) {
+        end = new Date(this.endDate + 'T23:59:59.999');
+      }
 
-      return;
-    }
+      if (start && end && start > end) {
+        this.message = 'A data inicial não pode ser maior que a data final.';
+        return;
+      }
 
     const requests =
       this.maintenanceRequestService.listAll();
@@ -99,10 +95,11 @@ export class ViewRevenueReportComponent implements OnInit {
         return;
       }
 
-      if (
-        paymentDate < start ||
-        paymentDate > end
-      ) {
+      if (start && paymentDate < start) {
+        return;
+      }
+
+      if (end && paymentDate > end) {
         return;
       }
 
@@ -198,14 +195,38 @@ export class ViewRevenueReportComponent implements OnInit {
       );
   }
 
+
   printReport(): void {
     if (this.dailyRevenue.length === 0) {
-      this.message =
-        'Não existem receitas para gerar o relatório.';
-
+      this.message = 'Não existem receitas para gerar o relatório.';
       return;
     }
 
-    window.print();
+    let start = 'início dos registros';
+    let end = 'última receita registrada';
+
+    if (this.startDate) {
+      start = this.startDate.split('-').reverse().join('/');
+    }
+
+    if (this.endDate) {
+      end = this.endDate.split('-').reverse().join('/');
+    }
+
+    const doc = new jsPDF();
+
+    doc.setFontSize(16);
+    doc.text('Relatório de Receitas por Dia', 14, 16);
+
+    doc.setFontSize(10);
+    doc.text('Período: ' + start + ' até ' + end, 14, 25);
+
+    autoTable(doc, {
+      html: '#tabela-receitas',
+      startY: 32,
+      showFoot: 'lastPage'
+    });
+
+    doc.save('receitas-por-dia.pdf');
   }
 }

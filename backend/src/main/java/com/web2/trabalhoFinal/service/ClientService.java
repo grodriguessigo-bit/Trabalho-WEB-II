@@ -24,7 +24,7 @@ public class ClientService {
         try {
             if(clienteRepository.existsByCpf(client.getCpf()))
                 return new ApiResponse<>("Cpf já existente", false);
-            if(personRepository.existsByEmailAndOtherId(client.getEmail(), client.getId_person()))
+            if(personRepository.existsByEmailAndOtherId(client.getEmail(), client.getId()))
                 return new ApiResponse<>("Email Já cadastrado", false);
 
             Client salvo = clienteRepository.save(client);

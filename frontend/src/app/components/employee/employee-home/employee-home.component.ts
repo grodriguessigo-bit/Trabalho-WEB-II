@@ -20,7 +20,7 @@ import { RequestStatus } from '../../../shared/enum/request-status.enum';
 export class EmployeeHomeComponent {
   employee: Employee | undefined;
   clientRequests: MaintenanceRequest[] = [];
-  filterType: 'TODAS' | 'HOJE' | 'PERIODO' = 'TODAS';
+  filterType: 'ABERTAS' | 'TODAS' | 'HOJE' | 'PERIODO' = 'ABERTAS';
   startDate = '';
   endDate = '';
 
@@ -45,6 +45,13 @@ export class EmployeeHomeComponent {
   loadClientRequests(): void {
     const requests = this.maintenanceRequestService.listAll()
       .sort((a, b) => new Date(a.requestDateTime).getTime() - new Date(b.requestDateTime).getTime());
+    
+    if (this.filterType === 'ABERTAS') {
+      this.clientRequests = requests.filter(
+        request => request.status === RequestStatus.OPEN
+      );
+      return;
+    }
 
     if (this.filterType === 'HOJE') {
       this.clientRequests = requests.filter((request) => this.isSameDay(new Date(request.requestDateTime), new Date()));
@@ -114,15 +121,29 @@ export class EmployeeHomeComponent {
   getStatusClass(status: string): string {
     switch (status) {
       case RequestStatus.OPEN:
-        return 'bg-warning text-dark';
-      case RequestStatus.APPROVED:
-      case RequestStatus.REDIRECTED:
-        return 'bg-primary';
-      case RequestStatus.PAID:
-        return 'bg-success';
+        return 'status-open';
+
       case RequestStatus.QUOTED:
+        return 'status-quoted';
+
+      case RequestStatus.REJECTED:
+        return 'status-rejected';
+
+      case RequestStatus.APPROVED:
+        return 'status-approved';
+
+      case RequestStatus.REDIRECTED:
+        return 'status-redirected';
+
       case RequestStatus.FIXED:
-        return 'bg-info text-dark';
+        return 'status-fixed';
+
+      case RequestStatus.PAID:
+        return 'status-paid';
+
+      case RequestStatus.FINALIZED:
+        return 'status-finalized';
+
       default:
         return 'bg-secondary';
     }
@@ -132,15 +153,16 @@ export class EmployeeHomeComponent {
     switch (request.status) {
       case RequestStatus.OPEN:
         return 'Efetuar Orçamento';
+
       case RequestStatus.APPROVED:
-      case RequestStatus.REJECTED:
-        return 'Visualizar';
       case RequestStatus.REDIRECTED:
-        return 'Efetuar manutenção';
+        return 'Efetuar Manutenção';
+
       case RequestStatus.PAID:
         return 'Finalizar Solicitação';
+
       default:
-        return 'Visualizar';
+        return 'Sem ação disponível';
     }
   }
 
@@ -148,15 +170,14 @@ export class EmployeeHomeComponent {
     switch (request.status) {
       case RequestStatus.OPEN:
         return ['/employee/quote-form', request.id];
-      
+
       case RequestStatus.APPROVED:
-      case RequestStatus.REJECTED:  
       case RequestStatus.REDIRECTED:
         return ['/employee/request/maintenance', request.id];
 
       case RequestStatus.PAID:
         return ['/employee/finalize-request', request.id];
-      
+
       default:
         return null;
     }
