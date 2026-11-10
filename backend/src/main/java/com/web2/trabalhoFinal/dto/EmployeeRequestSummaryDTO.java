@@ -4,11 +4,10 @@ import com.web2.trabalhoFinal.entities.enums.RequestStatus;
 
 import java.time.Instant;
 
-public record MaintenanceRequestSummaryDTO(
+public record EmployeeRequestSummaryDTO(
     Long maintenanceRequestId,
+    RequestStatus status,
     Instant requestDateTime,
-    String equipmentDescription,
-    RequestStatus status
-) {
-
-}
+    String clientName,
+    String equipmentDescription
+) { }
