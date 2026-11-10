@@ -24,7 +24,6 @@ public class RequestHistory {
     @Column(nullable = false)
     private HistoryActions actions;
 
-    @Column(nullable = false)
     private RequestStatus previousStatus;
 
     @Column(nullable = false)
