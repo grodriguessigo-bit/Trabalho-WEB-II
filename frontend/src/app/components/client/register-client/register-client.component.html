@@ -196,18 +196,11 @@
         @if (message()) {
           <div class="row mb-3">
             <div class="col-md-9 offset-md-3">
-              <div class="text-body-secondary small" role="alert">
+              <div class="small mt-1"
+                [class.text-success]="success()"
+                [class.text-danger]="!success()"
+                role="alert">
                 {{ message() }}
-              </div>
-            </div>
-          </div>
-        }
-
-        @if (generatedPassword) {
-          <div class="row mb-3">
-            <div class="col-md-9 offset-md-3">
-              <div class="text-success small" role="status">
-                Senha gerada: <strong>{{ generatedPassword }}</strong>
               </div>
             </div>
           </div>

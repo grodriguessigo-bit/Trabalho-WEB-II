@@ -19,7 +19,7 @@ export class RegisterClientComponent {
   client = signal(new Client());
   zipMessage = signal("");
   message = signal("");
-  generatedPassword: string = "";
+  success = signal(false);
 
   constructor(
     private clientService: ClientService,
@@ -72,24 +72,29 @@ export class RegisterClientComponent {
   }
 
   insert(): void {
+    this.message.set("");
+    this.success.set(false);
 
-    if (this.formClient.form.valid) {
+    if (!this.formClient.form.valid) {
+      return;
+    }
 
-      if (!this.client().address.street) {
-        this.message.set("Busque o CEP antes de cadastrar.");
-        return;
-      }
+    if (!this.client().address.street) {
+      this.message.set("Busque o CEP antes de cadastrar.");
+      return;
+    }
 
-      this.clientService.insert(this.client()).subscribe({
-        next: (data) =>{
-          console.log(data);
-        },
-        error: () => {
-          this.message.set("Não foi possível cadastrar. Tente novamente.")
+    this.clientService.insert(this.client()).subscribe({
+      next: (data) =>{
+        this.success.set(data.success);
+        this.message.set(data.message);
+        console.log(data);
+      },
+      error: () => {
+        this.message.set("Não foi possível cadastrar. Tente novamente.")
         }
       })
 
-    }
   };
 
   clearAddress(): void {
@@ -100,13 +105,5 @@ export class RegisterClientComponent {
     this.zipMessage.set("");
   }
 
-  private generatePassword(): string {
-
-    let password = Math.floor(
-      1000 + Math.random() * 9000
-    ).toString();
-
-    return password;
-  }
 
 }
