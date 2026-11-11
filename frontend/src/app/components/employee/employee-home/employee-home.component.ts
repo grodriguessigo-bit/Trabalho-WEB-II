@@ -190,8 +190,15 @@ this.loadClientRequests();
   }
 
   logout(): void {
-    this.loginService.logout();
-    this.router.navigate(['/login']);
+    this.loginService.logout().subscribe({
+      next: () => {
+        this.loginService.clearLoggedUser();
+        this.router.navigate(['/login']);
+      },
+      error: () => {
+        alert('Não foi possível sair. Tente novamente.');
+      }
+    });
   }
 }
 

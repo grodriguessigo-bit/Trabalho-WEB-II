@@ -9,12 +9,10 @@ import { MaintenanceRequestService } from '../../../services/maintenance-request
 import { QuoteService } from '../../../services/quote.service';
 import { CommonModule } from '@angular/common';
 import { RequestStatus } from '../../../shared/enum/request-status.enum';
-import { MaintenanceChecklistComponent } from '../maintenance-checklist/maintenance-checklist.component';
-
 
 @Component({
   selector: 'app-client-home',
-  imports: [CommonModule, MaintenanceChecklistComponent],
+  imports: [CommonModule],
   templateUrl: './client-home.component.html',
   styleUrl: './client-home.component.css',
 })
@@ -74,10 +72,17 @@ export class ClientHomeComponent {
   }
 
   logout(): void {
-    this.loginService.logout();
-
-    this.router.navigate(['/login']);
+    this.loginService.logout().subscribe({
+      next: () => {
+        this.loginService.clearLoggedUser();
+        this.router.navigate(['/login']);
+      },
+      error: () => {
+        alert('Não foi possível sair. Tente novamente.');
+      }
+    });
   }
+
   OpenTicket(): void {
     this.router.navigate(['/client/equipment-repair']);
   }

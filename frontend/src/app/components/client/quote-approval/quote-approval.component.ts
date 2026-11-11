@@ -109,4 +109,27 @@ export class QuoteApprovalComponent {
 
 		this.router.navigate(['/client/home']);
 	}
+
+	getStatusLabel(): string {
+	switch (this.request?.status) {
+		case RequestStatus.OPEN:
+		return 'ABERTA';
+		case RequestStatus.QUOTED:
+		return 'ORÇADA';
+		case RequestStatus.APPROVED:
+		return 'APROVADA';
+		case RequestStatus.REJECTED:
+		return 'REJEITADA';
+		case RequestStatus.REDIRECTED:
+		return 'REDIRECIONADA';
+		case RequestStatus.FIXED:
+		return 'ARRUMADA';
+		case RequestStatus.PAID:
+		return 'PAGA';
+		case RequestStatus.FINALIZED:
+		return 'FINALIZADA';
+		default:
+		return '';
+	}
+	}
 }
