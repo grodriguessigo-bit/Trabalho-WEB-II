@@ -9,5 +9,6 @@ import java.util.Optional;
 public interface PersonRepository extends JpaRepository<Person, Long> {
     @Query("SELECT COUNT(p) > 0 FROM Person p WHERE p.email = :email AND p.id <> :id")
     boolean existsByEmailAndOtherId(@Param("email") String email, @Param("id") Long id);
+    boolean existsByEmail(@Param("email") String email);
     public Optional<Person> findByEmail(String email);
 }
