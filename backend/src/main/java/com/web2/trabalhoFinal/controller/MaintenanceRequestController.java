@@ -1,6 +1,7 @@
 package com.web2.trabalhoFinal.controller;
 
 import com.web2.trabalhoFinal.dto.ApiResponse;
+import com.web2.trabalhoFinal.dto.ClientRequestDetailsDTO;
 import com.web2.trabalhoFinal.dto.CreateMaintenanceRequest;
 import com.web2.trabalhoFinal.dto.ClientRequestSummaryDTO;
 import com.web2.trabalhoFinal.entities.MaintenanceRequest;
@@ -21,14 +22,33 @@ public class MaintenanceRequestController {
     public MaintenanceRequestController(MaintenanceRequestService maintenanceRequestService) {
         this.maintenanceRequestService = maintenanceRequestService;
     }
-//
-//    @GetMapping
-//    public ResponseEntity<List<ClientRequestSummaryDTO>> findAllClient(){
-//
-//        maintenanceRequestService.
-//
-//
-//    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<ClientRequestSummaryDTO>>> findAllClient(
+            @SessionAttribute(name = "clientId", required = false) Long clientId
+    ){
+        List<ClientRequestSummaryDTO> requests = maintenanceRequestService.findAllRequestByClient(clientId);
+
+        return ResponseEntity.ok().body(new ApiResponse<>(requests, "Solicitações consultadas com sucesso.", true));
+    }
+
+    //mostrar detalhes para cliente
+    @GetMapping("/{requestId}")
+    public ResponseEntity<ApiResponse<ClientRequestDetailsDTO>> findById(
+            @PathVariable("requestId") Long requestId,
+            @SessionAttribute(name = "clientId", required = false) Long clientId
+            ){
+
+        ClientRequestDetailsDTO request =  maintenanceRequestService.findById(requestId, clientId);
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        request,
+                        "Solicitação consultada com sucesso.",
+                        true
+                )
+        );
+    }
 
     @PostMapping
     public ResponseEntity<ApiResponse<ClientRequestSummaryDTO>> insert(

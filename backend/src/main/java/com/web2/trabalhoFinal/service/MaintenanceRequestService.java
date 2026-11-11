@@ -1,7 +1,6 @@
 package com.web2.trabalhoFinal.service;
 
-import com.web2.trabalhoFinal.dto.ApiResponse;
-import com.web2.trabalhoFinal.dto.CreateMaintenanceRequest;
+import com.web2.trabalhoFinal.dto.*;
 import com.web2.trabalhoFinal.entities.*;
 import com.web2.trabalhoFinal.entities.enums.HistoryActions;
 import com.web2.trabalhoFinal.entities.enums.RequestStatus;
@@ -10,10 +9,14 @@ import com.web2.trabalhoFinal.repository.CategoryRepository;
 import com.web2.trabalhoFinal.repository.ClientRepository;
 import com.web2.trabalhoFinal.repository.MaintenanceRequestRepository;
 import com.web2.trabalhoFinal.repository.RequestHistoryRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -88,11 +91,119 @@ public class MaintenanceRequestService {
         return new ApiResponse<>(saveMaintenance, "Solicitação de manutenção salva com sucesso", true);
     }
 
-//
-//    public ApiResponse<List<MaintenanceRequest>> findAllClientRequest(){
-//
-//
-//    }
+    //sem validacao não precisa ser ApiResponse pode ser o Data direto
+    public List<ClientRequestSummaryDTO> findAllRequestByClient(Long clientId){
+        List<MaintenanceRequest> requests = maintenanceRequestRepository.findByClient_idOrderByRequestDateTimeAsc(clientId);
+
+        return requests.stream()
+        .map(request -> new ClientRequestSummaryDTO(
+                request.getId(),
+                request.getRequestDateTime(),
+                request.getEquipmentDescription(),
+                request.getRequestStatus()
+        )).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public ClientRequestDetailsDTO findById (Long requestId, Long clientId){
+
+        MaintenanceRequest request =  maintenanceRequestRepository.findById(requestId).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Solicitação não encontrada"));
+
+        if(request.getClient().getId() != clientId){
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Solicitação não encontrada");
+        }
+
+
+        QuoteDTO quoteDTO = null;
+        PaymentDTO paymentDTO = null;
+
+        Quote quote = request.getQuote();
+
+        if(quote != null){
+            String employeeName = null;
+
+            if(quote.getEmployee() != null){
+                employeeName = quote.getEmployee().getName();
+            }
+
+            quoteDTO = new QuoteDTO(
+                    quote.getPrice(),
+                    quote.getQuoteDateTime(),
+                    employeeName
+            );
+
+            if(quote.getPayment() != null){
+                paymentDTO = new PaymentDTO(
+                        quote.getPayment().getAmount(),
+                        quote.getPayment().getPaymentDateTime()
+                );
+            }
+        }
+
+        MaintenanceDTO maintenanceDTO = null;
+        Maintenance maintenance = request.getMaintenance();
+
+        if(maintenance != null){
+
+            String employeeName = null;
+
+            if(maintenance.getEmployee() != null){
+                employeeName = maintenance.getEmployee().getName();
+            }
+
+            maintenanceDTO = new MaintenanceDTO(
+                    maintenance.getMaintenanceDescription(),
+                    maintenance.getClienteInstructions(),
+                    maintenance.getMaintenanceDateTime(),
+                    employeeName
+            );
+
+        }
+
+        List<ClientRequestHistoryDTO> historyDTO = new ArrayList<>();
+
+        if(request.getRequestHistory() != null){
+            String employee = null;
+
+            for(RequestHistory requestHistory : request.getRequestHistory()){
+
+                if(requestHistory.getPerformedBy() != null){
+                    employee = requestHistory.getPerformedBy().getName();
+                }
+
+                historyDTO.add(new ClientRequestHistoryDTO(
+                        requestHistory.getId(),
+                        requestHistory.getActions(),
+                        requestHistory.getPreviousStatus(),
+                        requestHistory.getNewStatus(),
+                        requestHistory.getChangeDateTime(),
+                        employee
+                ));
+            }
+
+            historyDTO.sort(Comparator.comparing(ClientRequestHistoryDTO::changeDateTime)
+                    .thenComparing(ClientRequestHistoryDTO::requestHistoryId));
+
+        }
+
+        return new ClientRequestDetailsDTO(
+                request.getId(),
+                request.getEquipmentDescription(),
+                request.getDefectDescription(),
+                request.getRequestDateTime(),
+                request.getRequestStatus(),
+                request.getCategory().getName(),
+                quoteDTO,
+                maintenanceDTO,
+                paymentDTO,
+                historyDTO
+        );
+    }
+
 
 
 

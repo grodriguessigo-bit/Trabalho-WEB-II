@@ -11,6 +11,5 @@ public record ClientRequestHistoryDTO(
         RequestStatus previousStatus,
         RequestStatus newStatus,
         Instant changeDateTime,
-        String performedByName,
-        String description
+        String performedByName
 ) {}

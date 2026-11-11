@@ -42,7 +42,7 @@ public class QuoteService {
 
         String nomeFuncionario = (quote.getEmployee() != null) ? quote.getEmployee().getName() : "Técnico Responsável";
         QuoteDTO dto = new QuoteDTO(
-                quote.getPrice(), request.getEquipmentDescription(),quote.getQuoteDateTime(), nomeFuncionario);
+                quote.getPrice(),quote.getQuoteDateTime(), nomeFuncionario);
 
         return new ApiResponse<>(dto, "Orçamento encontrado com sucesso", true);
     }
