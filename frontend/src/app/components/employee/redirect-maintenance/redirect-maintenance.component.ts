@@ -64,13 +64,18 @@ export class RedirectMaintenanceComponent implements OnInit {
 
   loadEmployees(): void {
     const loggedUserId = this.loginService.getLoggedUserId();
-    const empList: any = this.employeeService.listAll ? this.employeeService.listAll() : [];
 
-    if (Array.isArray(empList) && empList.length > 0) {
-      this.employees = empList.filter((emp: any) => Number(emp.id) !== loggedUserId);
-    } else {
-      this.employees = [];
-    }
+    this.employeeService.listAll().subscribe({
+      next: employees => {
+        this.employees = employees.filter(
+          employee => Number(employee.id) !== loggedUserId
+        );
+      },
+      error: error => {
+        console.error('Erro ao buscar funcionários:', error);
+        this.employees = [];
+      }
+    });
   }
 
   redirectMaintenance(): void {
