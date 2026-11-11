@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 
 import { EmployeeDTO, EmployeeService } from '../../../services/employee.service';
@@ -29,23 +29,25 @@ export class EmployeeHomeComponent {
     private router: Router,
     private maintenanceRequestService: MaintenanceRequestService,
     private clientService: ClientService,
+    private cdr: ChangeDetectorRef,
   ) {
     if (this.loginService.getLoggedUserType() !== 'EMPLOYEE') {
       this.router.navigate(['/login']);
       return;
     }
 
-  const id = this.loginService.getLoggedUserId();
-  this.employeeService.findById(id).subscribe({
-    next: (employee) => {
-      this.employee = employee;
-    },
-    error: () => {
-      this.employee = undefined;
-    }
-  });
-
-this.loadClientRequests();
+    const id = this.loginService.getLoggedUserId();
+    this.employeeService.findById(id).subscribe({
+      next: (employee) => {
+        this.employee = employee;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.employee = undefined;
+        this.cdr.markForCheck();
+      }
+    });
+    this.loadClientRequests();
   }
 
   loadClientRequests(): void {

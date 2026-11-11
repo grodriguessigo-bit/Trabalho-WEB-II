@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 
 import { EmployeeDTO, EmployeeService } from '../../../services/employee.service';
@@ -18,7 +18,8 @@ export class ListEmployeeComponent {
   constructor(
     private employeeService: EmployeeService,
     private loginService: LoginService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
 
     if (this.loginService.getLoggedUserType() !== "EMPLOYEE") {
@@ -33,13 +34,13 @@ export class ListEmployeeComponent {
     this.employeeService.listAll().subscribe({
       next: (employees) => {
         this.employees = employees;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         alert(err.error?.message ?? 'Erro ao carregar funcionários.');
       }
     });
   }
-
   remove(employee: EmployeeDTO): void {
 
     const loggedId = this.loginService.getLoggedUserId();
