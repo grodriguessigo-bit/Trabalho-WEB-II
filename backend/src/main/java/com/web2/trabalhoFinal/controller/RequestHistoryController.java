@@ -21,10 +21,4 @@ public class RequestHistoryController {
     public RequestHistoryController(RequestHistoryService requestHistoryService) {
         this.requestHistoryService = requestHistoryService;
     }
-
-    @PostMapping
-    public ResponseEntity<ApiResponse<RequestHistory>> salvar(@RequestBody RequestHistory requestHistory) {
-        ApiResponse<RequestHistory> resposta = requestHistoryService.salvar(requestHistory);
-        return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
-    }
 }

@@ -5,7 +5,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
 import { ClientService } from '../../../services/client.service';
 import { Client } from '../../../shared/models/client.model';
-import { EmployeeService } from '../../../services/employee.service'; 
+import { EmployeeService } from '../../../services/employee.service';
 import { LoginService } from '../../../services/login.service';
 import { RequestStatus } from '../../../shared/enum/request-status.enum';
 
@@ -52,12 +52,12 @@ export class RedirectMaintenanceComponent implements OnInit {
     const found = this.requestService.findById(numericId);
     if (found) {
       this.request = found;
-      this.message = '';     
+      this.message = '';
       if (found.clientId) {
       this.client = this.clientService.findById(found.clientId);
     }
   }   else {
-      this.request = null; 
+      this.request = null;
       this.message = 'Solicitação não encontrada.';
   }
 }
@@ -68,7 +68,7 @@ export class RedirectMaintenanceComponent implements OnInit {
     this.employeeService.listAll().subscribe({
       next: employees => {
         this.employees = employees.filter(
-          employee => Number(employee.id) !== loggedUserId
+          (employee) => employee.active && Number(employee.id) !== loggedUserId,
         );
       },
       error: error => {

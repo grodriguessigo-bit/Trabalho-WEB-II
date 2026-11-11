@@ -14,10 +14,4 @@ public class RequestHistoryService {
     public RequestHistoryService(RequestHistoryRepository requestHistoryRepository) {
         this.requestHistoryRepository = requestHistoryRepository;
     }
-
-    @Transactional
-    public ApiResponse<RequestHistory> salvar(RequestHistory requestHistory) {
-        RequestHistory salvo = requestHistoryRepository.save(requestHistory);
-        return new ApiResponse<>(salvo, "Histórico salvo com sucesso", true);
-    }
 }

@@ -102,6 +102,13 @@ public class RedirectService {
                         "Funcionário de destino não encontrado."
                 ));
 
+        if (!destination.isActive()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Não é possível redirecionar para um funcionário desativado."
+            );
+        }
+
         RequestHistory history = new RequestHistory();
         history.setMaintenanceRequest(request);
         history.setActions(HistoryActions.MAINTENANCE_REDIRECTED);
