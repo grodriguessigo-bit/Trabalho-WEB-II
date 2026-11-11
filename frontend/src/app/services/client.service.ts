@@ -20,8 +20,8 @@ export class ClientService {
 
   constructor(private httpClient: HttpClient) {}
 
-  insert(client: Client): Observable<Client> {
-    return this.httpClient.post<Client>(this.BASE_URL, JSON.stringify(client), this.httpOptions);
+  insert(client: Client): Observable<{ message: string; success: boolean }> {
+    return this.httpClient.post<{ message: string; success: boolean }>(this.BASE_URL, JSON.stringify(client), this.httpOptions);
   }
 
   alter(client: Client): Observable<Client> {

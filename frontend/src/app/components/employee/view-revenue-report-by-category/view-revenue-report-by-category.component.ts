@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
-
 import { CategoryService } from '../../../services/category.service';
 import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
 import { QuoteService } from '../../../services/quote.service';
-
 import { Category } from '../../../shared/models/category.model';
 import { RequestStatus } from '../../../shared/enum/request-status.enum';
+import { jsPDF } from 'jspdf';
+import { autoTable } from 'jspdf-autotable';
 
 @Component({
   selector: 'app-view-revenue-report-by-category',
@@ -96,15 +96,26 @@ export class ViewRevenueReportByCategoryComponent implements OnInit {
   }
 
   printReport(): void {
-
     if (this.totalRevenue === 0) {
-
-      this.message =
-        'Não existem receitas para gerar o relatório.';
-
+      this.message = 'Não existem receitas para gerar o relatório.';
       return;
     }
 
-    window.print();
+    const doc = new jsPDF();
+
+    doc.setFontSize(16);
+    doc.text('Relatório de Receitas por Categoria', 14, 16);
+
+    doc.setFontSize(10);
+    doc.text('Receitas de todo o período, agrupadas por categoria.', 14, 25);
+
+    autoTable(doc, {
+      html: '#tabela-receitas-categoria',
+      startY: 32,
+      showFoot: 'lastPage'
+    });
+
+    doc.save('receitas-por-categoria.pdf');
   }
+
 }

@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { LoginService } from '../../services/login.service';
 import { Login } from '../../shared/models/login.model';
+import { LoggedUser } from '../../shared/models/logged-user.model';
 
 @Component({
   selector: 'app-login',
@@ -62,45 +63,36 @@ export class LoginComponent implements OnInit {
   }
 
   login(): void {
-
     this.loading = true;
-
     this.message = '';
 
-    this.loginService
-      .login(this.loginData)
-      .subscribe(user => {
-
+    this.loginService.login(this.loginData).subscribe({
+      next: resposta => {
         this.loading = false;
 
-        if (!user) {
+        const usuario = new LoggedUser(
+          resposta.data.userId,
+          resposta.data.profile
+        );
 
-          this.message =
-            'E-mail ou senha inválidos.';
+        this.loginService.setLoggedUser(usuario);
 
-          return;
+        if (usuario.type === 'CLIENT') {
+          this.router.navigate(['/client/home']);
+        } else if (usuario.type === 'EMPLOYEE') {
+          this.router.navigate(['/employee/home']);
         }
+      },
+      error: erro => {
+        this.loading = false;
 
-        this.loginService
-          .setLoggedUser(user);
-
-        if (user.type === 'CLIENT') {
-
-          this.router.navigate([
-            '/client/home'
-          ]);
-
-          return;
+        if (erro.status === 401) {
+          this.message = 'E-mail ou senha inválidos.';
+        } else {
+          this.message = 'Não foi possível entrar. Tente novamente.';
         }
-
-        if (user.type === 'EMPLOYEE') {
-
-          this.router.navigate([
-            '/employee/home'
-          ]);
-        }
-
-      });
+      }
+    });
   }
 
 }

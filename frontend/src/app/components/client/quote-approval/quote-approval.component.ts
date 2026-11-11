@@ -24,6 +24,7 @@ export class QuoteApprovalComponent {
 	categoryName = '';
 	message = '';
 	quoteObservations = '';
+	approvalConfirmed: boolean = false;
 
 	constructor(
 		private route: ActivatedRoute,
@@ -100,6 +101,12 @@ export class QuoteApprovalComponent {
 		);
 
 		this.maintenanceRequestService.update(this.request);
+
+		if (status === RequestStatus.APPROVED) {
+		this.approvalConfirmed = true;
+		return;
+		}
+
 		this.router.navigate(['/client/home']);
 	}
 }
