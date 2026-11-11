@@ -72,14 +72,12 @@ export class QuoteFormComponent {
         this.request.clientId
       );
 
-    const category =
-      this.categoryService.findById(
-        this.request.categoryId
-      );
-
-    if (category) {
-      this.categoryName = category.name;
-    }
+    this.categoryService.findById(this.request.categoryId).subscribe({
+      next: (response) => {
+        this.categoryName = response.success ? response.data.name : '';
+      },
+      error: (error) => console.error('Erro ao buscar categoria:', error),
+    });
   }
 
   createQuote(): void {

@@ -57,7 +57,12 @@ export class QuoteApprovalComponent {
 		this.request = request;
 		this.quotePrice = quote.price;
 		this.quoteDescription = quote.description ?? '';
-		this.categoryName = this.categoryService.findById(request.categoryId)?.name ?? '';
+		this.categoryService.findById(request.categoryId).subscribe({
+			next: (response) => {
+				this.categoryName = response.success ? response.data.name : '';
+			},
+			error: (error) => console.error('Erro ao buscar categoria:', error),
+		});
 		this.quoteObservations = quote.observations ?? '';
 	}
 
