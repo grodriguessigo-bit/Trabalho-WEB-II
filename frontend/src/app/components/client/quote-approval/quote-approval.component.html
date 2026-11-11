@@ -1,71 +1,174 @@
 <div class="container py-4">
-  <h1 class="mb-4">Orçamento da solicitação</h1>
 
-  @if (request) {
+  <h1 class="mb-4">
+    Orçamento da solicitação
+  </h1>
+
+  @if (request(); as request) {
+
     <div class="card mb-3">
-      <div class="card-body">
-        <h2 class="h5 mb-3">Dados da solicitação</h2>
 
-        <p><strong>Equipamento:</strong> {{ request.equipmentDescription }}</p>
-        <p class="text-break"><strong>Defeito:</strong> {{ request.defectDescription }}</p>
-        <p><strong>Categoria:</strong> {{ categoryName || 'Não informada' }}</p>
+      <div class="card-body">
+
+        <h2 class="h5 mb-3">
+          Dados da solicitação
+        </h2>
+
+        <p>
+          <strong>Equipamento:</strong>
+          {{ request.equipmentDescription }}
+        </p>
+
+        <p>
+          <strong>Defeito:</strong>
+          {{ request.defectDescription }}
+        </p>
+
+        <p>
+          <strong>Categoria:</strong>
+          {{ request.categoryName }}
+        </p>
+
         <p>
           <strong>Data da solicitação:</strong>
           {{ request.requestDateTime | date:'dd/MM/yyyy HH:mm' }}
         </p>
+
         <p class="mb-0">
-          <strong>Estado:</strong> {{ getStatusLabel() }}
+          <strong>Estado:</strong>
+          {{ getStatusLabel(request.status) }}
         </p>
+
       </div>
+
     </div>
 
-    <div class="alert alert-info">
-      <p class="mb-1">Valor do orçamento</p>
-      <strong class="fs-3">{{ quotePrice | currency:'BRL' }}</strong>
-    </div>
+    @if (request.quote; as quote) {
 
-    <div class="card mb-3">
-      <div class="card-body">
-        <h2 class="h5">Descrição do orçamento</h2>
-        <p class="text-break">{{ quoteDescription || 'Não informada' }}</p>
+      <div class="alert alert-info">
 
-        <h2 class="h5">Observações</h2>
-        <p class="text-break mb-0">
-          {{ quoteObservations || 'Nenhuma observação.' }}
+        <p class="mb-1">
+          Valor do orçamento
         </p>
-      </div>
-    </div>
 
-    @if (message) {
-      <div class="alert alert-danger" role="alert">
-        {{ message }}
+        <strong class="fs-3">
+          {{ quote.price | currency:'BRL' }}
+        </strong>
+
+      </div>
+
+      <div class="card mb-3">
+
+        <div class="card-body">
+
+          <p>
+            <strong>Funcionário:</strong>
+            {{ quote.employeeName || 'Não informado' }}
+          </p>
+
+          <p class="mb-0">
+            <strong>Data do orçamento:</strong>
+            {{ quote.quoteDateTime | date:'dd/MM/yyyy HH:mm' }}
+          </p>
+
+        </div>
+
       </div>
     }
 
-    @if (approvalConfirmed) {
-      <div class="alert alert-success" role="status">
-        Serviço Aprovado no Valor {{ quotePrice | currency:'BRL' }}
-      </div>
+    @if (message()) {
 
-      <button type="button" class="btn btn-primary" (click)="goBack()">
+      <div
+        class="alert"
+        [class.alert-success]="approvalConfirmed()"
+        [class.alert-danger]="!approvalConfirmed()">
+
+        {{ message() }}
+
+      </div>
+    }
+
+    @if (approvalConfirmed()) {
+
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="goBack()">
+
         OK
+
       </button>
+
     } @else {
-      <div class="d-flex flex-wrap gap-2">
-        @if (request.status === 'QUOTED') {
-          <button type="button" class="btn btn-success" (click)="approve()">
+
+      @if (request.status === 'QUOTED') {
+
+        <div class="mb-3">
+
+          <label
+            for="rejectionReason"
+            class="form-label">
+
+            Motivo da rejeição
+
+          </label>
+
+          <textarea
+            id="rejectionReason"
+            name="rejectionReason"
+            class="form-control"
+            rows="3"
+            [(ngModel)]="rejectionReason">
+          </textarea>
+
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+
+          <button
+            type="button"
+            class="btn btn-success"
+            (click)="approve()">
+
             Aprovar o Serviço
+
           </button>
 
-          <button type="button" class="btn btn-danger" (click)="reject()">
+          <button
+            type="button"
+            class="btn btn-danger"
+            (click)="reject()">
+
             Rejeitar o Serviço
-          </button>
-        }
 
-        <button type="button" class="btn btn-secondary" (click)="goBack()">
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="goBack()">
+
+            Voltar
+
+          </button>
+
+        </div>
+
+      } @else {
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="goBack()">
+
           Voltar
+
         </button>
-      </div>
+
+      }
+
     }
+
   }
+
 </div>

@@ -1,101 +1,131 @@
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
-import { ClientService } from '../../../services/client.service';
-import { Client } from '../../../shared/models/client.model';
-import { EmployeeService } from '../../../services/employee.service';
 import { LoginService } from '../../../services/login.service';
+import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
+import { RedirectService } from '../../../services/redirect.service';
+import { EmployeeDTO, EmployeeService } from '../../../services/employee.service';
 import { RequestStatus } from '../../../shared/enum/request-status.enum';
+import { EmployeeRequestDetailsDTO } from '../../../shared/models/request-api.model';
 
 @Component({
   selector: 'app-redirect-maintenance',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule
+  ],
   templateUrl: './redirect-maintenance.component.html',
   styleUrls: ['./redirect-maintenance.component.css']
 })
 export class RedirectMaintenanceComponent implements OnInit {
-  request: any = null;
-  client?: Client;
-  employees: any[] = [];
-  targetEmployeeId: string = '';
-  message: string = '';
+
+  request = signal<EmployeeRequestDetailsDTO | null>(null);
+  employees = signal<EmployeeDTO[]>([]);
+  message = signal('');
+
+  targetEmployeeId = '';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
+    private loginService: LoginService,
     private requestService: MaintenanceRequestService,
-    private clientService: ClientService,
-    private employeeService: EmployeeService,
-    private loginService: LoginService
-  ) {
-    if (this.loginService.getLoggedUserType() !== "EMPLOYEE") {
+    private redirectService: RedirectService,
+    private employeeService: EmployeeService
+  ) {}
+
+  ngOnInit(): void {
+
+    if (this.loginService.getLoggedUserType() !== 'EMPLOYEE') {
       this.router.navigate(['/login']);
       return;
     }
+
+    const requestId =
+      Number(this.route.snapshot.paramMap.get('id'));
+
+    this.loadRequest(requestId);
+    this.loadEmployees();
   }
 
-  ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.loadRequest(id);
-      this.loadEmployees();
-    } else {
-      this.message = 'ID da solicitação não fornecido na URL.';
-    }
-  }
+  loadRequest(requestId: number): void {
 
-  loadRequest(id: string): void {
-    const numericId = Number(id);
-    const found = this.requestService.findById(numericId);
-    if (found) {
-      this.request = found;
-      this.message = '';
-      if (found.clientId) {
-      this.client = this.clientService.findById(found.clientId);
-    }
-  }   else {
-      this.request = null;
-      this.message = 'Solicitação não encontrada.';
+    this.requestService
+      .getEmployeeDetails(requestId)
+      .subscribe({
+        next: response => {
+
+          if (
+            response.data.status !== RequestStatus.APPROVED &&
+            response.data.status !== RequestStatus.REDIRECTED
+          ) {
+            this.router.navigate(['/employee/home']);
+            return;
+          }
+
+          this.request.set(response.data);
+        },
+
+        error: () => {
+          this.router.navigate(['/employee/home']);
+        }
+      });
   }
-}
 
   loadEmployees(): void {
-    const loggedUserId = this.loginService.getLoggedUserId();
 
-    this.employeeService.listAll().subscribe({
-      next: employees => {
-        this.employees = employees.filter(
-          (employee) => employee.active && Number(employee.id) !== loggedUserId,
-        );
-      },
-      error: error => {
-        console.error('Erro ao buscar funcionários:', error);
-        this.employees = [];
-      }
-    });
+    const loggedEmployeeId =
+      this.loginService.getLoggedUserId();
+
+    this.employeeService
+      .listAll()
+      .subscribe({
+        next: employees => {
+
+          this.employees.set(
+            employees.filter(
+              employee =>
+                employee.active &&
+                employee.id !== loggedEmployeeId
+            )
+          );
+        },
+
+        error: () => {
+          this.employees.set([]);
+        }
+      });
   }
 
   redirectMaintenance(): void {
-    if (!this.request) {
-      this.request.status = 'Solicitação inválida.';
+
+    const request = this.request();
+
+    if (!request) {
       return;
     }
 
     if (!this.targetEmployeeId) {
-      this.message = 'Selecione o funcionário de destino.';
+      this.message.set(
+        'Selecione o funcionário de destino.'
+      );
       return;
     }
-    this.request.status = RequestStatus.REDIRECTED;
-    if ('assignedEmployeeId' in this.request) {
-    this.request.assignedEmployeeId = Number(this.targetEmployeeId);
-    }
 
-    this.requestService.update(this.request);
+    this.message.set('');
 
-    alert('Solicitação redirecionada com sucesso!');
-    this.router.navigate(['/employee/home']);
+    this.redirectService.redirect(request.requestId, Number(this.targetEmployeeId)).subscribe({
+        next: () => {
+          this.router.navigate(['/employee/home']);
+        },
+
+        error: error => {
+          this.message.set(error.error?.message ??'Não foi possível redirecionar a manutenção.'
+          );
+        }
+      });
   }
 }

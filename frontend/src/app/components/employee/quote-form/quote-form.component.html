@@ -4,7 +4,7 @@
 
     <h1>Efetuar Orçamento</h1>
 
-    @if (request) {
+    @if (request(); as request) {
 
       <div class="well">
 
@@ -22,7 +22,7 @@
 
         <p>
           <strong>Categoria:</strong>
-          {{ categoryName }}
+          {{ request.categoryName }}
         </p>
 
         <p>
@@ -32,71 +32,94 @@
 
       </div>
 
-    }
-
-    @if (client) {
-
       <div class="well">
+
         <h3>Dados do Cliente</h3>
+
         <p>
           <strong>Nome:</strong>
-          {{ client.name }}
+          {{ request.client.name }}
         </p>
 
         <p>
           <strong>CPF:</strong>
-          {{ client.cpf }}
+          {{ request.client.cpf }}
         </p>
 
         <p>
           <strong>E-mail:</strong>
-          {{ client.email }}
+          {{ request.client.email }}
         </p>
 
         <p>
           <strong>Telefone:</strong>
-          {{ client.phone }}
+          {{ request.client.phone }}
         </p>
 
-        <p>
-          <strong>Endereço:</strong>
-          {{ client.address.street }},
-          {{ client.address.number }} -
-          {{ client.address.neighborhood }},
-          {{ client.address.city }}/{{ client.address.state }}
-        </p>
+        @if (request.client.address; as address) {
+
+          <p>
+            <strong>Endereço:</strong>
+
+            {{ address.street }},
+            {{ address.number }} -
+
+            {{ address.neighborhood }},
+            {{ address.city }}/{{ address.state }}
+          </p>
+
+        }
+
       </div>
+
+      <div class="well">
+
+        <div class="form-group">
+
+          <label for="price">
+            Valor do Orçamento:
+          </label>
+
+          <input
+            type="number"
+            class="form-control"
+            id="price"
+            name="price"
+            [(ngModel)]="price"
+            min="0.01"
+            step="0.01">
+
+        </div>
+
+        @if (message()) {
+
+          <div class="alert alert-danger">
+            {{ message() }}
+          </div>
+
+        }
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="createQuote()">
+
+          Efetuar Orçamento
+
+        </button>
+
+        <a
+          class="btn btn-default"
+          [routerLink]="['/employee/home']">
+
+          Voltar
+
+        </a>
+
+      </div>
+
     }
 
-    <div class="well">
-
-      <div class="form-group">
-        <label for="price">Valor do Orçamento:</label>
-        <input type="number" class="form-control" id="price" name="price" [(ngModel)]="price" min="0.01" step="0.01">
-      </div>
-
-      <div class="form-group">
-        <label for="quoteDescription">Descrição do Orçamento:</label>
-        <textarea
-          class="form-control"
-          id="quoteDescription"
-          name="quoteDescription"
-          [(ngModel)]="quoteDescription"
-          rows="5"
-          maxlength="500"
-          placeholder="Descreva os serviços e materiais incluídos no orçamento..."></textarea>
-      </div>
-
-      @if (message) {
-        <div class="alert alert-danger">
-          {{ message }}
-        </div>
-      }
-
-      <button type="button" class="btn btn-primary" (click)="createQuote()"> Efetuar Orçamento </button>
-
-      <a class="btn btn-default" [routerLink]="['/employee/home']"> Voltar </a>
-
-    </div>
   </div>
+
 </div>

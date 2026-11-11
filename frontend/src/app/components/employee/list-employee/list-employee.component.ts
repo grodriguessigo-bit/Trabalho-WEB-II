@@ -58,7 +58,7 @@ export class ListEmployeeComponent {
     }
 
     if (confirm("Deseja remover o funcionário " + employee.name + "?")) {
-      this.employeeService.remove(employee.id, loggedId ?? undefined).subscribe({
+      this.employeeService.remove(employee.id).subscribe({
         next: () => {
           this.listAll();
         },

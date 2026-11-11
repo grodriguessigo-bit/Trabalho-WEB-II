@@ -1,14 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 
 import { EmployeeDTO, EmployeeService } from '../../../services/employee.service';
 import { LoginService } from '../../../services/login.service';
-import { ClientService } from '../../../services/client.service';
-
-import { MaintenanceRequest } from '../../../shared/models/maintenance-request';
 import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
+
 import { RequestStatus } from '../../../shared/enum/request-status.enum';
+import {
+  EmployeeRequestSummaryDTO,
+  RequestFilter,
+  STATUS_LABELS
+} from '../../../shared/models/request-api.model';
 
 @Component({
   selector: 'app-employee-home',
@@ -16,10 +19,17 @@ import { RequestStatus } from '../../../shared/enum/request-status.enum';
   templateUrl: './employee-home.component.html',
   styleUrl: './employee-home.component.css',
 })
-export class EmployeeHomeComponent {
-  employee: EmployeeDTO | undefined;
-  clientRequests: MaintenanceRequest[] = [];
-  filterType: 'ABERTAS' | 'TODAS' | 'HOJE' | 'PERIODO' = 'ABERTAS';
+export class EmployeeHomeComponent implements OnInit {
+
+  employee = signal<EmployeeDTO | null>(null);
+
+  clientRequests =
+    signal<EmployeeRequestSummaryDTO[]>([]);
+
+  message = signal('');
+
+  filterType: RequestFilter = 'ABERTAS';
+
   startDate = '';
   endDate = '';
 
@@ -27,107 +37,76 @@ export class EmployeeHomeComponent {
     private employeeService: EmployeeService,
     private loginService: LoginService,
     private router: Router,
-    private maintenanceRequestService: MaintenanceRequestService,
-    private clientService: ClientService,
-    private cdr: ChangeDetectorRef,
-  ) {
+    private maintenanceRequestService: MaintenanceRequestService
+  ) {}
+
+  ngOnInit(): void {
+
     if (this.loginService.getLoggedUserType() !== 'EMPLOYEE') {
       this.router.navigate(['/login']);
       return;
     }
 
-    const id = this.loginService.getLoggedUserId();
-    this.employeeService.findById(id).subscribe({
-      next: (employee) => {
-        this.employee = employee;
-        this.cdr.markForCheck();
-      },
-      error: () => {
-        this.employee = undefined;
-        this.cdr.markForCheck();
-      }
-    });
+    const id =
+      this.loginService.getLoggedUserId();
+
+    this.employeeService
+      .findById(id)
+      .subscribe({
+        next: employee => {
+          this.employee.set(employee);
+        },
+
+        error: () => {
+          this.employee.set(null);
+        }
+      });
+
     this.loadClientRequests();
   }
 
   loadClientRequests(): void {
-    const requests = this.maintenanceRequestService.listAll()
-      .sort((a, b) => new Date(a.requestDateTime).getTime() - new Date(b.requestDateTime).getTime());
-    
-    if (this.filterType === 'ABERTAS') {
-      this.clientRequests = requests.filter(
-        request => request.status === RequestStatus.OPEN
-      );
+
+    this.message.set('');
+
+    if (
+      this.filterType === 'PERIODO' &&
+      (!this.startDate || !this.endDate)
+    ) {
+      this.clientRequests.set([]);
       return;
     }
 
-    if (this.filterType === 'HOJE') {
-      this.clientRequests = requests.filter((request) => this.isSameDay(new Date(request.requestDateTime), new Date()));
-      return;
-    }
+    this.maintenanceRequestService
+      .listEmployeeRequests(
+        this.filterType,
+        this.startDate,
+        this.endDate
+      )
+      .subscribe({
+        next: response => {
+          this.clientRequests.set(response.data);
+        },
 
-    if (this.filterType === 'PERIODO') {
-      this.clientRequests = requests.filter((request) => this.isInPeriod(new Date(request.requestDateTime)));
-      return;
-    }
+        error: error => {
+          this.clientRequests.set([]);
 
-    this.clientRequests = requests;
+          this.message.set(
+            error.error?.message ??
+            'Não foi possível consultar as solicitações.'
+          );
+        }
+      });
   }
 
-  private isSameDay(dateA: Date, dateB: Date): boolean {
-    return dateA.getFullYear() === dateB.getFullYear()
-      && dateA.getMonth() === dateB.getMonth()
-      && dateA.getDate() === dateB.getDate();
+  getStatusLabel(status: RequestStatus): string {
+    return STATUS_LABELS[status];
   }
 
-  private isInPeriod(requestDate: Date): boolean {
-    if (this.startDate) {
-      const start = new Date(`${this.startDate}T00:00:00`);
-      if (requestDate < start) {
-        return false;
-      }
-    }
+  getStatusClass(status: RequestStatus): string {
 
-    if (this.endDate) {
-      const end = new Date(`${this.endDate}T23:59:59`);
-      if (requestDate > end) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  getClientName(clientId: number): string {
-    const client = this.clientService.findById(clientId);
-    return client ? client.name : 'Cliente não encontrado';
-  }
-
-  getStatusLabel(status: string): string {
     switch (status) {
-      case RequestStatus.OPEN:
-        return 'ABERTA';
-      case RequestStatus.QUOTED:
-        return 'ORÇADA';
-      case RequestStatus.APPROVED:
-        return 'APROVADA';
-      case RequestStatus.REJECTED:
-        return 'REJEITADA';
-      case RequestStatus.REDIRECTED:
-        return 'REDIRECIONADA';
-      case RequestStatus.FIXED:
-        return 'ARRUMADA';
-      case RequestStatus.PAID:
-        return 'PAGA';
-      case RequestStatus.FINALIZED:
-        return 'FINALIZADA';
-      default:
-        return status;
-    }
-  }
 
-  getStatusClass(status: string): string {
-    switch (status) {
       case RequestStatus.OPEN:
         return 'status-open';
 
@@ -157,8 +136,12 @@ export class EmployeeHomeComponent {
     }
   }
 
-  getActionText(request: MaintenanceRequest): string {
+  getActionText(
+    request: EmployeeRequestSummaryDTO
+  ): string {
+
     switch (request.status) {
+
       case RequestStatus.OPEN:
         return 'Efetuar Orçamento';
 
@@ -174,17 +157,30 @@ export class EmployeeHomeComponent {
     }
   }
 
-  getActionRoute(request: MaintenanceRequest): any[] | null {
+  getActionRoute(
+    request: EmployeeRequestSummaryDTO
+  ): any[] | null {
+
     switch (request.status) {
+
       case RequestStatus.OPEN:
-        return ['/employee/quote-form', request.id];
+        return [
+          '/employee/quote-form',
+          request.maintenanceRequestId
+        ];
 
       case RequestStatus.APPROVED:
       case RequestStatus.REDIRECTED:
-        return ['/employee/request/maintenance', request.id];
+        return [
+          '/employee/request/maintenance',
+          request.maintenanceRequestId
+        ];
 
       case RequestStatus.PAID:
-        return ['/employee/finalize-request', request.id];
+        return [
+          '/employee/finalize-request',
+          request.maintenanceRequestId
+        ];
 
       default:
         return null;
@@ -192,15 +188,18 @@ export class EmployeeHomeComponent {
   }
 
   logout(): void {
-    this.loginService.logout().subscribe({
-      next: () => {
-        this.loginService.clearLoggedUser();
-        this.router.navigate(['/login']);
-      },
-      error: () => {
-        alert('Não foi possível sair. Tente novamente.');
-      }
-    });
+
+    this.loginService
+      .logout()
+      .subscribe({
+        next: () => {
+          this.loginService.clearLoggedUser();
+          this.router.navigate(['/login']);
+        },
+
+        error: () => {
+          alert('Não foi possível sair. Tente novamente.');
+        }
+      });
   }
 }
-

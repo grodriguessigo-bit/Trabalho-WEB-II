@@ -1,153 +1,105 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-
-import { MaintenanceRequest } from '../../../shared/models/maintenance-request';
-import { RequestHistory } from '../../../shared/models/request-history.model';
-import { Quote } from '../../../shared/models/quote';
-import { Client } from '../../../shared/models/client.model';
-
-import { RequestStatus } from '../../../shared/enum/request-status.enum';
-import { HistoryActions } from '../../../shared/enum/history-actions.enum';
-
+import { LoginService } from '../../../services/login.service';
 import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
 import { QuoteService } from '../../../services/quote.service';
-import { LoginService } from '../../../services/login.service';
-import { EmployeeService } from '../../../services/employee.service';
-import { ClientService } from '../../../services/client.service';
-import { CategoryService } from '../../../services/category.service';
+import { RequestStatus } from '../../../shared/enum/request-status.enum';
+import { EmployeeRequestDetailsDTO } from '../../../shared/models/request-api.model';
 
-import { catchError, of } from 'rxjs';
 @Component({
   selector: 'app-quote-form',
-  imports: [FormsModule, RouterModule, CommonModule],
+  imports: [
+    FormsModule,
+    RouterModule,
+    CommonModule
+  ],
   templateUrl: './quote-form.component.html',
   styleUrl: './quote-form.component.css',
 })
-export class QuoteFormComponent {
+export class QuoteFormComponent implements OnInit {
 
-  request: MaintenanceRequest | undefined;
+  request =
+    signal<EmployeeRequestDetailsDTO | null>(null);
 
-  client: Client | undefined;
+  message = signal('');
 
-  categoryName: string = '';
-
-  price: number = 0;
-
-  quoteDescription: string = '';
-
-  message: string = '';
+  price = 0;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private maintenanceRequestService: MaintenanceRequestService,
     private quoteService: QuoteService,
-    private loginService: LoginService,
-    private employeeService: EmployeeService,
-    private clientService: ClientService,
-    private categoryService: CategoryService
-  ) {
+    private loginService: LoginService
+  ) {}
+
+  ngOnInit(): void {
 
     if (this.loginService.getLoggedUserType() !== 'EMPLOYEE') {
       this.router.navigate(['/login']);
       return;
     }
 
-    const id = Number(
-      this.route.snapshot.paramMap.get('id')
-    );
+    const requestId =
+      Number(this.route.snapshot.paramMap.get('id'));
 
-    this.request =
-      this.maintenanceRequestService.findById(id);
+    this.maintenanceRequestService
+      .getEmployeeDetails(requestId)
+      .subscribe({
+        next: response => {
 
-    if (!this.request) {
-      this.router.navigate(['/employee/home']);
-      return;
-    }
+          if (
+            !response.data ||
+            response.data.status !== RequestStatus.OPEN
+          ) {
+            this.router.navigate(['/employee/home']);
+            return;
+          }
 
-    this.client =
-      this.clientService.findById(
-        this.request.clientId
-      );
+          this.request.set(response.data);
+        },
 
-    this.categoryService.findById(this.request.categoryId).subscribe({
-      next: (response) => {
-        this.categoryName = response.success ? response.data.name : '';
-      },
-      error: (error) => console.error('Erro ao buscar categoria:', error),
-    });
+        error: () => {
+          this.router.navigate(['/employee/home']);
+        }
+      });
   }
 
   createQuote(): void {
 
-    if (!this.request) {
+    const request = this.request();
+
+    if (!request) {
       return;
     }
 
     if (this.price <= 0) {
-      this.message = 'Informe um valor válido.';
+      this.message.set(
+        'Informe um valor válido.'
+      );
       return;
     }
 
-    if (!this.quoteDescription.trim()) {
-      this.message = 'Informe a descrição do orçamento.';
-      return;
-    }
+    this.message.set('');
 
-    if (this.request.status !== RequestStatus.OPEN) {
-      this.message = 'Esta solicitação não está aberta.';
-      return;
-    }
+    this.quoteService
+      .create(
+        request.requestId,
+        this.price
+      )
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/employee/home']);
+        },
 
-    const request = this.request;
-
-    const employeeId =
-      this.loginService.getLoggedUserId();
-
-    // Se a busca falhar, employee vem undefined e o nome fica vazio (igual antes).
-    this.employeeService.findById(employeeId).pipe(
-      catchError(() => of(undefined))
-    ).subscribe((employee) => {
-
-      const quoteDateTime =
-        new Date().toISOString();
-
-      const quote = new Quote(
-        0,
-        request.id,
-        employeeId,
-        this.price,
-        this.quoteDescription.trim(),
-        quoteDateTime
-      );
-
-      this.quoteService.insert(quote);
-
-      const previousStatus =
-        request.status;
-
-      request.status =
-        RequestStatus.QUOTED;
-
-      const history = new RequestHistory(
-        request.requestHistory.length + 1,
-        HistoryActions.QUOTE_CREATED,
-        previousStatus,
-        RequestStatus.QUOTED,
-        quoteDateTime,
-        'Orçamento criado no valor de R$ ' + this.price.toFixed(2),
-        employee ? employee.name : ''
-      );
-
-      request.requestHistory.push(history);
-
-      this.maintenanceRequestService.update(
-        request
-      );
-
-      this.router.navigate(['/employee/home']);
-    });
+        error: error => {
+          this.message.set(
+            error.error?.message ??
+            'Não foi possível registrar o orçamento.'
+          );
+        }
+      });
   }
 }
