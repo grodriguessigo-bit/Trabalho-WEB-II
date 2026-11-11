@@ -3,7 +3,7 @@ package com.web2.trabalhoFinal.controller;
 import com.web2.trabalhoFinal.dto.ApiResponse;
 import com.web2.trabalhoFinal.dto.PerformMaintenanceDTO;
 import com.web2.trabalhoFinal.service.MaintenanceService;
-import com.web2.trabalhoFinal.service.PermissaoFuncionario;
+import com.web2.trabalhoFinal.service.EmployeePermission;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +17,11 @@ import org.springframework.web.bind.annotation.*;
 public class MaintenanceController {
 
     private final MaintenanceService maintenanceService;
-    private final PermissaoFuncionario permissaoFuncionario;
+    private final EmployeePermission employeePermission;
 
-    public MaintenanceController(MaintenanceService maintenanceService, PermissaoFuncionario permissaoFuncionario) {
+    public MaintenanceController(MaintenanceService maintenanceService, EmployeePermission employeePermission) {
         this.maintenanceService = maintenanceService;
-        this.permissaoFuncionario = permissaoFuncionario;
+        this.employeePermission = employeePermission;
     }
 
     @PostMapping("/request/{requestId}")
@@ -31,7 +31,7 @@ public class MaintenanceController {
             Long employeeId,
             @RequestBody PerformMaintenanceDTO dto
     ) {
-        permissaoFuncionario.verificar(employeeId);
+        employeePermission.verificar(employeeId);
         ApiResponse<Void> response = maintenanceService.perform(
                 requestId,
                 employeeId,
