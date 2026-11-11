@@ -4,6 +4,7 @@ import com.web2.trabalhoFinal.dto.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -15,6 +16,18 @@ public class ApiExceptionHandler {
         return ResponseEntity.badRequest().body(new ApiResponse<>(exception.getMessage(), false));
     }
 
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ApiResponse<Void>> handleResponseStatus(
+            ResponseStatusException exception
+    ) {
+        return ResponseEntity.status(exception.getStatusCode()).body(
+                new ApiResponse<>(
+                        exception.getReason(),
+                        false
+                )
+        );
+    }
 
 
 }

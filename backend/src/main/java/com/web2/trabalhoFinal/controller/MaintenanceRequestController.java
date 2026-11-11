@@ -132,5 +132,32 @@ public class MaintenanceRequestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(response, result.getMessage(), true));
     }
 
+    //RESGATA SOLICITACAO
+    @PostMapping("/{requestId}/rescue")
+    public ResponseEntity<ApiResponse<Void>> rescue(
+            @PathVariable("requestId") Long requestId,
+            @SessionAttribute(name = "clientId", required = false) Long clientId
+    ) {
+        ApiResponse<Void> response =
+                maintenanceRequestService.rescue(requestId, clientId);
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    //FINALIZA SOLICITACAO
+    @PostMapping("/{requestId}/finalize")
+    public ResponseEntity<ApiResponse<Void>> finalizeRequest(
+            @PathVariable("requestId") Long requestId,
+            @SessionAttribute(name = "employeeId", required = false) Long employeeId
+    ) {
+        ApiResponse<Void> response =
+                maintenanceRequestService.finalizeRequest(
+                        requestId,
+                        employeeId
+                );
+
+        return ResponseEntity.ok(response);
+    }
 
 }

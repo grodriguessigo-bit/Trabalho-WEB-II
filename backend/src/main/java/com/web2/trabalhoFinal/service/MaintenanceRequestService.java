@@ -5,10 +5,7 @@ import com.web2.trabalhoFinal.entities.*;
 import com.web2.trabalhoFinal.entities.enums.HistoryActions;
 import com.web2.trabalhoFinal.entities.enums.RequestStatus;
 import com.web2.trabalhoFinal.exception.InvalidMaintenanceRequestException;
-import com.web2.trabalhoFinal.repository.CategoryRepository;
-import com.web2.trabalhoFinal.repository.ClientRepository;
-import com.web2.trabalhoFinal.repository.MaintenanceRequestRepository;
-import com.web2.trabalhoFinal.repository.RequestHistoryRepository;
+import com.web2.trabalhoFinal.repository.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,14 +25,15 @@ public class MaintenanceRequestService {
     private final ClientRepository clientRepository;
     private final CategoryRepository categoryRepository;
     private final RequestHistoryRepository requestHistoryRepository;
+    private final EmployeeRepository employeeRepository;
 
-    public MaintenanceRequestService(MaintenanceRequestRepository maintenanceRequestRepository, ClientRepository clientRepository, CategoryRepository categoryRepository, RequestHistoryRepository requestHistoryRepository) {
+    public MaintenanceRequestService(MaintenanceRequestRepository maintenanceRequestRepository, ClientRepository clientRepository, CategoryRepository categoryRepository, RequestHistoryRepository requestHistoryRepository, EmployeeRepository employeeRepository) {
         this.maintenanceRequestRepository = maintenanceRequestRepository;
         this.clientRepository = clientRepository;
         this.categoryRepository = categoryRepository;
         this.requestHistoryRepository = requestHistoryRepository;
+        this.employeeRepository = employeeRepository;
     }
-
 
     //INSERT DE SOLICITACAO
     @Transactional
@@ -98,6 +96,14 @@ public class MaintenanceRequestService {
 
     //SOLICITACOES NA TELA INICIAL DE CLIENTES
     public List<ClientRequestSummaryDTO> findAllRequestByClient(Long clientId){
+
+        if (clientId == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Entre como cliente."
+            );
+        }
+
         List<MaintenanceRequest> requests = maintenanceRequestRepository.findByClient_idOrderByRequestDateTimeAsc(clientId);
 
         return requests.stream()
@@ -114,6 +120,13 @@ public class MaintenanceRequestService {
     //DETALHES DA SOLICITAÇÃO PARA O CLIENTE
     @Transactional(readOnly = true)
     public ClientRequestDetailsDTO findById (Long requestId, Long clientId){
+
+        if (clientId == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Entre como cliente."
+            );
+        }
 
         MaintenanceRequest request =  maintenanceRequestRepository.findById(requestId).orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
@@ -175,9 +188,9 @@ public class MaintenanceRequestService {
         List<ClientRequestHistoryDTO> historyDTO = new ArrayList<>();
 
         if(request.getRequestHistory() != null){
-            String employee = null;
 
             for(RequestHistory requestHistory : request.getRequestHistory()){
+                String employee = null;
 
                 if(requestHistory.getPerformedBy() != null){
                     employee = requestHistory.getPerformedBy().getName();
@@ -473,6 +486,110 @@ public class MaintenanceRequestService {
         );
     }
 
+
+    //RESGATAR SOLICITACAO
+    @Transactional
+    public ApiResponse<Void> rescue(Long requestId, Long clientId) {
+
+        if (clientId == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Entre como cliente."
+            );
+        }
+
+        MaintenanceRequest request = maintenanceRequestRepository
+                .findById(requestId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Solicitação não encontrada."
+                ));
+
+        if (request.getClient().getId() != clientId) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Solicitação não encontrada."
+            );
+        }
+
+        if (request.getRequestStatus() != RequestStatus.REJECTED) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Só é possível resgatar uma solicitação rejeitada."
+            );
+        }
+
+        request.setRequestStatus(RequestStatus.APPROVED);
+        maintenanceRequestRepository.save(request);
+
+        RequestHistory history = new RequestHistory();
+        history.setMaintenanceRequest(request);
+        history.setActions(HistoryActions.REQUEST_RESCUED);
+        history.setPreviousStatus(RequestStatus.REJECTED);
+        history.setNewStatus(RequestStatus.APPROVED);
+        history.setChangeDateTime(Instant.now());
+        history.setPerformedBy(request.getClient());
+
+        requestHistoryRepository.save(history);
+
+        return new ApiResponse<>(
+                "Solicitação resgatada com sucesso.",
+                true
+        );
+    }
+
+
+    //FINALIZAR PEDIDO - employee
+    @Transactional
+    public ApiResponse<Void> finalizeRequest(
+            Long requestId,
+            Long employeeId
+    ) {
+        if (employeeId == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Entre como funcionário."
+            );
+        }
+
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED,
+                        "Funcionário não encontrado. Faça login novamente."
+                ));
+
+        MaintenanceRequest request = maintenanceRequestRepository
+                .findById(requestId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Solicitação não encontrada."
+                ));
+
+        if (request.getRequestStatus() != RequestStatus.PAID) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Só é possível finalizar uma solicitação paga."
+            );
+        }
+
+        request.setRequestStatus(RequestStatus.FINALIZED);
+        maintenanceRequestRepository.save(request);
+
+        RequestHistory history = new RequestHistory();
+        history.setMaintenanceRequest(request);
+        history.setActions(HistoryActions.REQUEST_FINALIZED);
+        history.setPreviousStatus(RequestStatus.PAID);
+        history.setNewStatus(RequestStatus.FINALIZED);
+        history.setChangeDateTime(Instant.now());
+        history.setPerformedBy(employee);
+
+        requestHistoryRepository.save(history);
+
+        return new ApiResponse<>(
+                "Solicitação finalizada com sucesso.",
+                true
+        );
+    }
 
 
 
