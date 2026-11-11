@@ -22,12 +22,11 @@ public class Redirect {
     @JoinColumn(name = "id_request_history", nullable = false, unique = true)
     private RequestHistory requestHistory;
 
-    @OneToOne
-    @JoinColumn(name="id_SourceEmployee")
+    @ManyToOne
+    @JoinColumn(name = "id_SourceEmployee")
     private Employee sourceEmployee;
 
-    @OneToOne
-    @JoinColumn(name="id_destinationEmployee")
+    @ManyToOne
+    @JoinColumn(name = "id_destinationEmployee")
     private Employee destinationEmployee;
-
 }
