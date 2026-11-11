@@ -2,9 +2,14 @@
 
   <h1>Finalizar Solicitação</h1>
 
-  @if (request) {
+  @if (request(); as request) {
 
     <div class="well">
+
+      <p>
+        <strong>Cliente:</strong>
+        {{ request.client.name }}
+      </p>
 
       <p>
         <strong>Equipamento:</strong>
@@ -17,6 +22,11 @@
       </p>
 
       <p>
+        <strong>Categoria:</strong>
+        {{ request.categoryName }}
+      </p>
+
+      <p>
         <strong>Data/Hora:</strong>
         {{ request.requestDateTime | date:'dd/MM/yyyy HH:mm' }}
       </p>
@@ -26,12 +36,21 @@
         {{ request.status }}
       </p>
 
+      @if (request.payment; as payment) {
+
+        <p>
+          <strong>Valor pago:</strong>
+          {{ payment.amount | currency:'BRL' }}
+        </p>
+
+      }
+
     </div>
 
-    @if (message) {
+    @if (message()) {
 
       <div class="alert alert-danger">
-        {{ message }}
+        {{ message() }}
       </div>
 
     }
@@ -39,18 +58,20 @@
     <button
       type="button"
       class="btn btn-success"
-      (click)="finalizeRequest()"
-    >
+      (click)="finalizeRequest()">
+
       Finalizar Solicitação
+
     </button>
 
   }
 
   <a
     class="btn btn-default"
-    [routerLink]="['/employee/home']"
-  >
+    [routerLink]="['/employee/home']">
+
     Voltar
+
   </a>
 
 </div>

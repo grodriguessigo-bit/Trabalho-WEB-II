@@ -1,74 +1,79 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-
-import { Client } from '../../../shared/models/client.model';
-import { ClientService } from '../../../services/client.service';
-import { LoginService } from '../../../services/login.service';
-import { MaintenanceRequest } from '../../../shared/models/maintenance-request';
-import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
-import { QuoteService } from '../../../services/quote.service';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
+import { ClientRequestSummaryDTO } from '../../../shared/models/request-api.model';
+import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
+import { LoginService } from '../../../services/login.service';
 import { RequestStatus } from '../../../shared/enum/request-status.enum';
 
 @Component({
   selector: 'app-client-home',
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './client-home.component.html',
   styleUrl: './client-home.component.css',
 })
-export class ClientHomeComponent {
-  client: Client | undefined;
-
-  requests: MaintenanceRequest[] = [];
+export class ClientHomeComponent implements OnInit {
+  requests = signal<ClientRequestSummaryDTO[]>([]);
+  message = signal('');
+  saving = signal(false);
 
   constructor(
-    private clientService: ClientService,
+    private maintenanceRequestService: MaintenanceRequestService,
     private loginService: LoginService,
     private router: Router,
-    private maintenanceRequestService: MaintenanceRequestService,
-    private quoteService: QuoteService,
-  ) {
-    if (this.loginService.getLoggedUserType() !== 'CLIENT') {
-      this.router.navigate(['/login']);
+  ) {}
+
+  ngOnInit(): void {
+    this.loadRequests();
+  }
+
+  loadRequests(): void {
+    this.message.set('');
+
+    this.maintenanceRequestService.listClientRequests().subscribe({
+      next: response => {
+        if (response.success) {
+          this.requests.set(response.data);
+        } else {
+          this.message.set(response.message);
+        }
+      },
+      error: error => {
+        this.message.set(
+          error.error?.message ??
+          'Não foi possível carregar as solicitações.'
+        );
+      }
+    });
+  }
+
+  rescueRequest(requestId: number): void {
+    if (this.saving()) {
       return;
     }
 
-    const id = this.loginService.getLoggedUserId();
+    this.message.set('');
+    this.saving.set(true);
 
-    this.client = this.clientService.findById(id);
+    this.maintenanceRequestService.rescueRequest(requestId).subscribe({
+      next: response => {
+        this.saving.set(false);
 
-    this.requests = maintenanceRequestService.findByClientId(id);
-  }
+        if (response.success) {
+          this.loadRequests();
+        } else {
+          this.message.set(response.message);
+        }
+      },
+      error: error => {
+        this.saving.set(false);
 
-  getStatusLabel(status: string): string {
-    switch (status) {
-      case 'OPEN':
-        return 'ABERTA';
-
-      case 'QUOTED':
-        return 'ORÇADA';
-
-      case 'APPROVED':
-        return 'APROVADA';
-
-      case 'REJECTED':
-        return 'REJEITADA';
-
-      case 'REDIRECTED':
-        return 'REDIRECIONADA';
-
-      case 'FIXED':
-        return 'ARRUMADA';
-
-      case 'PAID':
-        return 'PAGA';
-
-      case 'FINALIZED':
-        return 'FINALIZADA';
-
-      default:
-        return status;
-    }
+        this.message.set(
+          error.error?.message ??
+          'Não foi possível resgatar a solicitação.'
+        );
+      }
+    });
   }
 
   logout(): void {
@@ -78,45 +83,39 @@ export class ClientHomeComponent {
         this.router.navigate(['/login']);
       },
       error: () => {
-        alert('Não foi possível sair. Tente novamente.');
+        this.message.set('Não foi possível sair. Tente novamente.');
       }
     });
   }
 
-  OpenTicket(): void {
-    this.router.navigate(['/client/equipment-repair']);
-  }
+  getStatusLabel(status: RequestStatus): string {
+    switch (status) {
+      case RequestStatus.OPEN:
+        return 'ABERTA';
 
-  openRequest(requestId: number): void {
-    this.router.navigate(['/client/request-details', requestId]);
-  }
+      case RequestStatus.QUOTED:
+        return 'ORÇADA';
 
-  openQuote(requestId: number): void {
-    this.router.navigate(['/client/quote-approval', requestId]);
-  }
+      case RequestStatus.APPROVED:
+        return 'APROVADA';
 
-  canReviewQuote(request: MaintenanceRequest): boolean {
-    if (request.status === RequestStatus.APPROVED || request.status === RequestStatus.REJECTED) {
-      return false;
+      case RequestStatus.REJECTED:
+        return 'REJEITADA';
+
+      case RequestStatus.REDIRECTED:
+        return 'REDIRECIONADA';
+
+      case RequestStatus.FIXED:
+        return 'ARRUMADA';
+
+      case RequestStatus.PAID:
+        return 'PAGA';
+
+      case RequestStatus.FINALIZED:
+        return 'FINALIZADA';
+
+      default:
+        return status;
     }
-
-    return request.status === RequestStatus.QUOTED ||
-      this.quoteService.findByRequestId(request.id) !== undefined;
-  }
-
-  rescueRequest(requestId: number): void {
-    const rescued = this.maintenanceRequestService.rescueRequest(requestId);
-
-    if(!rescued){
-      return;
-    }
-
-    const clientId = this.loginService.getLoggedUserId();
-
-    this.requests = this.maintenanceRequestService.findByClientId(clientId);
-  }
-
-  payRequest(requestId: number): void {
-    this.router.navigate(['/client/pay-request', requestId]);
   }
 }

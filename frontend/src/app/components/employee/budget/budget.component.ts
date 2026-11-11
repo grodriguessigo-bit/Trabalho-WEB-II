@@ -1,26 +1,23 @@
-import { Component } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
-import { MaintenanceRequest } from '../../../shared/models/maintenance-request';
+import { Component, OnInit, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+
+import { LoginService } from '../../../services/login.service';
 import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
 import { QuoteService } from '../../../services/quote.service';
-import { LoginService } from '../../../services/login.service';
-import { Quote } from '../../../shared/models/quote';
-import { RequestHistory } from '../../../shared/models/request-history.model';
-import { HistoryActions } from '../../../shared/enum/history-actions.enum';
 import { RequestStatus } from '../../../shared/enum/request-status.enum';
-import { FormsModule } from '@angular/forms';
+import { EmployeeRequestDetailsDTO } from '../../../shared/models/request-api.model';
 
 @Component({
   selector: 'app-budget',
   templateUrl: './budget.component.html',
-  imports: [ FormsModule ],
+  imports: [FormsModule],
   styleUrls: ['./budget.component.css']
 })
-export class BudgetComponent {
-
-  client: MaintenanceRequest | undefined;
+export class BudgetComponent implements OnInit {
+  request = signal<EmployeeRequestDetailsDTO | null>(null);
+  message = signal('');
   price = 0;
-  message = '';
 
   constructor(
     private router: Router,
@@ -28,46 +25,44 @@ export class BudgetComponent {
     private maintenanceRequestService: MaintenanceRequestService,
     private quoteService: QuoteService,
     private loginService: LoginService
-  ) {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+  ) {}
 
-    this.client = this.maintenanceRequestService.findById(id);
-  }
-
-  generateBudget() {
-    if (!this.client || this.price <= 0) {
-      this.message = 'Informe um valor válido para o orçamento.';
+  ngOnInit(): void {
+    if (this.loginService.getLoggedUserType() !== 'EMPLOYEE') {
+      this.router.navigate(['/login']);
       return;
     }
 
-    const quoteDateTime = new Date().toISOString();
-    const previousStatus = this.client.status;
+    const requestId = Number(this.route.snapshot.paramMap.get('id'));
 
-    this.quoteService.insert(
-      new Quote(
-        0,
-        this.client.id,
-        this.loginService.getLoggedUserId(),
-        this.price,
-        quoteDateTime,
-      ),
-    );
+    this.maintenanceRequestService.getEmployeeDetails(requestId).subscribe({
+      next: response => {
+        if (!response.data || response.data.status !== RequestStatus.OPEN) {
+          this.router.navigate(['/employee/home']);
+          return;
+        }
 
-    this.client.status = RequestStatus.QUOTED;
-    this.client.requestHistory ??= [];
-    this.client.requestHistory.push(
-      new RequestHistory(
-        this.client.requestHistory.length + 1,
-        HistoryActions.QUOTE_CREATED,
-        previousStatus,
-        RequestStatus.QUOTED,
-        quoteDateTime,
-        'Orçamento criado no valor de R$ ' + this.price.toFixed(2),
-      ),
-    );
+        this.request.set(response.data);
+      },
+      error: () => this.router.navigate(['/employee/home'])
+    });
+  }
 
-    this.maintenanceRequestService.update(this.client);
+  generateBudget(): void {
+    const request = this.request();
 
-    this.router.navigate(['/employee/home']);
+    if (!request) return;
+
+    if (this.price <= 0) {
+      this.message.set('Informe um valor válido para o orçamento.');
+      return;
+    }
+
+    this.message.set('');
+
+    this.quoteService.create(request.requestId, this.price).subscribe({
+      next: () => this.router.navigate(['/employee/home']),
+      error: error => this.message.set(error.error?.message ?? 'Não foi possível gerar o orçamento.')
+    });
   }
 }

@@ -1,104 +1,108 @@
-<div class="container">
+<div class="container py-4">
+  <h1>Área do Cliente</h1>
 
-  <div class="col-md-12">
-
-    <h1>Área do Cliente</h1>
-
-    @if (client) {
-
-    <div class="well">
-
-      <div class="/">
-        <div class="col-md-6">
-          <strong>Cliente:</strong> {{ client.name }}
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-6">
-          <strong>E-mail:</strong> {{ client.email }}
-        </div>
-      </div>
-
+  @if (message()) {
+    <div class="alert alert-info" role="alert">
+      {{ message() }}
     </div>
-    }
+  }
 
-    <h2>Solicitações</h2>
+  <a
+    class="btn btn-primary mb-3"
+    [routerLink]="['/client/equipment-repair']"
+  >
+    Abrir Chamado
+  </a>
 
-    <table class="table table-striped table-bordered table-hover">
-
-      <tbody>
-
+  <div class="table-responsive">
+    <table class="table table-striped table-bordered">
+      <thead>
         <tr>
           <th>Data/Hora</th>
           <th>Equipamento</th>
           <th>Estado</th>
-          <th class="text-center">Ações</th>
+          <th>Ações</th>
         </tr>
+      </thead>
 
-        @if (requests.length === 0) {
-        <tr>
-          <td colspan="4">Nenhuma solicitação cadastrada.</td>
-        </tr>
-        }
+      <tbody>
+        @for (request of requests(); track request.maintenanceRequestId) {
+          <tr>
+            <td>
+              {{ request.requestDateTime | date:'dd/MM/yyyy HH:mm' }}
+            </td>
 
-        @else{
-        @for(request of requests; track request.id){
-        <tr>
-          <td>
-            {{ request.requestDateTime | date:'dd/MM/yyyy HH:mm' }}
-          </td>
-          <td>
-            {{request.equipmentDescription}}
-          </td>
-          <td>
-            <span class="status-badge" [ngClass]="'status-' + request.status.toLowerCase()">
-              {{getStatusLabel(request.status)}}
-            </span>
-          </td>
+            <td>
+              {{ request.equipmentDescription | slice:0:30 }}
+            </td>
 
+            <td>
+              {{ getStatusLabel(request.status) }}
+            </td>
 
-          <td class="text-center">
+            <td>
+              <a
+                class="btn btn-primary btn-sm me-2"
+                [routerLink]="[
+                  '/client/request-details',
+                  request.maintenanceRequestId
+                ]"
+              >
+                Visualizar
+              </a>
 
-            <button type="button" class="btn btn-primary btn-sm" (click)="openRequest(request.id)">
-              Visualizar
-            </button>
+              @if (request.status === 'QUOTED') {
+                <a
+                  class="btn btn-success btn-sm"
+                  [routerLink]="[
+                    '/client/quote-approval',
+                    request.maintenanceRequestId
+                  ]"
+                >
+                  Aprovar/Rejeitar Serviço
+                </a>
+              }
 
-            @if (canReviewQuote(request)) {
-            <button type="button" class="btn btn-success btn-sm" (click)="openQuote(request.id)">
-              Aprovar/Rejeitar Serviço
-            </button>
-            }
+              @if (request.status === 'REJECTED') {
+                <button
+                  type="button"
+                  class="btn btn-warning btn-sm"
+                  [disabled]="saving()"
+                  (click)="rescueRequest(request.maintenanceRequestId)"
+                >
+                  Resgatar Serviço
+                </button>
+              }
 
-            @switch (request.status) {
-
-            @case ('REJECTED') {
-            <button type="button" class="btn btn-warning btn-sm" (click)="rescueRequest(request.id)">
-              Resgatar Serviço
-            </button>
-            }
-
-            @case ('FIXED') {
-            <button type="button" class="btn btn-success btn-sm" (click)="payRequest(request.id)">
-              Pagar Serviço
-            </button>
-            }
-            }
-          </td>
-        </tr>
-        }
+              @if (request.status === 'FIXED') {
+                <a
+                  class="btn btn-success btn-sm"
+                  [routerLink]="[
+                    '/client/pay-request',
+                    request.maintenanceRequestId
+                  ]"
+                >
+                  Pagar Serviço
+                </a>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="4">
+              Nenhuma solicitação cadastrada.
+            </td>
+          </tr>
         }
       </tbody>
-
     </table>
-
-    <button type="button" class="btn btn-default" (click)="logout()">
-      <i class="fa fa-sign-out"></i> Sair
-    </button>
-    <button type="button" class="btn btn-default" (click)="OpenTicket()">
-      <i class="fa fa-ticket"></i> Abrir Chamado
-    </button>
-
   </div>
 
+  <button
+    type="button"
+    class="btn btn-secondary"
+    (click)="logout()"
+  >
+    Sair
+  </button>
 </div>

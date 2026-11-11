@@ -1,11 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+
 import { MaintenanceRequest } from '../../../shared/models/maintenance-request';
-import { RequestStatus } from '../../../shared/enum/request-status.enum';
-import { HistoryActions } from '../../../shared/enum/history-actions.enum';
-import { RequestHistory } from '../../../shared/models/request-history.model';
-import { LoginService } from '../../../services/login.service';
 import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
 import { Category } from '../../../shared/models/category.model';
 import { CategoryService } from '../../../services/category.service';
@@ -16,68 +13,86 @@ import { CategoryService } from '../../../services/category.service';
   templateUrl: './client-equipment-repair.component.html',
   styleUrls: ['./client-equipment-repair.component.css'],
 })
-
 export class ClientEquipmentRepairComponent {
-  equipmentCategories: Category[] = [];
+  equipmentCategories = signal<Category[]>([]);
+  message = signal('');
+  saving = signal(false);
 
   request = new MaintenanceRequest();
 
   constructor(
     private router: Router,
-    private loginService: LoginService,
     private maintenanceRequestService: MaintenanceRequestService,
     private categoryService: CategoryService,
   ) {
     this.categoryService.listAll().subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.equipmentCategories = response.data.filter(category => category.active);
+      next: response => {
+        if (!response.success) {
+          this.message.set(response.message);
+          return;
         }
+
+        this.equipmentCategories.set(
+          response.data.filter(category => category.active)
+        );
       },
-      error: (error) => console.error('Erro ao buscar categorias:', error),
+      error: error => {
+        this.message.set(
+          error.error?.message ??
+          'Não foi possível carregar as categorias.'
+        );
+      }
     });
   }
 
   createRequest(): void {
-    if (
-      !this.request.equipmentDescription ||
-      !this.request.defectDescription ||
-      this.request.equipmentDescription.length > 30 ||
-      !this.request.categoryId
-    ) {
-      // faz a validação dos campos antes de cadastrar o reparo
-      alert('Por favor, preencha todos os campos antes de cadastrar o reparo.');
+    if (this.saving()) {
       return;
     }
 
-    const clientId = this.loginService.getLoggedUserId();
+    const equipmentDescription =
+      this.request.equipmentDescription.trim();
 
-    if (!clientId) {
-      alert('Cliente não identificado.');
-      this.router.navigate(['/login']);
+    const defectDescription =
+      this.request.defectDescription.trim();
+
+    const categoryId = Number(this.request.categoryId);
+
+    if (!equipmentDescription || !defectDescription || !categoryId) {
+      this.message.set('Preencha todos os campos.');
       return;
     }
 
-    this.request.clientId = clientId;
+    this.message.set('');
+    this.saving.set(true);
 
-    this.request.requestDateTime = new Date().toISOString();
+    this.maintenanceRequestService.createRequest({
+      equipmentDescription,
+      defectDescription,
+      categoryId
+    }).subscribe({
+      next: response => {
+        this.saving.set(false);
 
-    this.request.status = RequestStatus.OPEN;
+        if (!response.success) {
+          this.message.set(response.message);
+          return;
+        }
 
-    const history = new RequestHistory(
-      0,
-      HistoryActions.REQUEST_CREATED,
-      null,
-      RequestStatus.OPEN,
-      new Date().toISOString(),
-      'Solicitação de manutenção criada',
-    );
+        alert(response.message);
+        this.router.navigate(['/client/home']);
+      },
+      error: error => {
+        this.saving.set(false);
 
-    this.request.requestHistory.push(history);
-
-    this.maintenanceRequestService.insert(this.request);
-
-    this.router.navigate(['/client/home']);
+        this.message.set(
+          error.status === 401
+            ? 'Sua sessão expirou. Entre novamente.'
+            : error.error?.message ??
+              'Não foi possível cadastrar a solicitação.'
+        );
+      }
+    });
   }
 
   goBack(): void {

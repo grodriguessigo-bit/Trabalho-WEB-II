@@ -1,22 +1,27 @@
 <h1 class="page-header text-center" style="color: grey;">Gerar Orçamento</h1>
 
-<div class="text-center">
-
+@if (request(); as request) {
+  <div class="text-center">
     <div style="width: 50%; margin: 0 auto; text-align: left;">
-        <p>Cliente ID: {{ client?.clientId }}</p>
-        <p>Equipamento: {{ client?.equipmentDescription }}</p>
-        <p>Descrição: {{ client?.defectDescription }}</p>
-        <p>Data Solicitação: {{ client?.requestDateTime }}</p>
+      <p><strong>Cliente:</strong> {{ request.client.name }}</p>
+      <p><strong>Equipamento:</strong> {{ request.equipmentDescription }}</p>
+      <p><strong>Descrição:</strong> {{ request.defectDescription }}</p>
+      <p><strong>Categoria:</strong> {{ request.categoryName }}</p>
+      <p><strong>Data Solicitação:</strong> {{ request.requestDateTime }}</p>
     </div>
 
-    <div style="display: flex; justify-content: center; align-items: center; margin-top: 15px;">
-        <label for="price">Valor do orçamento:</label>
-        <input id="price" type="number" min="0.01" step="0.01" class="form-control" [(ngModel)]="price" style="width: 50%; margin: 8px auto;">
+    <div style="margin-top: 15px;">
+      <label for="price">Valor do orçamento:</label>
+      <input id="price" type="number" min="0.01" step="0.01" class="form-control"
+        [(ngModel)]="price" style="width: 50%; margin: 8px auto;">
 
-        @if (message) {
-            <p class="text-danger">{{ message }}</p>
-        }
+      @if (message()) {
+        <p class="text-danger">{{ message() }}</p>
+      }
     </div>
 
-    <button type="button" class="btn btn-primary" (click)="generateBudget()" style="margin-top: 20px;">Gerar Orçamento</button>
-</div>
+    <button type="button" class="btn btn-primary" (click)="generateBudget()" style="margin-top: 20px;">
+      Gerar Orçamento
+    </button>
+  </div>
+}

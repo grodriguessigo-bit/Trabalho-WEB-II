@@ -1,16 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-
-import { CategoryService } from '../../../services/category.service';
 import { LoginService } from '../../../services/login.service';
 import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
-import { QuoteService } from '../../../services/quote.service';
 import { HistoryActions } from '../../../shared/enum/history-actions.enum';
 import { RequestStatus } from '../../../shared/enum/request-status.enum';
-import { MaintenanceRequest } from '../../../shared/models/maintenance-request';
-import { Quote } from '../../../shared/models/quote';
-import { RequestHistory } from '../../../shared/models/request-history.model';
+import { ClientRequestDetailsDTO, ACTION_LABELS, STATUS_LABELS } from '../../../shared/models/request-api.model';
 
 @Component({
   selector: 'app-request-details.component',
@@ -18,103 +13,109 @@ import { RequestHistory } from '../../../shared/models/request-history.model';
   templateUrl: './request-details.component.component.html',
   styleUrl: './request-details.component.component.css',
 })
-export class RequestDetailsComponentComponent {
-  request: MaintenanceRequest | undefined;
-  quote: Quote | undefined;
-  categoryName = '';
-  historyEntries: RequestHistory[] = [];
+export class RequestDetailsComponentComponent implements OnInit {
+
+  request = signal<ClientRequestDetailsDTO | null>(null);
+  message = signal('');
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private loginService: LoginService,
-    private maintenanceRequestService: MaintenanceRequestService,
-    private quoteService: QuoteService,
-    private categoryService: CategoryService,
-  ) {
+    private maintenanceRequestService: MaintenanceRequestService
+  ) {}
+
+  ngOnInit(): void {
+
     if (this.loginService.getLoggedUserType() !== 'CLIENT') {
       this.router.navigate(['/login']);
       return;
     }
 
-    const requestId = Number(this.route.snapshot.paramMap.get('id'));
-    const request = this.maintenanceRequestService.findById(requestId);
-    const clientId = this.loginService.getLoggedUserId();
+    const requestId =
+      Number(this.route.snapshot.paramMap.get('id'));
 
-    if (!request || request.clientId !== clientId) {
-      this.router.navigate(['/client/home']);
-      return;
-    }
+    this.loadRequest(requestId);
+  }
 
-    this.request = request;
-    this.quote = this.quoteService.findByRequestId(request.id);
-    this.categoryService.findById(request.categoryId).subscribe({
-      next: (response) => {
-        this.categoryName = response.success ? response.data.name : '';
-      },
-      error: (error) => console.error('Erro ao buscar categoria:', error),
-    });
-    this.historyEntries = request.requestHistory ?? [];
+  loadRequest(requestId: number): void {
+
+    this.maintenanceRequestService
+      .getClientDetails(requestId)
+      .subscribe({
+        next: response => {
+          this.request.set(response.data);
+        },
+
+        error: () => {
+          this.router.navigate(['/client/home']);
+        }
+      });
   }
 
   getStatusLabel(status: RequestStatus): string {
-    const labels: Record<RequestStatus, string> = {
-      [RequestStatus.OPEN]: 'ABERTA',
-      [RequestStatus.QUOTED]: 'ORÇADA',
-      [RequestStatus.APPROVED]: 'APROVADA',
-      [RequestStatus.REJECTED]: 'REJEITADA',
-      [RequestStatus.REDIRECTED]: 'REDIRECIONADA',
-      [RequestStatus.FIXED]: 'ARRUMADA',
-      [RequestStatus.PAID]: 'PAGA',
-      [RequestStatus.FINALIZED]: 'FINALIZADA',
-    };
-
-    return labels[status] ?? status;
+    return STATUS_LABELS[status];
   }
 
   getActionLabel(action: HistoryActions): string {
-    const labels: Record<HistoryActions, string> = {
-      [HistoryActions.REQUEST_CREATED]: 'Solicitação criada',
-      [HistoryActions.QUOTE_CREATED]: 'Orçamento criado',
-      [HistoryActions.QUOTE_APPROVED]: 'Orçamento aprovado',
-      [HistoryActions.QUOTE_REJECTED]: 'Orçamento rejeitado',
-      [HistoryActions.REQUEST_RESCUED]: 'Solicitação resgatada',
-      [HistoryActions.MAINTENANCE_REDIRECTED]: 'Manutenção redirecionada',
-      [HistoryActions.MAINTENANCE_COMPLETED]: 'Manutenção concluída',
-      [HistoryActions.PAYMENT_CONFIRMED]: 'Pagamento confirmado',
-      [HistoryActions.REQUEST_FINALIZED]: 'Solicitação finalizada',
-    };
-
-    return labels[action] ?? action;
+    return ACTION_LABELS[action];
   }
 
   canReviewQuote(): boolean {
-    return this.request?.status === RequestStatus.QUOTED && this.quote !== undefined;
+
+    return (
+      this.request()?.status === RequestStatus.QUOTED &&
+      this.request()?.quote != null
+    );
   }
 
   openQuote(): void {
-    if (this.request) {
-      this.router.navigate(['/client/quote-approval', this.request.id]);
+
+    const request = this.request();
+
+    if (request) {
+      this.router.navigate([
+        '/client/quote-approval',
+        request.requestId
+      ]);
     }
   }
 
-  rescueRequest(requestId: number): void {
-    const rescued = this.maintenanceRequestService.rescueRequest(requestId);
+  rescueRequest(): void {
 
-    if (!rescued) {
+    const request = this.request();
+
+    if (!request) {
       return;
     }
 
-    const updatedRequest = this.maintenanceRequestService.findById(requestId);
+    this.maintenanceRequestService
+      .rescueRequest(request.requestId)
+      .subscribe({
+        next: response => {
+          this.message.set(response.message);
+          this.loadRequest(request.requestId);
+        },
 
-    if (updatedRequest) {
-      this.request = updatedRequest;
-      this.historyEntries = updatedRequest.requestHistory;
-    }
+        error: error => {
+          this.message.set(
+            error.error?.message ??
+            'Não foi possível resgatar a solicitação.'
+          );
+        }
+      });
   }
 
-  payRequest(requestId: number): void {
-    this.router.navigate(['/client/pay-request', requestId]);
+  payRequest(): void {
+
+    const request = this.request();
+
+    if (request) {
+      this.router.navigate([
+        '/client/pay-request',
+        request.requestId
+      ]);
+    }
   }
 
   goBack(): void {

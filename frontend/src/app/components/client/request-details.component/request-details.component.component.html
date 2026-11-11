@@ -1,84 +1,189 @@
 <div class="container py-4">
+
   <h1 class="mb-4">Detalhes da solicitação</h1>
 
-  @if (request) {
+  @if (message()) {
+    <div class="alert alert-info">
+      {{ message() }}
+    </div>
+  }
+
+  @if (request(); as request) {
+
     <div class="d-flex flex-wrap gap-2 mb-3">
+
       @if (request.status === 'REJECTED') {
-        <button type="button" class="btn btn-warning"
-          (click)="rescueRequest(request.id)">
+        <button
+          type="button"
+          class="btn btn-warning"
+          (click)="rescueRequest()">
           Resgatar Serviço
         </button>
       }
 
       @if (request.status === 'FIXED') {
-        <button type="button" class="btn btn-success"
-          (click)="payRequest(request.id)">
+        <button
+          type="button"
+          class="btn btn-success"
+          (click)="payRequest()">
           Pagar Serviço
         </button>
       }
 
-      <button type="button" class="btn btn-secondary" (click)="goBack()">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="goBack()">
         Voltar
       </button>
+
     </div>
 
     <div class="card mb-3">
-      <div class="card-body">
-        <h2 class="h5 mb-3">Dados da solicitação</h2>
 
-        <p class="text-break">
-          <strong>Equipamento:</strong> {{ request.equipmentDescription }}
+      <div class="card-body">
+
+        <h2 class="h5 mb-3">
+          Dados da solicitação
+        </h2>
+
+        <p>
+          <strong>Equipamento:</strong>
+          {{ request.equipmentDescription }}
         </p>
-        <p class="text-break">
-          <strong>Defeito:</strong> {{ request.defectDescription }}
+
+        <p>
+          <strong>Defeito:</strong>
+          {{ request.defectDescription }}
         </p>
-        <p><strong>Categoria:</strong> {{ categoryName || 'Não informada' }}</p>
+
+        <p>
+          <strong>Categoria:</strong>
+          {{ request.categoryName }}
+        </p>
+
         <p>
           <strong>Data da solicitação:</strong>
           {{ request.requestDateTime | date:'dd/MM/yyyy HH:mm' }}
         </p>
+
         <p class="mb-0">
-          <strong>Estado:</strong> {{ getStatusLabel(request.status) }}
+          <strong>Estado:</strong>
+          {{ getStatusLabel(request.status) }}
         </p>
+
       </div>
+
     </div>
 
-    @if (quote) {
+    @if (request.quote; as quote) {
+
       <div class="card mb-3">
+
         <div class="card-body">
-          <h2 class="h5">Orçamento</h2>
+
+          <h2 class="h5">
+            Orçamento
+          </h2>
 
           <div class="alert alert-info">
-            <strong class="fs-3">{{ quote.price | currency:'BRL' }}</strong>
+            <strong class="fs-3">
+              {{ quote.price | currency:'BRL' }}
+            </strong>
           </div>
 
-          <p class="text-break">
-            <strong>Descrição:</strong>
-            {{ quote.description || 'Não informada' }}
+          <p>
+            <strong>Funcionário:</strong>
+            {{ quote.employeeName || 'Não informado' }}
           </p>
-          <p class="text-break">
-            <strong>Observações:</strong>
-            {{ quote.observations || 'Nenhuma observação.' }}
-          </p>
+
           <p>
             <strong>Data do orçamento:</strong>
             {{ quote.quoteDateTime | date:'dd/MM/yyyy HH:mm' }}
           </p>
 
           @if (canReviewQuote()) {
-            <button type="button" class="btn btn-primary" (click)="openQuote()">
+            <button
+              type="button"
+              class="btn btn-primary"
+              (click)="openQuote()">
+
               Aprovar ou rejeitar orçamento
+
             </button>
           }
+
+        </div>
+
+      </div>
+    }
+
+    @if (request.maintenance; as maintenance) {
+
+      <div class="card mb-3">
+        <div class="card-body">
+
+          <h2 class="h5">
+            Manutenção
+          </h2>
+
+          <p>
+            <strong>Descrição:</strong>
+            {{ maintenance.maintenanceDescription }}
+          </p>
+
+          <p>
+            <strong>Orientações ao cliente:</strong>
+            {{ maintenance.clientInstructions }}
+          </p>
+
+          <p>
+            <strong>Funcionário:</strong>
+            {{ maintenance.employeeName || 'Não informado' }}
+          </p>
+
+          <p>
+            <strong>Data:</strong>
+            {{ maintenance.maintenanceDateTime | date:'dd/MM/yyyy HH:mm' }}
+          </p>
+
         </div>
       </div>
     }
 
-    <h2 class="h4 mb-3">Histórico</h2>
+    @if (request.payment; as payment) {
 
-    @if (historyEntries.length > 0) {
+      <div class="card mb-3">
+        <div class="card-body">
+
+          <h2 class="h5">
+            Pagamento
+          </h2>
+
+          <p>
+            <strong>Valor:</strong>
+            {{ payment.amount | currency:'BRL' }}
+          </p>
+
+          <p>
+            <strong>Data:</strong>
+            {{ payment.paymentDateTime | date:'dd/MM/yyyy HH:mm' }}
+          </p>
+
+        </div>
+      </div>
+    }
+
+    <h2 class="h4 mb-3">
+      Histórico
+    </h2>
+
+    @if (request.history.length > 0) {
+
       <div class="table-responsive">
+
         <table class="table table-striped table-bordered">
+
           <thead>
             <tr>
               <th>Data/Hora</th>
@@ -89,32 +194,62 @@
           </thead>
 
           <tbody>
-            @for (history of historyEntries; track history.id) {
+
+            @for (
+              history of request.history;
+              track history.requestHistoryId
+            ) {
+
               <tr>
+
                 <td>
                   {{ history.changeDateTime | date:'dd/MM/yyyy HH:mm' }}
                 </td>
-                <td class="text-break">
-                  <strong>{{ getActionLabel(history.action) }}</strong>
-                  <p class="mb-0">{{ history.description }}</p>
-                </td>
+
                 <td>
-                  @if (history.previousStatus != null) {
+                  <strong>
+                    {{ getActionLabel(history.action) }}
+                  </strong>
+
+                  @if (history.rejectionReason) {
+                    <div>
+                      Motivo: {{ history.rejectionReason }}
+                    </div>
+                  }
+                </td>
+
+                <td>
+
+                  @if (history.previousStatus) {
                     {{ getStatusLabel(history.previousStatus) }}
                     →
                   }
+
                   {{ getStatusLabel(history.newStatus) }}
+
                 </td>
-                <td>{{ history.performedByName || 'Não informado' }}</td>
+
+                <td>
+                  {{ history.performedByName || 'Não informado' }}
+                </td>
+
               </tr>
             }
+
           </tbody>
+
         </table>
+
       </div>
+
     } @else {
+
       <div class="alert alert-info">
         Nenhum histórico disponível.
       </div>
+
     }
+
   }
+
 </div>

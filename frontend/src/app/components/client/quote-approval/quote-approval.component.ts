@@ -1,140 +1,138 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-
-import { CategoryService } from '../../../services/category.service';
 import { LoginService } from '../../../services/login.service';
 import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
 import { QuoteService } from '../../../services/quote.service';
-import { HistoryActions } from '../../../shared/enum/history-actions.enum';
 import { RequestStatus } from '../../../shared/enum/request-status.enum';
-import { MaintenanceRequest } from '../../../shared/models/maintenance-request';
-import { RequestHistory } from '../../../shared/models/request-history.model';
+import { ClientRequestDetailsDTO, STATUS_LABELS } from '../../../shared/models/request-api.model';
 
 @Component({
-	selector: 'app-quote-approval',
-	imports: [CommonModule],
-	templateUrl: './quote-approval.component.html',
-	styleUrl: './quote-approval.component.css',
+  selector: 'app-quote-approval',
+  imports: [
+    CommonModule,
+    FormsModule
+  ],
+  templateUrl: './quote-approval.component.html',
+  styleUrl: './quote-approval.component.css',
 })
-export class QuoteApprovalComponent {
-	request: MaintenanceRequest | undefined;
-	quotePrice: number | undefined;
-	quoteDescription = '';
-	categoryName = '';
-	message = '';
-	quoteObservations = '';
-	approvalConfirmed: boolean = false;
+export class QuoteApprovalComponent implements OnInit {
 
-	constructor(
-		private route: ActivatedRoute,
-		private router: Router,
-		private loginService: LoginService,
-		private maintenanceRequestService: MaintenanceRequestService,
-		private quoteService: QuoteService,
-		private categoryService: CategoryService,
-	) {
-		if (this.loginService.getLoggedUserType() !== 'CLIENT') {
-			this.router.navigate(['/login']);
-			return;
-		}
+  request = signal<ClientRequestDetailsDTO | null>(null);
+  message = signal('');
+  approvalConfirmed = signal(false);
 
-		const requestId = Number(this.route.snapshot.paramMap.get('id'));
-		const request = this.maintenanceRequestService.findById(requestId);
+  rejectionReason = '';
 
-		if (!request || request.clientId !== this.loginService.getLoggedUserId()) {
-			this.router.navigate(['/client/home']);
-			return;
-		}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private loginService: LoginService,
+    private maintenanceRequestService: MaintenanceRequestService,
+    private quoteService: QuoteService
+  ) {}
 
-		const quote = this.quoteService.findByRequestId(requestId);
+  ngOnInit(): void {
 
-		if (!quote) {
-			this.router.navigate(['/client/home']);
-			return;
-		}
+    if (this.loginService.getLoggedUserType() !== 'CLIENT') {
+      this.router.navigate(['/login']);
+      return;
+    }
 
-		this.request = request;
-		this.quotePrice = quote.price;
-		this.quoteDescription = quote.description ?? '';
-		this.categoryService.findById(request.categoryId).subscribe({
-			next: (response) => {
-				this.categoryName = response.success ? response.data.name : '';
-			},
-			error: (error) => console.error('Erro ao buscar categoria:', error),
-		});
-		this.quoteObservations = quote.observations ?? '';
-	}
+    const requestId =
+      Number(this.route.snapshot.paramMap.get('id'));
 
-	approve(): void {
-		this.updateRequestStatus(RequestStatus.APPROVED, HistoryActions.QUOTE_APPROVED, 'Orçamento aprovado pelo cliente.');
-	}
+    this.maintenanceRequestService
+      .getClientDetails(requestId)
+      .subscribe({
+        next: response => {
 
-	reject(): void {
-		this.updateRequestStatus(RequestStatus.REJECTED, HistoryActions.QUOTE_REJECTED, 'Orçamento rejeitado pelo cliente.');
-	}
+          if (
+            !response.data ||
+            !response.data.quote
+          ) {
+            this.router.navigate(['/client/home']);
+            return;
+          }
 
-	goBack(): void {
-		this.router.navigate(['/client/home']);
-	}
+          this.request.set(response.data);
+        },
 
-	private updateRequestStatus(
-		status: RequestStatus,
-		action: HistoryActions,
-		description: string,
-	): void {
-		if (!this.request || this.request.status !== RequestStatus.QUOTED) {
-			this.message = 'Esta solicitação não está aguardando aprovação.';
-			return;
-		}
+        error: () => {
+          this.router.navigate(['/client/home']);
+        }
+      });
+  }
 
-		const changeDateTime = new Date().toISOString();
-		const previousStatus = this.request.status;
-		this.request.requestHistory ??= [];
+  approve(): void {
 
-		this.request.status = status;
-		this.request.requestHistory.push(
-			new RequestHistory(
-				this.request.requestHistory.length + 1,
-				action,
-				previousStatus,
-				status,
-				changeDateTime,
-				description,
-				'Cliente',
-			),
-		);
+    const request = this.request();
 
-		this.maintenanceRequestService.update(this.request);
+    if (!request) {
+      return;
+    }
 
-		if (status === RequestStatus.APPROVED) {
-		this.approvalConfirmed = true;
-		return;
-		}
+    this.message.set('');
 
-		this.router.navigate(['/client/home']);
-	}
+    this.quoteService
+      .approve(request.requestId)
+      .subscribe({
+        next: response => {
+          this.message.set(response.message);
+          this.approvalConfirmed.set(true);
+        },
 
-	getStatusLabel(): string {
-	switch (this.request?.status) {
-		case RequestStatus.OPEN:
-		return 'ABERTA';
-		case RequestStatus.QUOTED:
-		return 'ORÇADA';
-		case RequestStatus.APPROVED:
-		return 'APROVADA';
-		case RequestStatus.REJECTED:
-		return 'REJEITADA';
-		case RequestStatus.REDIRECTED:
-		return 'REDIRECIONADA';
-		case RequestStatus.FIXED:
-		return 'ARRUMADA';
-		case RequestStatus.PAID:
-		return 'PAGA';
-		case RequestStatus.FINALIZED:
-		return 'FINALIZADA';
-		default:
-		return '';
-	}
-	}
+        error: error => {
+          this.message.set(
+            error.error?.message ??
+            'Não foi possível aprovar o orçamento.'
+          );
+        }
+      });
+  }
+
+  reject(): void {
+
+    const request = this.request();
+
+    if (!request) {
+      return;
+    }
+
+    if (!this.rejectionReason.trim()) {
+      this.message.set(
+        'Informe o motivo da rejeição.'
+      );
+      return;
+    }
+
+    this.message.set('');
+
+    this.quoteService
+      .reject(
+        request.requestId,
+        this.rejectionReason
+      )
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/client/home']);
+        },
+
+        error: error => {
+          this.message.set(
+            error.error?.message ??
+            'Não foi possível rejeitar o orçamento.'
+          );
+        }
+      });
+  }
+
+  getStatusLabel(status: RequestStatus): string {
+    return STATUS_LABELS[status];
+  }
+
+  goBack(): void {
+    this.router.navigate(['/client/home']);
+  }
 }

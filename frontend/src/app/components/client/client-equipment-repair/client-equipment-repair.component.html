@@ -1,39 +1,93 @@
-<form id="repair-form" class="repair-form" #formRepair="ngForm">
+<form
+  id="repair-form"
+  class="repair-form"
+  #formRepair="ngForm"
+  (ngSubmit)="createRequest()"
+>
+  <h1 class="repair-form__title">Cadastrar novo reparo</h1>
 
+  <label class="repair-form__label" for="description">
+    Descrição do equipamento:
+  </label>
 
-    <h1 class="repair-form__title">Cadastrar novo reparo</h1>
+  <input
+    type="text"
+    class="repair-form__control"
+    id="description"
+    name="description"
+    maxlength="30"
+    [(ngModel)]="request.equipmentDescription"
+    #description="ngModel"
+    required
+  >
 
-    <label class="repair-form__label">Descrição do equipamento: </label>
-    <input type="text" class="repair-form__control" id="description" name="description" maxlength="30"
-    [(ngModel)]="request.equipmentDescription" #description="ngModel" required>
-
-    @if (description.errors && (description.dirty || description.touched)) {
-      <div class="alert alert-danger">
-        <div [hidden]="!description.errors['required']"> Digite a descrição do problema. </div>
-      </div>
-    }
-
-    <label class="repair-form__label" for="DescriptionDefect">Descrição do defeito:</label>
-    <input type="text" class="repair-form__control" id="DescriptionDefect" name="DescriptionDefect"
-    [(ngModel)]="request.defectDescription" #DescriptionDefect="ngModel" required>
-
-    @if (DescriptionDefect.errors && (DescriptionDefect.dirty || DescriptionDefect.touched)) {
+  @if (description.invalid && (description.dirty || description.touched)) {
     <div class="alert alert-danger">
-        <div [hidden]="!DescriptionDefect.errors['required']"> Digite a descrição do defeito. </div>
+      Digite a descrição do equipamento.
     </div>
+  }
+
+  <label class="repair-form__label" for="DescriptionDefect">
+    Descrição do defeito:
+  </label>
+
+  <input
+    type="text"
+    class="repair-form__control"
+    id="DescriptionDefect"
+    name="DescriptionDefect"
+    [(ngModel)]="request.defectDescription"
+    #defect="ngModel"
+    required
+  >
+
+  @if (defect.invalid && (defect.dirty || defect.touched)) {
+    <div class="alert alert-danger">
+      Digite a descrição do defeito.
+    </div>
+  }
+
+  <label class="repair-form__label" for="equipamentCategory">
+    Categoria do equipamento:
+  </label>
+
+  <select
+    class="repair-form__controlSelect"
+    id="equipamentCategory"
+    name="equipamentCategory"
+    [(ngModel)]="request.categoryId"
+    required
+  >
+    <option [ngValue]="0" disabled>
+      Selecione uma categoria
+    </option>
+
+    @for (cat of equipmentCategories(); track cat.id) {
+      <option [ngValue]="cat.id">
+        {{ cat.name }}
+      </option>
     }
+  </select>
 
-    <label class="repair-form__label" for="equipamentCategory">Categoria do equipamento:</label>
-    <select class="repair-form__controlSelect" id="equipamentCategory" name="equipamentCategory" [(ngModel)]="request.categoryId" #equipamentCategory="ngModel" required>
-        <option class="repair-form_label" value="">Selecione uma categoria</option>
-        @for (cat of equipmentCategories; track cat.id) {
-            <option [ngValue]="cat.id">{{ cat.name }}</option>
-        }
-    </select>
-    <button type="submit" class="repair-form__buttton" (click)="createRequest()">Cadastrar</button>
-    <button type="submit" class="repair-form__buttton" (click)="goBack()">Voltar</button>
+  @if (message()) {
+    <div class="alert alert-danger" role="alert">
+      {{ message() }}
+    </div>
+  }
 
+  <button
+    type="submit"
+    class="repair-form__buttton"
+    [disabled]="formRepair.invalid || !request.categoryId || saving()"
+  >
+    {{ saving() ? 'Cadastrando...' : 'Cadastrar' }}
+  </button>
 
+  <button
+    type="button"
+    class="repair-form__buttton"
+    (click)="goBack()"
+  >
+    Voltar
+  </button>
 </form>
-
-

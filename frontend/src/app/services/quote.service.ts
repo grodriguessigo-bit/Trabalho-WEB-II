@@ -1,80 +1,63 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Quote } from '../shared/models/quote';
-
-const LS_KEY = "quotes";
+import { Observable } from 'rxjs';
+import { ApiResponse } from '../shared/models/api-response.model';
+import { QuoteDTO } from '../shared/models/request-api.model';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class QuoteService {
 
-  listAll(): Quote[] {
-    const quotes = localStorage.getItem(LS_KEY);
+  private readonly apiUrl =
+    'http://localhost:8090/quotes';
 
-    if (!quotes) {
-      return [
-        new Quote(
-          1,
-          5,
-          1,
-          450,
-          'Orçamento inicial da solicitação.',
-          '2026-09-15T10:00:00',
-        ),
-        new Quote(
-          2,
-          4,
-          1,
-          320,
-          'Manutenção do equipamento.',
-          '2026-09-13T18:00:00',
-        ),
-      ];
-    }
+  constructor(
+    private http: HttpClient
+  ) {}
 
-    return JSON.parse(quotes).map((quote: Quote) => new Quote(
-      quote.id,
-      quote.requestId,
-      quote.employeeId,
-      quote.price,
-      quote.description ?? '',
-      quote.quoteDateTime,
-      quote.observations ?? '',
-    ));
-  }
+  create(
+    requestId: number,
+    price: number
+  ): Observable<ApiResponse<QuoteDTO>> {
 
-  insert(quote: Quote): void {
-    const quotes = this.listAll();
-
-    quote.id = this.generateId(quotes);
-
-    quotes.push(quote);
-
-    this.saveAll(quotes);
-  }
-
-  findByRequestId(requestId: number): Quote | undefined {
-    return this.listAll().find(
-      quote => quote.requestId === requestId
+    return this.http.post<ApiResponse<QuoteDTO>>(
+      `${this.apiUrl}/request/${requestId}`,
+      { price },
+      { withCredentials: true }
     );
   }
 
-  private saveAll(quotes: Quote[]): void {
-    localStorage.setItem(
-      LS_KEY,
-      JSON.stringify(quotes)
+  findByRequestId(
+    requestId: number
+  ): Observable<ApiResponse<QuoteDTO>> {
+
+    return this.http.get<ApiResponse<QuoteDTO>>(
+      `${this.apiUrl}/request/${requestId}`,
+      { withCredentials: true }
     );
   }
 
-  private generateId(quotes: Quote[]): number {
+  approve(
+    requestId: number
+  ): Observable<ApiResponse<null>> {
 
-    if (quotes.length === 0) {
-      return 1;
-    }
-
-    const highestId = Math.max(...quotes.map(quote => quote.id));
-
-    return highestId + 1;
+    return this.http.post<ApiResponse<null>>(
+      `${this.apiUrl}/request/${requestId}/approve`,
+      {},
+      { withCredentials: true }
+    );
   }
 
+  reject(
+    requestId: number,
+    reason: string
+  ): Observable<ApiResponse<null>> {
+
+    return this.http.post<ApiResponse<null>>(
+      `${this.apiUrl}/request/${requestId}/reject`,
+      { reason },
+      { withCredentials: true }
+    );
+  }
 }

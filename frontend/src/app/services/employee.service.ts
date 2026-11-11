@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -42,36 +42,63 @@ export class EmployeeService {
 
   listAll(): Observable<EmployeeDTO[]> {
     return this.http
-      .get<ApiResponse<EmployeeDTO[]>>(API_URL)
-      .pipe(map(res => res.data));
+      .get<ApiResponse<EmployeeDTO[]>>(
+        API_URL,
+        { withCredentials: true }
+      )
+      .pipe(
+        map(response => response.data)
+      );
   }
 
   findById(id: number): Observable<EmployeeDTO> {
     return this.http
-      .get<ApiResponse<EmployeeDTO>>(`${API_URL}/${id}`)
-      .pipe(map(res => res.data));
+      .get<ApiResponse<EmployeeDTO>>(
+        `${API_URL}/${id}`,
+        { withCredentials: true }
+      )
+      .pipe(
+        map(response => response.data)
+      );
   }
 
   insert(employee: CreateEmployeeDTO): Observable<EmployeeDTO> {
     return this.http
-      .post<ApiResponse<EmployeeDTO>>(API_URL, employee)
-      .pipe(map(res => res.data));
+      .post<ApiResponse<EmployeeDTO>>(
+        API_URL,
+        employee,
+        { withCredentials: true }
+      )
+      .pipe(
+        map(response => response.data)
+      );
   }
 
-  update(id: number, employee: UpdateEmployeeDTO): Observable<EmployeeDTO> {
+  update(
+    id: number,
+    employee: UpdateEmployeeDTO
+  ): Observable<EmployeeDTO> {
+
     return this.http
-      .put<ApiResponse<EmployeeDTO>>(`${API_URL}/${id}`, employee)
-      .pipe(map(res => res.data));
+      .put<ApiResponse<EmployeeDTO>>(
+        `${API_URL}/${id}`,
+        employee,
+        { withCredentials: true }
+      )
+      .pipe(
+        map(response => response.data)
+      );
   }
 
-  remove(id: number, loggedEmployeeId?: number): Observable<EmployeeDTO> {
-    let headers = new HttpHeaders();
-    if (loggedEmployeeId !== undefined) {
-      headers = headers.set('X-Employee-Id', String(loggedEmployeeId));
-    }
-
+  remove(id: number): Observable<EmployeeDTO> {
     return this.http
-      .patch<ApiResponse<EmployeeDTO>>(`${API_URL}/${id}/deactivate`, null, { headers })
-      .pipe(map(res => res.data));
+      .patch<ApiResponse<EmployeeDTO>>(
+        `${API_URL}/${id}/deactivate`,
+        null,
+        { withCredentials: true }
+      )
+      .pipe(
+        map(response => response.data)
+      );
   }
 }
