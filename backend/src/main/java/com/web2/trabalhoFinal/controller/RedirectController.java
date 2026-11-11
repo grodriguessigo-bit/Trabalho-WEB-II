@@ -2,6 +2,7 @@ package com.web2.trabalhoFinal.controller;
 
 import com.web2.trabalhoFinal.dto.ApiResponse;
 import com.web2.trabalhoFinal.dto.RedirectMaintenanceDTO;
+import com.web2.trabalhoFinal.service.PermissaoFuncionario;
 import com.web2.trabalhoFinal.service.RedirectService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +17,11 @@ import org.springframework.web.bind.annotation.*;
 public class RedirectController {
 
     private final RedirectService redirectService;
+    private final PermissaoFuncionario permissaoFuncionario;
 
-    public RedirectController(RedirectService redirectService) {
+    public RedirectController(RedirectService redirectService, PermissaoFuncionario permissaoFuncionario) {
         this.redirectService = redirectService;
+        this.permissaoFuncionario = permissaoFuncionario;
     }
 
     @PostMapping("/request/{requestId}")
@@ -28,6 +31,7 @@ public class RedirectController {
             Long employeeId,
             @RequestBody RedirectMaintenanceDTO destinationId
     ) {
+        permissaoFuncionario.verificar(employeeId);
         ApiResponse<Void> response = redirectService.redirect(
                 requestId,
                 employeeId,

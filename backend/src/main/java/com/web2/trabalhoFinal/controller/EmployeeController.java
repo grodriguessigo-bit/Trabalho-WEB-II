@@ -5,6 +5,7 @@ import com.web2.trabalhoFinal.dto.CreateEmployeeDTO;
 import com.web2.trabalhoFinal.dto.EmployeeDTO;
 import com.web2.trabalhoFinal.dto.UpdateEmployeeDTO;
 import com.web2.trabalhoFinal.service.EmployeeService;
+import com.web2.trabalhoFinal.service.PermissaoFuncionario;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,16 +14,26 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/employees")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class EmployeeController {
 
     private final EmployeeService employeeService;
-    public EmployeeController(EmployeeService employeeService) {
+    private final PermissaoFuncionario permissaoFuncionario;
+
+    public EmployeeController(
+            EmployeeService employeeService,
+            PermissaoFuncionario permissaoFuncionario
+    ) {
         this.employeeService = employeeService;
+        this.permissaoFuncionario = permissaoFuncionario;
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<EmployeeDTO>>salvar(@RequestBody CreateEmployeeDTO dto) {
+    public ResponseEntity<ApiResponse<EmployeeDTO>> salvar(
+            @RequestBody CreateEmployeeDTO dto,
+            @SessionAttribute(name = "employeeId", required = false) Long employeeId
+    ) {
+        permissaoFuncionario.verificar(employeeId);
         ApiResponse<EmployeeDTO> resposta = employeeService.salvar(dto);
 
         HttpStatus status;
@@ -34,19 +45,30 @@ public class EmployeeController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<EmployeeDTO>>> listar() {
+    public ResponseEntity<ApiResponse<List<EmployeeDTO>>> listar(
+            @SessionAttribute(name = "employeeId", required = false) Long employeeId
+    ) {
+        permissaoFuncionario.verificar(employeeId);
         return ResponseEntity.ok(employeeService.listar());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<EmployeeDTO>> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<EmployeeDTO>> buscarPorId(
+            @PathVariable Long id,
+            @SessionAttribute(name = "employeeId", required = false) Long employeeId
+    ) {
+        permissaoFuncionario.verificar(employeeId);
         ApiResponse<EmployeeDTO> resposta = employeeService.buscarPorId(id);
         HttpStatus status = resposta.isSuccess() ? HttpStatus.OK : HttpStatus.NOT_FOUND;
         return ResponseEntity.status(status).body(resposta);
     }
+
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<EmployeeDTO>> atualizar(@PathVariable Long id,
-                                                              @RequestBody UpdateEmployeeDTO dto) {
+                                                              @RequestBody UpdateEmployeeDTO dto,
+                                                              @SessionAttribute(name = "employeeId", required = false) Long employeeId)
+    {
+        permissaoFuncionario.verificar(employeeId);
         ApiResponse<EmployeeDTO> resposta = employeeService.atualizar(id, dto);
 
         HttpStatus status;
@@ -61,8 +83,8 @@ public class EmployeeController {
     @PatchMapping("/{id}/deactivate")
     public ResponseEntity<ApiResponse<EmployeeDTO>> desativar(
             @PathVariable Long id,
-            @SessionAttribute(value = "EmployeeId", required = false) Long idSolicitante) {
-
+            @SessionAttribute(value = "employeeId", required = false) Long idSolicitante) {
+        permissaoFuncionario.verificar(idSolicitante);
         if (idSolicitante == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     new ApiResponse<>("Entre como funcionário.", false)

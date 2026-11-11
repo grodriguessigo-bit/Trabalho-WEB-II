@@ -3,6 +3,7 @@ package com.web2.trabalhoFinal.controller;
 import com.web2.trabalhoFinal.dto.ApiResponse;
 import com.web2.trabalhoFinal.dto.CategoryDTO;
 import com.web2.trabalhoFinal.service.CategoryService;
+import com.web2.trabalhoFinal.service.PermissaoFuncionario;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,9 +16,14 @@ import java.util.List;
 public class CategoryController {
 
     private final CategoryService categoryService;
+    private final PermissaoFuncionario permissaoFuncionario;
 
-    public CategoryController(CategoryService categoryService) {
+    public CategoryController(
+            CategoryService categoryService,
+            PermissaoFuncionario permissaoFuncionario
+    ) {
         this.categoryService = categoryService;
+        this.permissaoFuncionario = permissaoFuncionario;
     }
 
     @GetMapping
@@ -38,7 +44,11 @@ public class CategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<CategoryDTO>> salvar(@RequestBody CategoryDTO dto) {
+    public ResponseEntity<ApiResponse<CategoryDTO>> salvar(@RequestBody CategoryDTO dto,
+                                                           @SessionAttribute(name = "employeeId", required = false) Long employeeId
+    ) {
+
+        permissaoFuncionario.verificar(employeeId);
         ApiResponse<CategoryDTO> resposta = categoryService.save(dto);
 
         if (!resposta.isSuccess()) {
@@ -49,7 +59,10 @@ public class CategoryController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<CategoryDTO>> atualizar(@PathVariable Long id, @RequestBody CategoryDTO dto) {
+    public ResponseEntity<ApiResponse<CategoryDTO>> atualizar(@PathVariable Long id,
+                                                              @RequestBody CategoryDTO dto,
+                                                              @SessionAttribute(name = "employeeId", required = false) Long employeeId) {
+        permissaoFuncionario.verificar(employeeId);
         ApiResponse<CategoryDTO> resposta = categoryService.update(id, dto);
 
         if (!resposta.isSuccess()) {
@@ -60,7 +73,8 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> desativar(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> desativar(@PathVariable Long id, @SessionAttribute(name = "employeeId", required = false) Long employeeId) {
+        permissaoFuncionario.verificar(employeeId);
         ApiResponse<Void> resposta = categoryService.desativar(id);
 
         if (!resposta.isSuccess()) {
