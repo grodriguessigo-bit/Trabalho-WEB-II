@@ -99,18 +99,12 @@ export class RequestDetailsComponentComponent {
     if (!rescued) {
       return;
     }
-    else{
-      const requests = this.maintenanceRequestService.listAll();
 
-      // 2. Encontra este request específico dentro da lista atualizada
-      const updatedRequest = this.maintenanceRequestService.findById(requestId);
+    const updatedRequest = this.maintenanceRequestService.findById(requestId);
 
-      // 3. Atualiza a variável da tela com uma cópia nova ({ ... })
-      // Isso força o Angular a atualizar o HTML e sumir com o botão na hora!
-      if (updatedRequest) {
-        this.request = { ...updatedRequest };
-      }
-
+    if (updatedRequest) {
+      this.request = updatedRequest;
+      this.historyEntries = updatedRequest.requestHistory;
     }
   }
 
