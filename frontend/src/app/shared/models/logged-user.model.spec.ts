@@ -1,4 +1,4 @@
-import { LoggedUser } from './logged-usermodel';
+import { LoggedUser } from './logged-user.model';
 
 describe('LoggedUser', () => {
   it('should create an instance', () => {
