@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
@@ -12,8 +12,7 @@ import { LoginService } from '../../../services/login.service';
   templateUrl: './categories.component.html',
   styleUrl: './categories.component.css',
 })
-export class CategoriesComponent {
-
+export class CategoriesComponent implements OnInit {
   categories: Category[] = [];
   showModal = false;
   showDeactivateModal = false;
@@ -26,8 +25,10 @@ export class CategoriesComponent {
   constructor(
     private categoryService: CategoryService,
     private loginService: LoginService,
-    private router: Router
-  ) {
+    private router: Router,
+  ) {}
+
+  ngOnInit(): void {
     if (this.loginService.getLoggedUserType() !== 'EMPLOYEE') {
       this.router.navigate(['/login']);
       return;
@@ -37,12 +38,19 @@ export class CategoriesComponent {
   }
 
   listAll(): void {
-    this.categories = this.categoryService.listAll();
+    this.categoryService.listAll().subscribe({
+      next: (resposta) => {
+        if (resposta.success) {
+          this.categories = resposta.data;
+        }
+      },
+      error: (err) => console.error('Erro ao buscar categorias:', err),
+    });
   }
 
   get displayedCategories(): Category[] {
     if (this.showOnlyActive) {
-      return this.categories.filter(category => category.active);
+      return this.categories.filter((category) => category.active);
     }
 
     return this.categories;
@@ -82,9 +90,10 @@ export class CategoriesComponent {
     }
 
     const categoryAlreadyExists = this.categories.some(
-      category => category.active
-        && category.id !== this.editingCategory?.id
-        && category.name.trim().toLowerCase() === name.toLowerCase()
+      (category) =>
+        category.active &&
+        category.id !== this.editingCategory?.id &&
+        category.name.trim().toLowerCase() === name.toLowerCase(),
     );
 
     if (categoryAlreadyExists) {
@@ -93,15 +102,42 @@ export class CategoriesComponent {
     }
 
     if (this.editingCategory) {
-      this.categoryService.update(
-        new Category(this.editingCategory.id, name, this.editingCategory.active)
+      const categoriaAtualizada = new Category(
+        this.editingCategory.id,
+        name,
+        this.editingCategory.active,
       );
-    } else {
-      this.categoryService.insert(new Category(0, name, true));
-    }
 
-    this.listAll();
-    this.closeModal();
+      this.categoryService.update(categoriaAtualizada).subscribe({
+        next: (resposta) => {
+          if (resposta.success) {
+            this.listAll();
+            this.closeModal();
+          } else {
+            this.message = resposta.message;
+          }
+        },
+        error: (err) => {
+          this.message = err.error?.message || 'Erro ao atualizar categoria.';
+        },
+      });
+    } else {
+      const novaCategoria = new Category(0, name, true);
+
+      this.categoryService.insert(novaCategoria).subscribe({
+        next: (resposta) => {
+          if (resposta.success) {
+            this.listAll();
+            this.closeModal();
+          } else {
+            this.message = resposta.message;
+          }
+        },
+        error: (err) => {
+          this.message = err.error?.message || 'Erro ao criar categoria.';
+        },
+      });
+    }
   }
 
   openDeactivateModal(category: Category): void {
@@ -116,15 +152,33 @@ export class CategoriesComponent {
 
   confirmDeactivation(): void {
     if (this.categoryToDeactivate) {
-      this.categoryService.remove(this.categoryToDeactivate.id);
-      this.listAll();
+      this.categoryService.remove(this.categoryToDeactivate.id).subscribe({
+        next: (resposta) => {
+          if (resposta.success) {
+            this.listAll();
+          }
+          this.closeDeactivateModal();
+        },
+        error: (err) => {
+          console.error('Erro ao desativar categoria:', err);
+          this.closeDeactivateModal();
+        },
+      });
+    } else {
+      this.closeDeactivateModal();
     }
-
-    this.closeDeactivateModal();
   }
 
   activate(category: Category): void {
-    this.categoryService.activate(category.id);
-    this.listAll();
+    const categoriaAtivada = new Category(category.id, category.name, true);
+
+    this.categoryService.update(categoriaAtivada).subscribe({
+      next: (resposta) => {
+        if (resposta.success) {
+          this.listAll();
+        }
+      },
+      error: (err) => console.error('Erro ao reativar categoria:', err),
+    });
   }
 }
