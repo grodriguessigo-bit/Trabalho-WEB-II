@@ -1,79 +1,71 @@
-<main class="quote-approval">
-	<h1>Mostrar orçamento</h1>
+<div class="container py-4">
+  <h1 class="mb-4">Orçamento da solicitação</h1>
 
-	@if (request) {
-		<section class="request-details">
-			<h2>Dados da solicitação</h2>
+  @if (request) {
+    <div class="card mb-3">
+      <div class="card-body">
+        <h2 class="h5 mb-3">Dados da solicitação</h2>
 
-			<dl>
-				<div>
-					<dt>Equipamento</dt>
-					<dd>{{ request.equipmentDescription }}</dd>
-				</div>
-				<div>
-					<dt>Defeito</dt>
-					<dd>{{ request.defectDescription }}</dd>
-				</div>
-				<div>
-					<dt>Categoria</dt>
-					<dd>{{ categoryName || 'Não informada' }}</dd>
-				</div>
-				<div>
-					<dt>Data da solicitação</dt>
-					<dd>{{ request.requestDateTime | date: 'dd/MM/yyyy HH:mm' }}</dd>
-				</div>
-				<div>
-					<dt>Status</dt>
-					<dd>{{ request.status }}</dd>
-				</div>
-			</dl>
-		</section>
+        <p><strong>Equipamento:</strong> {{ request.equipmentDescription }}</p>
+        <p class="text-break"><strong>Defeito:</strong> {{ request.defectDescription }}</p>
+        <p><strong>Categoria:</strong> {{ categoryName || 'Não informada' }}</p>
+        <p>
+          <strong>Data da solicitação:</strong>
+          {{ request.requestDateTime | date:'dd/MM/yyyy HH:mm' }}
+        </p>
+        <p class="mb-0">
+          <strong>Estado:</strong> {{ getStatusLabel() }}
+        </p>
+      </div>
+    </div>
 
-		<section class="quote-highlight" aria-label="Preço orçado">
-			<span>Preço orçado</span>
-			<strong>{{ quotePrice | currency: 'BRL' }}</strong>
-			<div class="quote-description">
-				<span>Descrição do orçamento</span>
-				<p>{{ quoteDescription || 'Não informada' }}</p>
-			</div>
-		</section>
-		<textarea 
-			style="margin-top: 20px;"
-			readonly
-			class="form-control"
-			rows="4"
-			placeholder="Observações do orçamento"
-		>{{ quoteObservations}}</textarea>
+    <div class="alert alert-info">
+      <p class="mb-1">Valor do orçamento</p>
+      <strong class="fs-3">{{ quotePrice | currency:'BRL' }}</strong>
+    </div>
 
-		@if (message) {
-			<p class="message" role="alert">{{ message }}</p>
-		}
+    <div class="card mb-3">
+      <div class="card-body">
+        <h2 class="h5">Descrição do orçamento</h2>
+        <p class="text-break">{{ quoteDescription || 'Não informada' }}</p>
 
-		@if (approvalConfirmed) {
-		<div class="mt-4">
-			<p role="status">
-			Serviço Aprovado no Valor
-			{{ quotePrice | currency:'BRL' }}
-			</p>
+        <h2 class="h5">Observações</h2>
+        <p class="text-break mb-0">
+          {{ quoteObservations || 'Nenhuma observação.' }}
+        </p>
+      </div>
+    </div>
 
-			<button type="button" class="btn btn-primary" (click)="goBack()">
-			OK
-			</button>
-		</div>
-		} @else {
-		<div class="actions" style="margin-top: 20px;">
-			<button type="button" class="approve-button" (click)="approve()">
-			Aprovar o Serviço
-			</button>
+    @if (message) {
+      <div class="alert alert-danger" role="alert">
+        {{ message }}
+      </div>
+    }
 
-			<button type="button" class="reject-button" (click)="reject()">
-			Rejeitar o Serviço
-			</button>
+    @if (approvalConfirmed) {
+      <div class="alert alert-success" role="status">
+        Serviço Aprovado no Valor {{ quotePrice | currency:'BRL' }}
+      </div>
 
-			<button type="button" class="back-button" (click)="goBack()">
-			Voltar
-			</button>
-		</div>
-		}
-	}
-</main>
+      <button type="button" class="btn btn-primary" (click)="goBack()">
+        OK
+      </button>
+    } @else {
+      <div class="d-flex flex-wrap gap-2">
+        @if (request.status === 'QUOTED') {
+          <button type="button" class="btn btn-success" (click)="approve()">
+            Aprovar o Serviço
+          </button>
+
+          <button type="button" class="btn btn-danger" (click)="reject()">
+            Rejeitar o Serviço
+          </button>
+        }
+
+        <button type="button" class="btn btn-secondary" (click)="goBack()">
+          Voltar
+        </button>
+      </div>
+    }
+  }
+</div>

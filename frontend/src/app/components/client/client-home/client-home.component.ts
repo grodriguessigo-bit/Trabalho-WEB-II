@@ -9,12 +9,10 @@ import { MaintenanceRequestService } from '../../../services/maintenance-request
 import { QuoteService } from '../../../services/quote.service';
 import { CommonModule } from '@angular/common';
 import { RequestStatus } from '../../../shared/enum/request-status.enum';
-import { MaintenanceChecklistComponent } from '../maintenance-checklist/maintenance-checklist.component';
-
 
 @Component({
   selector: 'app-client-home',
-  imports: [CommonModule, MaintenanceChecklistComponent],
+  imports: [CommonModule],
   templateUrl: './client-home.component.html',
   styleUrl: './client-home.component.css',
 })
