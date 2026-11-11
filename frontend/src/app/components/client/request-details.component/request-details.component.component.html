@@ -1,119 +1,120 @@
-<main class="request-details-page">
-  <div class="page-header">
-
-    <h1>Detalhes da Solicitação</h1>
-
-
-    <div class="buttons d-flex gap-2">
-      @if (request) {
-        @switch (request.status) {
-
-          @case ('REJECTED') {
-            <button type="button" class="btn btn-warning btn-size" (click)="rescueRequest(request.id)">
-              Resgatar Serviço
-            </button>
-          }
-          @case ('FIXED') {
-            <button type="button" class="btn btn-success btn-size" (click)="payRequest(request.id)">
-              Pagar Serviço
-            </button>
-          }
-          @default {
-
-          }
-        }
-      }
-      <button type="button" class="btn btn-secondary btn-size" (click)="goBack()">
-        Voltar para solicitações
-      </button>
-
-    </div>
-  </div>
-
-
+<div class="container py-4">
+  <h1 class="mb-4">Detalhes da solicitação</h1>
 
   @if (request) {
-    <section class="details-card">
-      <div class="card-heading">
-        <h2>{{ request.equipmentDescription }}</h2>
-        <span class="status-badge" [ngClass]="'status-' + request.status.toLowerCase()">
-          {{ getStatusLabel(request.status) }}
-        </span>
-      </div>
+    <div class="d-flex flex-wrap gap-2 mb-3">
+      @if (request.status === 'REJECTED') {
+        <button type="button" class="btn btn-warning"
+          (click)="rescueRequest(request.id)">
+          Resgatar Serviço
+        </button>
+      }
 
-      <dl class="request-data">
-        <div>
-          <dt>Equipamento</dt>
-          <dd>{{ request.equipmentDescription }}</dd>
-        </div>
-        <div>
-          <dt>Categoria</dt>
-          <dd>{{ categoryName || 'Não informada' }}</dd>
-        </div>
-        <div>
-          <dt>Data da solicitação</dt>
-          <dd>{{ request.requestDateTime | date: 'dd/MM/yyyy HH:mm' }}</dd>
-        </div>
-        <div class="full-width">
-          <dt>Descrição do defeito</dt>
-          <dd>{{ request.defectDescription }}</dd>
-        </div>
-      </dl>
-    </section>
+      @if (request.status === 'FIXED') {
+        <button type="button" class="btn btn-success"
+          (click)="payRequest(request.id)">
+          Pagar Serviço
+        </button>
+      }
+
+      <button type="button" class="btn btn-secondary" (click)="goBack()">
+        Voltar
+      </button>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <h2 class="h5 mb-3">Dados da solicitação</h2>
+
+        <p class="text-break">
+          <strong>Equipamento:</strong> {{ request.equipmentDescription }}
+        </p>
+        <p class="text-break">
+          <strong>Defeito:</strong> {{ request.defectDescription }}
+        </p>
+        <p><strong>Categoria:</strong> {{ categoryName || 'Não informada' }}</p>
+        <p>
+          <strong>Data da solicitação:</strong>
+          {{ request.requestDateTime | date:'dd/MM/yyyy HH:mm' }}
+        </p>
+        <p class="mb-0">
+          <strong>Estado:</strong> {{ getStatusLabel(request.status) }}
+        </p>
+      </div>
+    </div>
 
     @if (quote) {
-      <section class="quote-card">
-        <div>
-          <p class="section-label">Orçamento</p>
-          <h2>{{ quote.price | currency: 'BRL' }}</h2>
-        </div>
-        <div class="quote-description">
-          <h3>Descrição do orçamento</h3>
-          <p>{{ quote.description || 'Não informada' }}</p>
-        </div>
-        <p class="quote-date">
-          Criado em {{ quote.quoteDateTime | date: 'dd/MM/yyyy HH:mm' }}
-        </p>
+      <div class="card mb-3">
+        <div class="card-body">
+          <h2 class="h5">Orçamento</h2>
 
-        @if (canReviewQuote()) {
-          <button type="button" class="review-button" (click)="openQuote()">
-            Aprovar ou rejeitar orçamento
-          </button>
-        }
-      </section>
-    }
-    <!--    @if (canReviewQuote(request)) {-->
-      <!--      <button type="button" class="btn btn-success btn-sm" (click)="openQuote(request.id)">-->
-      <!--        Aprovar/Rejeitar Serviço-->
-      <!--      </button>-->
-      <!--    }-->
+          <div class="alert alert-info">
+            <strong class="fs-3">{{ quote.price | currency:'BRL' }}</strong>
+          </div>
 
+          <p class="text-break">
+            <strong>Descrição:</strong>
+            {{ quote.description || 'Não informada' }}
+          </p>
+          <p class="text-break">
+            <strong>Observações:</strong>
+            {{ quote.observations || 'Nenhuma observação.' }}
+          </p>
+          <p>
+            <strong>Data do orçamento:</strong>
+            {{ quote.quoteDateTime | date:'dd/MM/yyyy HH:mm' }}
+          </p>
 
-    <section class="history-card">
-      <h2>Histórico</h2>
-
-      @if (historyEntries.length > 0) {
-        <ol class="history-list">
-          @for (history of historyEntries; track history.id) {
-            <li>
-              <div class="history-heading">
-                <strong>{{ getActionLabel(history.action) }}</strong>
-                <time>{{ history.changeDateTime | date: 'dd/MM/yyyy HH:mm' }}</time>
-              </div>
-              <p>{{ history.description }}</p>
-              <small>
-                {{ getStatusLabel(history.previousStatus ?? history.newStatus) }}
-                → {{ getStatusLabel(history.newStatus) }}
-                @if (history.performedByName) {
-                  · {{ history.performedByName }}
-                }
-              </small>
-            </li>
+          @if (canReviewQuote()) {
+            <button type="button" class="btn btn-primary" (click)="openQuote()">
+              Aprovar ou rejeitar orçamento
+            </button>
           }
-        </ol>
-      } @else {
-        <p class="empty-history">Nenhum histórico disponível.</p>
-      }
-    </section>
+        </div>
+      </div>
+    }
+
+    <h2 class="h4 mb-3">Histórico</h2>
+
+    @if (historyEntries.length > 0) {
+      <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+          <thead>
+            <tr>
+              <th>Data/Hora</th>
+              <th>Ocorrência</th>
+              <th>Alteração de estado</th>
+              <th>Responsável</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (history of historyEntries; track history.id) {
+              <tr>
+                <td>
+                  {{ history.changeDateTime | date:'dd/MM/yyyy HH:mm' }}
+                </td>
+                <td class="text-break">
+                  <strong>{{ getActionLabel(history.action) }}</strong>
+                  <p class="mb-0">{{ history.description }}</p>
+                </td>
+                <td>
+                  @if (history.previousStatus != null) {
+                    {{ getStatusLabel(history.previousStatus) }}
+                    →
+                  }
+                  {{ getStatusLabel(history.newStatus) }}
+                </td>
+                <td>{{ history.performedByName || 'Não informado' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div class="alert alert-info">
+        Nenhum histórico disponível.
+      </div>
+    }
   }
-</main>
+</div>
