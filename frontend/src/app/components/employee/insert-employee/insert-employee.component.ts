@@ -2,8 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
-import { Employee } from '../../../shared/models/employee.model';
-import { EmployeeService } from '../../../services/employee.service';
+import { CreateEmployeeDTO, EmployeeService } from '../../../services/employee.service';
 import { LoginService } from '../../../services/login.service';
 
 @Component({
@@ -16,7 +15,12 @@ export class InsertEmployeeComponent {
 
   @ViewChild('formEmployee') formEmployee!: NgForm;
 
-  employee: Employee = new Employee();
+  employee: CreateEmployeeDTO = {
+    name: '',
+    email: '',
+    birthDate: '',
+    password: ''
+  };
 
   message: string = "";
 
@@ -35,19 +39,15 @@ export class InsertEmployeeComponent {
   insert(): void {
 
     if (this.formEmployee.form.valid) {
-
-      const employee = this.employeeService.findByEmail(
-        this.employee.email
-      );
-
-      if (employee) {
-        this.message = "E-mail já cadastrado.";
-        return;
-      }
-
-      this.employeeService.insert(this.employee);
-
-      this.router.navigate(['/employee/list']);
+      this.message = "";
+      this.employeeService.insert(this.employee).subscribe({
+        next: () => {
+          this.router.navigate(['/employee/list']);
+        },
+        error: (err) => {
+          this.message = err.error?.message ?? "Erro ao cadastrar funcionário.";
+        }
+      });
     }
 
   }
