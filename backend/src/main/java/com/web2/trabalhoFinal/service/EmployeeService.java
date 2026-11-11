@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class EmployeeService {
@@ -58,5 +59,27 @@ public class EmployeeService {
                 salvo.getBirthDate(), salvo.isActive());
 
         return new ApiResponse<>(employeeDTO, "Funcionário salvo com sucesso", true);
+    }
+
+    @Transactional(readOnly = true)
+    public ApiResponse<List<EmployeeDTO>> listar() {
+        List<EmployeeDTO> lista = employeeRepository.findAll()
+                .stream()
+                .map(this::toDTO)
+                .toList();
+
+        return new ApiResponse<>(lista, "Funcionários listados com sucesso", true);
+    }
+
+    @Transactional(readOnly = true)
+    public ApiResponse<EmployeeDTO> buscarPorId(Long id) {
+        return employeeRepository.findById(id)
+                .map(e -> new ApiResponse<>(toDTO(e), "Funcionário encontrado", true))
+                .orElse(new ApiResponse<>("Funcionário não encontrado", false));
+    }
+
+    private EmployeeDTO toDTO(Employee e) {
+        return new EmployeeDTO(e.getId(), e.getName(), e.getEmail(),
+                e.getBirthDate(), e.isActive());
     }
 }
