@@ -1,19 +1,17 @@
 package com.web2.trabalhoFinal.controller;
 
 import com.web2.trabalhoFinal.dto.ApiResponse;
-import com.web2.trabalhoFinal.entities.Payment;
 import com.web2.trabalhoFinal.service.PaymentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/payments")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(
+        origins = "http://localhost:4200",
+        allowCredentials = "true"
+)
 public class PaymentController {
 
     private final PaymentService paymentService;
@@ -22,9 +20,17 @@ public class PaymentController {
         this.paymentService = paymentService;
     }
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<Payment>> salvar(@RequestBody Payment payment) {
-        ApiResponse<Payment> resposta = paymentService.salvar(payment);
-        return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
+    @PostMapping("/request/{requestId}")
+    public ResponseEntity<ApiResponse<Void>> pay(
+            @PathVariable Long requestId,
+            @SessionAttribute(name = "clientId", required = false)
+            Long clientId
+    ) {
+        ApiResponse<Void> response = paymentService.pay(
+                requestId,
+                clientId
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
