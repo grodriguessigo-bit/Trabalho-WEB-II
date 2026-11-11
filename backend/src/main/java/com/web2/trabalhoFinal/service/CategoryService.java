@@ -75,8 +75,17 @@ public class CategoryService {
             return new ApiResponse<>(null, "O nome da categoria não pode ser vazio", false);
         }
 
+        String name = dto.name().trim();
+
+        if (categoryRepository.existsByNameAndIdNot(name, id)) {
+            return new ApiResponse<>(
+                    "Já existe outra categoria com esse nome.",
+                    false
+            );
+        }
+
         Category category = optCategory.get();
-        category.setName(dto.name());
+        category.setName(name);
 
         Category atualizada = categoryRepository.save(category);
 

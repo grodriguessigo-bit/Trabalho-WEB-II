@@ -61,7 +61,13 @@ public class EmployeeController {
     @PatchMapping("/{id}/deactivate")
     public ResponseEntity<ApiResponse<EmployeeDTO>> desativar(
             @PathVariable Long id,
-            @RequestHeader(value = "X-Employee-Id", required = false) Long idSolicitante) {
+            @SessionAttribute(value = "EmployeeId", required = false) Long idSolicitante) {
+
+        if (idSolicitante == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new ApiResponse<>("Entre como funcionário.", false)
+            );
+        }
 
         ApiResponse<EmployeeDTO> resposta = employeeService.desativar(id, idSolicitante);
 
