@@ -595,7 +595,7 @@ public class MaintenanceRequestService {
 
     //FUNCAO A PARTE ---
 
-    private boolean canEmployeeSee(
+    public boolean canEmployeeSee(
             MaintenanceRequest request,
             Long employeeId
     ) {
