@@ -312,6 +312,166 @@ public class MaintenanceRequestService {
 
 
 
+    //DETALHES DA SOLICITACAO PARA EMPLOYEE VER
+    @Transactional(readOnly = true)
+    public EmployeeRequestDetailsDTO findByIdForEmployee(
+            Long requestId,
+            Long employeeId
+    ) {
+        if (employeeId == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Entre como funcionário."
+            );
+        }
+
+        MaintenanceRequest request = maintenanceRequestRepository
+                .findById(requestId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Solicitação não encontrada."
+                ));
+
+        if (!canEmployeeSee(request, employeeId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Solicitação não encontrada."
+            );
+        }
+
+        Client client = request.getClient();
+        Address address = client.getAddress();
+
+        AddressDTO addressDTO = null;
+
+        if (address != null) {
+            addressDTO = new AddressDTO(
+                    address.getZipCode(),
+                    address.getStreet(),
+                    address.getNumber(),
+                    address.getComplement(),
+                    address.getNeighborhood(),
+                    address.getCity(),
+                    address.getState()
+            );
+        }
+
+        ClientResponseDTO clientDTO = new ClientResponseDTO(
+                client.getId(),
+                client.getCpf(),
+                client.getName(),
+                client.getEmail(),
+                client.getPhone(),
+                addressDTO
+        );
+
+        QuoteDTO quoteDTO = null;
+        PaymentDTO paymentDTO = null;
+        Quote quote = request.getQuote();
+
+        if (quote != null) {
+            String employeeName = null;
+
+            if (quote.getEmployee() != null) {
+                employeeName = quote.getEmployee().getName();
+            }
+
+            quoteDTO = new QuoteDTO(
+                    quote.getPrice(),
+                    quote.getQuoteDateTime(),
+                    employeeName
+            );
+
+            Payment payment = quote.getPayment();
+
+            if (payment != null) {
+                paymentDTO = new PaymentDTO(
+                        payment.getAmount(),
+                        payment.getPaymentDateTime()
+                );
+            }
+        }
+
+        MaintenanceDTO maintenanceDTO = null;
+        Maintenance maintenance = request.getMaintenance();
+
+        if (maintenance != null) {
+            String employeeName = null;
+
+            if (maintenance.getEmployee() != null) {
+                employeeName = maintenance.getEmployee().getName();
+            }
+
+            maintenanceDTO = new MaintenanceDTO(
+                    maintenance.getMaintenanceDescription(),
+                    maintenance.getClienteInstructions(),
+                    maintenance.getMaintenanceDateTime(),
+                    employeeName
+            );
+        }
+
+        List<EmployeeRequestHistoryDTO> historyDTO = new ArrayList<>();
+
+        if (request.getRequestHistory() != null) {
+            for (RequestHistory history : request.getRequestHistory()) {
+                String performedByName = null;
+
+                if (history.getPerformedBy() != null) {
+                    performedByName = history.getPerformedBy().getName();
+                }
+
+                RedirectDTO redirectDTO = null;
+                Redirect redirect = history.getRedirect();
+
+                if (redirect != null) {
+                    String sourceName = null;
+                    String destinationName = null;
+
+                    if (redirect.getSourceEmployee() != null) {
+                        sourceName = redirect.getSourceEmployee().getName();
+                    }
+
+                    if (redirect.getDestinationEmployee() != null) {
+                        destinationName = redirect.getDestinationEmployee().getName();
+                    }
+
+                    redirectDTO = new RedirectDTO(
+                            sourceName,
+                            destinationName
+                    );
+                }
+
+                historyDTO.add(new EmployeeRequestHistoryDTO(
+                        history.getId(),
+                        history.getActions(),
+                        history.getPreviousStatus(),
+                        history.getNewStatus(),
+                        history.getChangeDateTime(),
+                        performedByName,
+                        redirectDTO
+                ));
+            }
+        }
+
+        historyDTO.sort(
+                Comparator.comparing(EmployeeRequestHistoryDTO::changeDateTime)
+                        .thenComparing(EmployeeRequestHistoryDTO::requestHistoryId)
+        );
+
+        return new EmployeeRequestDetailsDTO(
+                request.getId(),
+                request.getEquipmentDescription(),
+                request.getDefectDescription(),
+                request.getRequestDateTime(),
+                request.getRequestStatus(),
+                request.getCategory().getName(),
+                clientDTO,
+                quoteDTO,
+                maintenanceDTO,
+                paymentDTO,
+                historyDTO
+        );
+    }
 
 
 

@@ -86,6 +86,28 @@ public class MaintenanceRequestController {
         );
     }
 
+    //DETALHES DA SOLICITAÇÃO PARA O EMPLOYEE
+    @GetMapping("/employee/{requestId}")
+    public ResponseEntity<ApiResponse<EmployeeRequestDetailsDTO>> findByIdForEmployee(
+            @PathVariable("requestId") Long requestId,
+            @SessionAttribute(name = "employeeId", required = false) Long employeeId
+    ) {
+        EmployeeRequestDetailsDTO request =
+                maintenanceRequestService.findByIdForEmployee(
+                        requestId,
+                        employeeId
+                );
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        request,
+                        "Solicitação consultada com sucesso.",
+                        true
+                )
+        );
+    }
+
+
     //INSERT
     @PostMapping
     public ResponseEntity<ApiResponse<ClientRequestSummaryDTO>> insert(

@@ -12,6 +12,5 @@ public record EmployeeRequestHistoryDTO(
         RequestStatus newStatus,
         Instant changeDateTime,
         String performedByName,
-        String description,
         RedirectDTO redirect
 ) {}
