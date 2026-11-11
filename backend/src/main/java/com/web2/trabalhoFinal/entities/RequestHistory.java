@@ -43,4 +43,7 @@ public class RequestHistory {
     @OneToOne(mappedBy = "requestHistory")
     private Redirect redirect;
 
+    @Column(columnDefinition = "text")
+    private String rejectionReason;
+
 }
