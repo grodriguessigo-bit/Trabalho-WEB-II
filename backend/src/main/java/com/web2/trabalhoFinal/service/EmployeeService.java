@@ -114,6 +114,12 @@ public class EmployeeService {
                 .orElse(new ApiResponse<>("Funcionário não encontrado", false));
     }
 
+
+    private EmployeeDTO toDTO(Employee e) {
+        return new EmployeeDTO(e.getId(), e.getName(), e.getEmail(),
+                e.getBirthDate(), e.isActive());
+    }
+
     @Transactional
     public ApiResponse<EmployeeDTO> desativar(Long id, Long idSolicitante) {
         Employee employee = employeeRepository.findById(id).orElse(null);
@@ -133,10 +139,5 @@ public class EmployeeService {
         Employee salvo = employeeRepository.save(employee);
 
         return new ApiResponse<>(toDTO(salvo), "Funcionário desativado com sucesso", true);
-    }
-
-    private EmployeeDTO toDTO(Employee e) {
-        return new EmployeeDTO(e.getId(), e.getName(), e.getEmail(),
-                e.getBirthDate(), e.isActive());
     }
 }

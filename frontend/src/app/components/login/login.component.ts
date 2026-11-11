@@ -63,6 +63,16 @@ export class LoginComponent implements OnInit {
   }
 
   login(): void {
+    if (this.loading) {
+      return;
+    }
+
+    if (!this.loginData.email?.trim() || !this.loginData.password?.trim()) {
+      this.message = 'Informe o e-mail e a senha.';
+      return;
+    }
+
+    this.loginService.clearLoggedUser();
     this.loading = true;
     this.message = '';
 

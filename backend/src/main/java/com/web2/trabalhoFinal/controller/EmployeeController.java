@@ -57,6 +57,7 @@ public class EmployeeController {
 
         return ResponseEntity.status(status).body(resposta);
     }
+
     @PatchMapping("/{id}/deactivate")
     public ResponseEntity<ApiResponse<EmployeeDTO>> desativar(
             @PathVariable Long id,
