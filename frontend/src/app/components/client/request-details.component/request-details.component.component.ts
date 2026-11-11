@@ -48,7 +48,12 @@ export class RequestDetailsComponentComponent {
 
     this.request = request;
     this.quote = this.quoteService.findByRequestId(request.id);
-    this.categoryName = this.categoryService.findById(request.categoryId)?.name ?? '';
+    this.categoryService.findById(request.categoryId).subscribe({
+      next: (response) => {
+        this.categoryName = response.success ? response.data.name : '';
+      },
+      error: (error) => console.error('Erro ao buscar categoria:', error),
+    });
     this.historyEntries = request.requestHistory ?? [];
   }
 

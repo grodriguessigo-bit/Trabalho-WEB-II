@@ -46,8 +46,24 @@ export class ViewRevenueReportByCategoryComponent implements OnInit {
     this.totalRevenue = 0;
     this.message = '';
 
-    const categories =
-      this.categoryService.listAll();
+    this.categoryService.listAll().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.calculateRevenue(response.data);
+        } else {
+          this.message = response.message;
+        }
+      },
+      error: (error) => {
+        this.message = error.error?.message ?? error.message;
+      },
+    });
+  }
+
+  private calculateRevenue(categories: Category[]): void {
+    this.revenueByCategory = [];
+    this.totalRevenue = 0;
+    this.message = '';
 
     const requests =
       this.maintenanceRequestService

@@ -28,9 +28,14 @@ export class ClientEquipmentRepairComponent {
     private maintenanceRequestService: MaintenanceRequestService,
     private categoryService: CategoryService,
   ) {
-    this.equipmentCategories = this.categoryService
-      .listAll()
-      .filter(category => category.active);
+    this.categoryService.listAll().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.equipmentCategories = response.data.filter(category => category.active);
+        }
+      },
+      error: (error) => console.error('Erro ao buscar categorias:', error),
+    });
   }
 
   createRequest(): void {
