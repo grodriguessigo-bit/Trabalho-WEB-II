@@ -51,12 +51,6 @@ public class MaintenanceRequestService {
             throw new InvalidMaintenanceRequestException("Informe a descrição do defeito.");
         }
 
-        if (maintenanceRequestDto.equipmentDescription().trim().length() > 30) {
-            throw new InvalidMaintenanceRequestException(
-                    "A descrição do equipamento deve ter até 30 caracteres."
-            );
-        }
-
         if(maintenanceRequestDto.categoryId() == null || maintenanceRequestDto.categoryId() <= 0){
             throw new InvalidMaintenanceRequestException("Selecione uma categoria válida.");
         }

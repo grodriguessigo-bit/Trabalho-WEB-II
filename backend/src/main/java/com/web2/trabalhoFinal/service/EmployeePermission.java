@@ -7,11 +7,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
-public class PermissaoFuncionario {
+public class EmployeePermission {
 
     private final EmployeeRepository employeeRepository;
 
-    public PermissaoFuncionario(EmployeeRepository employeeRepository) {
+    public EmployeePermission(EmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
     }
 
