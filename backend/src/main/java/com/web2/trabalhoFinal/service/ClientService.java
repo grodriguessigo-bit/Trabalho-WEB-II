@@ -14,15 +14,18 @@ public class ClientService {
     private final ClientRepository clientRepository;
     private final PersonRepository personRepository;
     private final PasswordService passwordService;
+    private final EmailService emailService;
 
     public ClientService(
             ClientRepository clientRepository,
             PersonRepository personRepository,
-            PasswordService passwordService
+            PasswordService passwordService,
+            EmailService emailService
     ) {
         this.clientRepository = clientRepository;
         this.personRepository = personRepository;
         this.passwordService = passwordService;
+        this.emailService = emailService;
     }
 
     @Transactional
@@ -44,6 +47,8 @@ public class ClientService {
             client.setPassword(passwordService.hashPassword(password, salt));
 
             Client salvo = clientRepository.saveAndFlush(client);
+
+            emailService.enviarSenhaCadastro(salvo.getEmail(), password);
 
             System.out.println("Senha: " + password + "enviada para" + salvo.getEmail());
 
