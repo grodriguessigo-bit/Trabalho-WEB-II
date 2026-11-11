@@ -15,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -34,6 +36,8 @@ public class MaintenanceRequestService {
         this.requestHistoryRepository = requestHistoryRepository;
     }
 
+
+    //INSERT DE SOLICITACAO
     @Transactional
     public ApiResponse<MaintenanceRequest> save(CreateMaintenanceRequest maintenanceRequestDto, Long clienteId) {
 
@@ -91,7 +95,8 @@ public class MaintenanceRequestService {
         return new ApiResponse<>(saveMaintenance, "Solicitação de manutenção salva com sucesso", true);
     }
 
-    //sem validacao não precisa ser ApiResponse pode ser o Data direto
+
+    //SOLICITACOES NA TELA INICIAL DE CLIENTES
     public List<ClientRequestSummaryDTO> findAllRequestByClient(Long clientId){
         List<MaintenanceRequest> requests = maintenanceRequestRepository.findByClient_idOrderByRequestDateTimeAsc(clientId);
 
@@ -104,6 +109,9 @@ public class MaintenanceRequestService {
         )).toList();
     }
 
+
+
+    //DETALHES DA SOLICITAÇÃO PARA O CLIENTE
     @Transactional(readOnly = true)
     public ClientRequestDetailsDTO findById (Long requestId, Long clientId){
 
@@ -202,6 +210,154 @@ public class MaintenanceRequestService {
                 paymentDTO,
                 historyDTO
         );
+    }
+
+
+
+    //VISUALIZAÇÃO DE SOLICITAÇÕES COM FILTROS NA TELA DO EMPLOYEE
+    @Transactional(readOnly = true)
+    public List<EmployeeRequestSummaryDTO> findAllForEmployee(
+            Long employeeId,
+            String filter,
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+        if (employeeId == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Entre como funcionário."
+            );
+        }
+
+        if (filter == null) {
+            filter = "ABERTAS";
+        }
+
+        if (!filter.equals("ABERTAS")
+                && !filter.equals("TODAS")
+                && !filter.equals("HOJE")
+                && !filter.equals("PERIODO")) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Filtro inválido."
+            );
+        }
+
+        if (filter.equals("PERIODO")) {
+            if (startDate == null || endDate == null) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Preencha a data inicial e a final."
+                );
+            }
+
+            if (startDate.isAfter(endDate)) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "A data inicial não pode ser maior que a final."
+                );
+            }
+        }
+
+        ZoneId zone = ZoneId.of("America/Sao_Paulo");
+        LocalDate today = LocalDate.now(zone);
+
+        List<MaintenanceRequest> requests =
+                maintenanceRequestRepository.findAll();
+
+        List<EmployeeRequestSummaryDTO> result = new ArrayList<>();
+
+        for (MaintenanceRequest request : requests) {
+            if (!canEmployeeSee(request, employeeId)) {
+                continue;
+            }
+
+            if (filter.equals("ABERTAS")
+                    && request.getRequestStatus() != RequestStatus.OPEN) {
+                continue;
+            }
+
+            LocalDate requestDate = request.getRequestDateTime()
+                    .atZone(zone)
+                    .toLocalDate();
+
+            if (filter.equals("HOJE") && !requestDate.equals(today)) {
+                continue;
+            }
+
+            if (filter.equals("PERIODO")) {
+                if (requestDate.isBefore(startDate)
+                        || requestDate.isAfter(endDate)) {
+                    continue;
+                }
+            }
+
+            EmployeeRequestSummaryDTO summary = new EmployeeRequestSummaryDTO(
+                    request.getId(),
+                    request.getRequestStatus(),
+                    request.getRequestDateTime(),
+                    request.getClient().getName(),
+                    request.getEquipmentDescription()
+            );
+
+            result.add(summary);
+        }
+
+        result.sort(
+                Comparator.comparing(EmployeeRequestSummaryDTO::requestDateTime)
+        );
+
+        return result;
+    }
+
+
+
+
+
+
+
+    //FUNCAO A PARTE ---
+
+    private boolean canEmployeeSee(
+            MaintenanceRequest request,
+            Long employeeId
+    ) {
+        if (request.getRequestStatus() != RequestStatus.REDIRECTED) {
+            return true;
+        }
+
+        if (request.getRequestHistory() == null) {
+            return false;
+        }
+
+        RequestHistory last = null;
+
+        for (RequestHistory history : request.getRequestHistory()) {
+            if (history.getActions() != HistoryActions.MAINTENANCE_REDIRECTED) {
+                continue;
+            }
+
+            if (last == null) {
+                last = history;
+            } else if (history.getChangeDateTime().isAfter(last.getChangeDateTime())) {
+                last = history;
+            } else if (history.getChangeDateTime().equals(last.getChangeDateTime())
+                    && history.getId() > last.getId()) {
+                last = history;
+            }
+        }
+
+        if (last == null || last.getRedirect() == null) {
+            return false;
+        }
+
+        Employee destination = last.getRedirect().getDestinationEmployee();
+
+        if (destination == null) {
+            return false;
+        }
+
+        return destination.getId() == employeeId;
     }
 
 

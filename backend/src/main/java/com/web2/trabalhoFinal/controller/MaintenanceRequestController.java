@@ -1,15 +1,14 @@
 package com.web2.trabalhoFinal.controller;
 
-import com.web2.trabalhoFinal.dto.ApiResponse;
-import com.web2.trabalhoFinal.dto.ClientRequestDetailsDTO;
-import com.web2.trabalhoFinal.dto.CreateMaintenanceRequest;
-import com.web2.trabalhoFinal.dto.ClientRequestSummaryDTO;
+import com.web2.trabalhoFinal.dto.*;
 import com.web2.trabalhoFinal.entities.MaintenanceRequest;
 import com.web2.trabalhoFinal.service.MaintenanceRequestService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -23,6 +22,8 @@ public class MaintenanceRequestController {
         this.maintenanceRequestService = maintenanceRequestService;
     }
 
+
+    //SOLICITACOES NA TELA INICIAL DE CLIENTES
     @GetMapping
     public ResponseEntity<ApiResponse<List<ClientRequestSummaryDTO>>> findAllClient(
             @SessionAttribute(name = "clientId", required = false) Long clientId
@@ -32,7 +33,8 @@ public class MaintenanceRequestController {
         return ResponseEntity.ok().body(new ApiResponse<>(requests, "Solicitações consultadas com sucesso.", true));
     }
 
-    //mostrar detalhes para cliente
+
+    //DETALHES DA SOLICITAÇÃO PARA O CLIENTE
     @GetMapping("/{requestId}")
     public ResponseEntity<ApiResponse<ClientRequestDetailsDTO>> findById(
             @PathVariable("requestId") Long requestId,
@@ -50,6 +52,41 @@ public class MaintenanceRequestController {
         );
     }
 
+    //VISUALIZAÇÃO DE SOLICITAÇÕES COM FILTROS NA TELA DO EMPLOYEE
+    @GetMapping("/employee")
+    public ResponseEntity<ApiResponse<List<EmployeeRequestSummaryDTO>>> findAllForEmployee(
+            @SessionAttribute(name = "employeeId", required = false)
+            Long employeeId,
+
+            @RequestParam(name = "filter", defaultValue = "ABERTAS")
+            String filter,
+
+            @RequestParam(name = "startDate", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate startDate,
+
+            @RequestParam(name = "endDate", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate endDate
+    ) {
+        List<EmployeeRequestSummaryDTO> requests =
+                maintenanceRequestService.findAllForEmployee(
+                        employeeId,
+                        filter,
+                        startDate,
+                        endDate
+                );
+
+        return ResponseEntity.ok(
+                new ApiResponse<>(
+                        requests,
+                        "Solicitações consultadas com sucesso.",
+                        true
+                )
+        );
+    }
+
+    //INSERT
     @PostMapping
     public ResponseEntity<ApiResponse<ClientRequestSummaryDTO>> insert(
             @RequestBody CreateMaintenanceRequest maintenanceRequestDTO,
@@ -72,7 +109,6 @@ public class MaintenanceRequestController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(response, result.getMessage(), true));
     }
-
 
 
 }
