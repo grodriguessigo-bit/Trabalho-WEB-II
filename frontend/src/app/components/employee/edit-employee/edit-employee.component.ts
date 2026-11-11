@@ -2,8 +2,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
-import { Employee } from '../../../shared/models/employee.model';
-import { EmployeeService } from '../../../services/employee.service';
+import { EmployeeService, UpdateEmployeeDTO } from '../../../services/employee.service';
 import { LoginService } from '../../../services/login.service';
 
 @Component({
@@ -14,7 +13,14 @@ import { LoginService } from '../../../services/login.service';
 })
 export class EditEmployeeComponent {
 
-  employee: Employee = new Employee();
+  id: number = 0;
+
+  employee: UpdateEmployeeDTO = {
+    name: '',
+    email: '',
+    birthDate: '',
+    newPassword: ''
+  };
 
   message: string = "";
 
@@ -30,36 +36,36 @@ export class EditEmployeeComponent {
       return;
     }
 
-    const id = Number(
-      this.route.snapshot.paramMap.get('id')
-    );
+    this.id = Number(this.route.snapshot.paramMap.get('id'));
 
-    const employee = this.employeeService.findById(id);
-
-    if (employee) {
-      this.employee = employee;
-    } else {
-      this.router.navigate(['/employee/list']);
-    }
+    this.employeeService.findById(this.id).subscribe({
+      next: (employee) => {
+        // A senha nunca vem do servidor: o campo começa vazio.
+        this.employee = {
+          name: employee.name,
+          email: employee.email,
+          birthDate: employee.birthDate,
+          newPassword: ''
+        };
+      },
+      error: () => {
+        this.router.navigate(['/employee/list']);
+      }
+    });
 
   }
 
   update(): void {
 
-    const employee = this.employeeService.listAll().find(
-      item =>
-        item.email === this.employee.email &&
-        item.id !== this.employee.id
-    );
-
-    if (employee) {
-      this.message = "E-mail já cadastrado.";
-      return;
-    }
-
-    this.employeeService.update(this.employee);
-
-    this.router.navigate(['/employee/list']);
+    this.message = "";
+    this.employeeService.update(this.id, this.employee).subscribe({
+      next: () => {
+        this.router.navigate(['/employee/list']);
+      },
+      error: (err) => {
+        this.message = err.error?.message ?? "Erro ao atualizar funcionário.";
+      }
+    });
   }
 
 }

@@ -52,11 +52,12 @@
         </div>
 
         <div class="form-group row">
-          <label for="password" class="col-md-2 control-label">Senha:</label>
+          <label for="newPassword" class="col-md-2 control-label">Nova senha:</label>
 
           <div class="col-md-4">
-            <input type="password" class="form-control" id="password" name="password"
-            [(ngModel)]="employee.password" #password="ngModel" required>
+            <input type="password" class="form-control" id="newPassword" name="newPassword"
+            [(ngModel)]="employee.newPassword" #newPassword="ngModel"
+            placeholder="Deixe em branco para manter a atual">
           </div>
         </div>
 

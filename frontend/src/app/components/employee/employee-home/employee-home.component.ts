@@ -2,8 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 
-import { Employee } from '../../../shared/models/employee.model';
-import { EmployeeService } from '../../../services/employee.service';
+import { EmployeeDTO, EmployeeService } from '../../../services/employee.service';
 import { LoginService } from '../../../services/login.service';
 import { ClientService } from '../../../services/client.service';
 
@@ -18,7 +17,7 @@ import { RequestStatus } from '../../../shared/enum/request-status.enum';
   styleUrl: './employee-home.component.css',
 })
 export class EmployeeHomeComponent {
-  employee: Employee | undefined;
+  employee: EmployeeDTO | undefined;
   clientRequests: MaintenanceRequest[] = [];
   filterType: 'ABERTAS' | 'TODAS' | 'HOJE' | 'PERIODO' = 'ABERTAS';
   startDate = '';
@@ -36,10 +35,17 @@ export class EmployeeHomeComponent {
       return;
     }
 
-    const id = this.loginService.getLoggedUserId();
-    this.employee = this.employeeService.findById(id);
+  const id = this.loginService.getLoggedUserId();
+  this.employeeService.findById(id).subscribe({
+    next: (employee) => {
+      this.employee = employee;
+    },
+    error: () => {
+      this.employee = undefined;
+    }
+  });
 
-    this.loadClientRequests();
+this.loadClientRequests();
   }
 
   loadClientRequests(): void {
