@@ -5,7 +5,6 @@ import java.time.Instant;
 
 public record QuoteDTO(
         BigDecimal price,
-        String description,
         Instant quoteDateTime,
         String employeeName
 ) {}
