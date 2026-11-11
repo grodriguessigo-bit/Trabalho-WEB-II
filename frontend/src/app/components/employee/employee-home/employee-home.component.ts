@@ -1,9 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 
-import { Employee } from '../../../shared/models/employee.model';
-import { EmployeeService } from '../../../services/employee.service';
+import { EmployeeDTO, EmployeeService } from '../../../services/employee.service';
 import { LoginService } from '../../../services/login.service';
 import { ClientService } from '../../../services/client.service';
 
@@ -18,7 +17,7 @@ import { RequestStatus } from '../../../shared/enum/request-status.enum';
   styleUrl: './employee-home.component.css',
 })
 export class EmployeeHomeComponent {
-  employee: Employee | undefined;
+  employee: EmployeeDTO | undefined;
   clientRequests: MaintenanceRequest[] = [];
   filterType: 'ABERTAS' | 'TODAS' | 'HOJE' | 'PERIODO' = 'ABERTAS';
   startDate = '';
@@ -30,6 +29,7 @@ export class EmployeeHomeComponent {
     private router: Router,
     private maintenanceRequestService: MaintenanceRequestService,
     private clientService: ClientService,
+    private cdr: ChangeDetectorRef,
   ) {
     if (this.loginService.getLoggedUserType() !== 'EMPLOYEE') {
       this.router.navigate(['/login']);
@@ -37,8 +37,16 @@ export class EmployeeHomeComponent {
     }
 
     const id = this.loginService.getLoggedUserId();
-    this.employee = this.employeeService.findById(id);
-
+    this.employeeService.findById(id).subscribe({
+      next: (employee) => {
+        this.employee = employee;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.employee = undefined;
+        this.cdr.markForCheck();
+      }
+    });
     this.loadClientRequests();
   }
 
