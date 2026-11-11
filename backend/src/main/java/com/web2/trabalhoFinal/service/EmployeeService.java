@@ -114,6 +114,7 @@ public class EmployeeService {
                 .orElse(new ApiResponse<>("Funcionário não encontrado", false));
     }
 
+
     private EmployeeDTO toDTO(Employee e) {
         return new EmployeeDTO(e.getId(), e.getName(), e.getEmail(),
                 e.getBirthDate(), e.isActive());

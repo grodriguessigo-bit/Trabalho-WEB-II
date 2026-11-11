@@ -8,7 +8,7 @@ import { MaintenanceRequestService } from '../../../services/maintenance-request
 import { LoginService } from '../../../services/login.service';
 import { EmployeeService } from '../../../services/employee.service';
 import { CommonModule } from '@angular/common';
-
+import { catchError, of } from 'rxjs';
 
 @Component({
   selector: 'app-finalize-request',
@@ -46,7 +46,7 @@ export class FinalizeRequestComponent {
     }
   }
 
-  finalizeRequest(): void {
+finalizeRequest(): void {
 
     if (!this.request) {
       return;
@@ -58,40 +58,43 @@ export class FinalizeRequestComponent {
       return;
     }
 
-    const employee =
-      this.employeeService.findById(
-        this.loginService.getLoggedUserId()
+    const request = this.request;
+
+    this.employeeService.findById(
+      this.loginService.getLoggedUserId()
+    ).pipe(
+      catchError(() => of(undefined))
+    ).subscribe((employee) => {
+
+      const previousStatus =
+        request.status;
+
+      const changeDateTime =
+        new Date().toISOString();
+
+      request.status =
+        RequestStatus.FINALIZED;
+
+      const history =
+        new RequestHistory(
+          request.requestHistory.length + 1,
+          HistoryActions.REQUEST_FINALIZED,
+          previousStatus,
+          RequestStatus.FINALIZED,
+          changeDateTime,
+          'Solicitação finalizada.',
+          employee ? employee.name : ''
+        );
+
+      request.requestHistory.push(history);
+
+      this.maintenanceRequestService.update(
+        request
       );
 
-    const previousStatus =
-      this.request.status;
+      alert('Solicitação finalizada.');
 
-    const changeDateTime =
-      new Date().toISOString();
-
-    this.request.status =
-      RequestStatus.FINALIZED;
-
-    const history =
-      new RequestHistory(
-        this.request.requestHistory.length + 1,
-        HistoryActions.REQUEST_FINALIZED,
-        previousStatus,
-        RequestStatus.FINALIZED,
-        changeDateTime,
-        'Solicitação finalizada.',
-        employee ? employee.name : ''
-      );
-
-    this.request.requestHistory.push(history);
-
-    this.maintenanceRequestService.update(
-      this.request
-    );
-
-    alert('Solicitação finalizada.');
-
-    this.router.navigate(['/employee/home']);
+      this.router.navigate(['/employee/home']);
+    });
   }
-
 }
