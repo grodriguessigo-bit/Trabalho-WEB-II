@@ -14,7 +14,8 @@ export class LoginService {
   login(login: Login): Observable<{ data: { userId: number; profile: string } }> {
     return this.http.post<{ data: { userId: number; profile: string } }>(
       'http://localhost:8090/login',
-      login
+      login,
+      { withCredentials: true }
     );
   }
 
@@ -39,15 +40,17 @@ export class LoginService {
     return localStorage["loggedUserType"];
   }
 
-  logout(): void {
-
-    localStorage.removeItem(
-      "loggedUserId"
+  logout(): Observable<void> {
+    return this.http.post<void>(
+      'http://localhost:8090/logout',
+      {},
+      { withCredentials: true }
     );
+  }
 
-    localStorage.removeItem(
-      "loggedUserType"
-    );
+  clearLoggedUser(): void {
+    localStorage.removeItem('loggedUserId');
+    localStorage.removeItem('loggedUserType');
   }
 
 }
