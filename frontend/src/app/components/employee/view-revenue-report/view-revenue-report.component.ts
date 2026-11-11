@@ -196,6 +196,13 @@ export class ViewRevenueReportComponent implements OnInit {
   }
 
 
+  formatCurrency(value: number): string {
+    return value.toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    });
+  }
+
   printReport(): void {
     if (this.dailyRevenue.length === 0) {
       this.message = 'Não existem receitas para gerar o relatório.';

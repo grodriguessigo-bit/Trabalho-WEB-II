@@ -1,77 +1,35 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { Category } from '../shared/models/category.model';
-
-const LS_KEY = 'categories';
+import { ApiResponse } from '../shared/models/api-response.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CategoryService {
+  //PRECISA CRIAR UMA ROTA GLOBAL PARA A PORTA 8090 para ser utilizada por todo mundo
+  private readonly apiUrl = 'http://localhost:8090/categories';
 
-  listAll(): Category[] {
-    const categories = localStorage[LS_KEY];
+  constructor(private http: HttpClient) {}
 
-    if (categories) {
-      return JSON.parse(categories);
-    }
-
-    return [
-      new Category(1, 'Notebook', true),
-      new Category(2, 'Desktop', true),
-      new Category(3, 'Impressora', true),
-      new Category(4, 'Mouse', true),
-      new Category(5, 'Teclado', true),
-    ];
+  listAll(): Observable<ApiResponse<Category[]>> {
+    return this.http.get<ApiResponse<Category[]>>(this.apiUrl);
   }
 
-  insert(category: Category): void {
-    const categories = this.listAll();
-
-    category.id = new Date().getTime();
-
-    categories.push(category);
-
-    localStorage[LS_KEY] = JSON.stringify(categories);
+  findById(id: number): Observable<ApiResponse<Category>> {
+    return this.http.get<ApiResponse<Category>>(`${this.apiUrl}/${id}`);
   }
 
-  findById(id: number): Category | undefined {
-    const categories = this.listAll();
-
-    return categories.find(category => category.id === id);
+  insert(category: Category): Observable<ApiResponse<Category>> {
+    return this.http.post<ApiResponse<Category>>(this.apiUrl, category);
   }
 
-  update(category: Category): void {
-    const categories = this.listAll();
-
-    const index = categories.findIndex(
-      item => item.id === category.id
-    );
-
-    if (index !== -1) {
-      categories[index] = category;
-
-      localStorage[LS_KEY] = JSON.stringify(categories);
-    }
+  update(category: Category): Observable<ApiResponse<Category>> {
+    return this.http.put<ApiResponse<Category>>(`${this.apiUrl}/${category.id}`, category);
   }
 
-  remove(id: number): void {
-    const category = this.findById(id);
-
-    if (category) {
-      category.active = false;
-
-      this.update(category);
-    }
+  remove(id: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
   }
-
-  activate(id: number): void {
-    const category = this.findById(id);
-
-    if (category) {
-      category.active = true;
-
-      this.update(category);
-    }
-  }
-
 }

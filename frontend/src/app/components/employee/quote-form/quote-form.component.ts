@@ -18,6 +18,7 @@ import { EmployeeService } from '../../../services/employee.service';
 import { ClientService } from '../../../services/client.service';
 import { CategoryService } from '../../../services/category.service';
 
+import { catchError, of } from 'rxjs';
 @Component({
   selector: 'app-quote-form',
   imports: [FormsModule, RouterModule, CommonModule],
@@ -102,49 +103,53 @@ export class QuoteFormComponent {
       return;
     }
 
+    const request = this.request;
+
     const employeeId =
       this.loginService.getLoggedUserId();
 
-    const employee =
-      this.employeeService.findById(employeeId);
+    // Se a busca falhar, employee vem undefined e o nome fica vazio (igual antes).
+    this.employeeService.findById(employeeId).pipe(
+      catchError(() => of(undefined))
+    ).subscribe((employee) => {
 
-    const quoteDateTime =
-      new Date().toISOString();
+      const quoteDateTime =
+        new Date().toISOString();
 
-    const quote = new Quote(
-      0,
-      this.request.id,
-      employeeId,
-      this.price,
-      this.quoteDescription.trim(),
-      quoteDateTime
-    );
+      const quote = new Quote(
+        0,
+        request.id,
+        employeeId,
+        this.price,
+        this.quoteDescription.trim(),
+        quoteDateTime
+      );
 
-    this.quoteService.insert(quote);
+      this.quoteService.insert(quote);
 
-    const previousStatus =
-      this.request.status;
+      const previousStatus =
+        request.status;
 
-    this.request.status =
-      RequestStatus.QUOTED;
+      request.status =
+        RequestStatus.QUOTED;
 
-    const history = new RequestHistory(
-      this.request.requestHistory.length + 1,
-      HistoryActions.QUOTE_CREATED,
-      previousStatus,
-      RequestStatus.QUOTED,
-      quoteDateTime,
-      'Orçamento criado no valor de R$ ' + this.price.toFixed(2),
-      employee ? employee.name : ''
-    );
+      const history = new RequestHistory(
+        request.requestHistory.length + 1,
+        HistoryActions.QUOTE_CREATED,
+        previousStatus,
+        RequestStatus.QUOTED,
+        quoteDateTime,
+        'Orçamento criado no valor de R$ ' + this.price.toFixed(2),
+        employee ? employee.name : ''
+      );
 
-    this.request.requestHistory.push(history);
+      request.requestHistory.push(history);
 
-    this.maintenanceRequestService.update(
-      this.request
-    );
+      this.maintenanceRequestService.update(
+        request
+      );
 
-    this.router.navigate(['/employee/home']);
+      this.router.navigate(['/employee/home']);
+    });
   }
-
 }

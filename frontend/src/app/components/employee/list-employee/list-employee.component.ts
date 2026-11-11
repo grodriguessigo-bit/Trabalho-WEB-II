@@ -1,9 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 
-import { Employee } from '../../../shared/models/employee.model';
-import { EmployeeService } from '../../../services/employee.service';
+import { EmployeeDTO, EmployeeService } from '../../../services/employee.service';
 import { LoginService } from '../../../services/login.service';
 
 @Component({
@@ -14,15 +13,16 @@ import { LoginService } from '../../../services/login.service';
 })
 export class ListEmployeeComponent {
 
-  employees: Employee[] = [];
+  employees: EmployeeDTO[] = [];
 
   constructor(
     private employeeService: EmployeeService,
     private loginService: LoginService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
 
-  if (this.loginService.getLoggedUserType() !== "EMPLOYEE") {
+    if (this.loginService.getLoggedUserType() !== "EMPLOYEE") {
       this.router.navigate(['/login']);
       return;
     }
@@ -31,19 +31,26 @@ export class ListEmployeeComponent {
   }
 
   listAll(): void {
-    this.employees = this.employeeService.listAll();
+    this.employeeService.listAll().subscribe({
+      next: (employees) => {
+        this.employees = employees;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        alert(err.error?.message ?? 'Erro ao carregar funcionários.');
+      }
+    });
   }
+  remove(employee: EmployeeDTO): void {
 
-  remove(employee: Employee): void {
+    const loggedId = this.loginService.getLoggedUserId();
 
-    if (employee.id === this.loginService.getLoggedUserId()) {
+    if (employee.id === loggedId) {
       alert("Você não pode remover a si mesmo.");
       return;
     }
 
-    const activeEmployees = this.employees.filter(
-      employee => employee.active
-    );
+    const activeEmployees = this.employees.filter(e => e.active);
 
     if (activeEmployees.length === 1) {
       alert("O único funcionário não pode ser removido.");
@@ -51,9 +58,14 @@ export class ListEmployeeComponent {
     }
 
     if (confirm("Deseja remover o funcionário " + employee.name + "?")) {
-      this.employeeService.remove(employee.id);
-
-      this.listAll();
+      this.employeeService.remove(employee.id, loggedId ?? undefined).subscribe({
+        next: () => {
+          this.listAll();
+        },
+        error: (err) => {
+          alert(err.error?.message ?? 'Erro ao remover funcionário.');
+        }
+      });
     }
 
   }
