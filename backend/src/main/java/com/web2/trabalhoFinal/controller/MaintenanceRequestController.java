@@ -3,6 +3,7 @@ package com.web2.trabalhoFinal.controller;
 import com.web2.trabalhoFinal.dto.*;
 import com.web2.trabalhoFinal.entities.MaintenanceRequest;
 import com.web2.trabalhoFinal.service.MaintenanceRequestService;
+import com.web2.trabalhoFinal.service.PermissaoFuncionario;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +18,11 @@ import java.util.List;
 public class MaintenanceRequestController {
 
     private final MaintenanceRequestService maintenanceRequestService;
+    private final PermissaoFuncionario permissaoFuncionario;
 
-    public MaintenanceRequestController(MaintenanceRequestService maintenanceRequestService) {
+    public MaintenanceRequestController(MaintenanceRequestService maintenanceRequestService, PermissaoFuncionario permissaoFuncionario) {
         this.maintenanceRequestService = maintenanceRequestService;
+        this.permissaoFuncionario = permissaoFuncionario;
     }
 
 
@@ -69,6 +72,7 @@ public class MaintenanceRequestController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate endDate
     ) {
+        permissaoFuncionario.verificar(employeeId);
         List<EmployeeRequestSummaryDTO> requests =
                 maintenanceRequestService.findAllForEmployee(
                         employeeId,
@@ -92,6 +96,7 @@ public class MaintenanceRequestController {
             @PathVariable("requestId") Long requestId,
             @SessionAttribute(name = "employeeId", required = false) Long employeeId
     ) {
+        permissaoFuncionario.verificar(employeeId);
         EmployeeRequestDetailsDTO request =
                 maintenanceRequestService.findByIdForEmployee(
                         requestId,
@@ -151,6 +156,7 @@ public class MaintenanceRequestController {
             @PathVariable("requestId") Long requestId,
             @SessionAttribute(name = "employeeId", required = false) Long employeeId
     ) {
+        permissaoFuncionario.verificar(employeeId);
         ApiResponse<Void> response =
                 maintenanceRequestService.finalizeRequest(
                         requestId,
