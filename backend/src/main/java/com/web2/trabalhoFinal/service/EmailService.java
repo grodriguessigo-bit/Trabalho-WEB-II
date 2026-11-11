@@ -18,8 +18,8 @@ public class EmailService {
         message.setTo(emailDestino);
         message.setSubject("Bem-vindo! Sua senha de acesso");
         message.setText("Seu cadastro foi realizado com sucesso!\n\n" +
-                "Sua senha de acesso de 4 dígitos é: " + senhaGerada + "\n\n" +
-                "Recomendamos alterá-la após o primeiro login.");
+                "Sua senha de acesso de 4 dígitos é: " + senhaGerada + "\n\n"
+                );
 
         mailSender.send(message);
     }
