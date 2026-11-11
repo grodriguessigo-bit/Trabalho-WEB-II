@@ -4,6 +4,7 @@ import com.web2.trabalhoFinal.dto.ApiResponse;
 import com.web2.trabalhoFinal.entities.Client;
 import com.web2.trabalhoFinal.repository.ClientRepository;
 import com.web2.trabalhoFinal.repository.PersonRepository;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,23 +13,43 @@ public class ClientService {
 
     private final ClientRepository clientRepository;
     private final PersonRepository personRepository;
+    private final PasswordService passwordService;
 
-
-    public ClientService(ClientRepository clientRepository, PersonRepository personRepository) {
+    public ClientService(
+            ClientRepository clientRepository,
+            PersonRepository personRepository,
+            PasswordService passwordService
+    ) {
         this.clientRepository = clientRepository;
         this.personRepository = personRepository;
+        this.passwordService = passwordService;
     }
 
     @Transactional
     public ApiResponse<Client> salvar(Client client) {
         try {
-            if(clientRepository.existsByCpf(client.getCpf()))
-                return new ApiResponse<>("Cpf já existente", false);
-            if(personRepository.existsByEmailAndOtherId(client.getEmail(), client.getId_person()))
-                return new ApiResponse<>("Email Já cadastrado", false);
+            if (clientRepository.existsByCpf(client.getCpf())) {
+                return new ApiResponse<>("CPF já existente", false);
+            }
 
-            Client salvo = clientRepository.save(client);
-            return new ApiResponse<>(salvo, "Cliente salvo com sucesso", true);
+            if (personRepository.existsByEmailAndOtherId(
+                    client.getEmail(), client.getId())) {
+                return new ApiResponse<>("E-mail já cadastrado", false);
+            }
+
+            String password = passwordService.generatePassword();
+            String salt = passwordService.generateSalt();
+
+            client.setSalt(salt);
+            client.setPassword(passwordService.hashPassword(password, salt));
+
+            Client salvo = clientRepository.saveAndFlush(client);
+
+            System.out.println("Senha: " + password + "enviada para" + salvo.getEmail());
+
+            return new ApiResponse<>(
+                salvo, "Cliente salvo com sucesso", true
+            );
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

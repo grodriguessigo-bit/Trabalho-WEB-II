@@ -166,7 +166,11 @@ export const routes: Routes = [
   },
   {
     path: 'employee/budget-rejected/:id',
-    component: BudgetRejectedComponent
+    component: BudgetRejectedComponent,
+    canActivate: [authGuard],
+    data: {
+      role: 'EMPLOYEE'
+    }
   },
   {
     path: 'employee/request/maintenance/:id',

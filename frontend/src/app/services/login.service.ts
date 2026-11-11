@@ -1,7 +1,6 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of, map } from 'rxjs';
-import { ClientService } from './client.service';
-import { EmployeeService } from './employee.service';
+import { Observable } from 'rxjs';
 import { Login } from '../shared/models/login.model';
 import { LoggedUser } from '../shared/models/logged-user.model';
 
@@ -10,51 +9,13 @@ import { LoggedUser } from '../shared/models/logged-user.model';
 })
 export class LoginService {
 
-  constructor(
-    private clientService: ClientService,
-    private employeeService: EmployeeService
-  ) {}
+  constructor(private http: HttpClient) {}
 
-  login(login: Login): Observable<LoggedUser | null> {
-
-    const employee =
-      this.employeeService.findByEmail(login.email);
-
-    if (
-      employee &&
-      employee.active &&
-      employee.password === login.password
-    ) {
-
-      return of(employee).pipe(
-        map(user =>
-          new LoggedUser(
-            user.id,
-            'EMPLOYEE'
-          )
-        )
-      );
-    }
-
-    const client =
-      this.clientService.findByEmail(login.email);
-
-    if (
-      client &&
-      client.password === login.password
-    ) {
-
-      return of(client).pipe(
-        map(user =>
-          new LoggedUser(
-            user.id,
-            'CLIENT'
-          )
-        )
-      );
-    }
-
-    return of(null);
+  login(login: Login): Observable<{ data: { userId: number; profile: string } }> {
+    return this.http.post<{ data: { userId: number; profile: string } }>(
+      'http://localhost:8090/login',
+      login
+    );
   }
 
   setLoggedUser(user: LoggedUser): void {

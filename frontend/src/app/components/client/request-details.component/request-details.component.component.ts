@@ -114,8 +114,8 @@ export class RequestDetailsComponentComponent {
     }
   }
 
-  payRequest(clientId: number): void {
-    this.router.navigate(['/client/equipment-repair']);
+  payRequest(requestId: number): void {
+    this.router.navigate(['/client/pay-request', requestId]);
   }
 
   goBack(): void {

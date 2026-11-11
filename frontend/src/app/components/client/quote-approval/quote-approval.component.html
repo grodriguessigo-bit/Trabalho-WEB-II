@@ -49,16 +49,31 @@
 			<p class="message" role="alert">{{ message }}</p>
 		}
 
-		<div class="actions" style="margin-top: 20px;">
-			<button type="button" class="approve-button" (click)="approve()">
-				Aprovar o Serviço
-			</button>
-			<button type="button" class="reject-button" (click)="reject()">
-				Rejeitar o Serviço
-			</button>
-			<button type="button" class="back-button" (click)="goBack()">
-				Voltar
+		@if (approvalConfirmed) {
+		<div class="mt-4">
+			<p role="status">
+			Serviço Aprovado no Valor
+			{{ quotePrice | currency:'BRL' }}
+			</p>
+
+			<button type="button" class="btn btn-primary" (click)="goBack()">
+			OK
 			</button>
 		</div>
+		} @else {
+		<div class="actions" style="margin-top: 20px;">
+			<button type="button" class="approve-button" (click)="approve()">
+			Aprovar o Serviço
+			</button>
+
+			<button type="button" class="reject-button" (click)="reject()">
+			Rejeitar o Serviço
+			</button>
+
+			<button type="button" class="back-button" (click)="goBack()">
+			Voltar
+			</button>
+		</div>
+		}
 	}
 </main>

@@ -82,27 +82,23 @@
       </h2>
 
       <p>
+        <strong>Período:</strong>
 
-        <strong>
-          Período:
-        </strong>
+        @if (startDate) {
+          De {{ startDate | date:'dd/MM/yyyy':'UTC' }}
+        } @else {
+          Desde o início
+        }
 
-        {{
-          startDate
-            | date:'dd/MM/yyyy':'UTC'
-        }}
-
-        até
-
-        {{
-          endDate
-            | date:'dd/MM/yyyy':'UTC'
-        }}
-
+        @if (endDate) {
+          até {{ endDate | date:'dd/MM/yyyy':'UTC' }}
+        } @else {
+          até a última receita registrada
+        }
       </p>
 
       <table
-        class="table table-striped table-bordered">
+        class="table table-striped table-bordered" id="tabela-receitas">
 
         <thead>
 
@@ -185,7 +181,7 @@
         class="btn btn-success"
         (click)="printReport()">
 
-        Imprimir / Salvar PDF
+        Salvar PDF
 
       </button>
 

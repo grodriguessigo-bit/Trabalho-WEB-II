@@ -33,6 +33,7 @@
         class="form-select"
         [value]="filterType"
         (change)="filterType = $any($event.target).value; loadClientRequests()">
+        <option value="ABERTAS">ABERTAS</option>
         <option value="TODAS">TODAS</option>
         <option value="HOJE">HOJE</option>
         <option value="PERIODO">PERÍODO DE DATAS DE ABERTURA</option>
