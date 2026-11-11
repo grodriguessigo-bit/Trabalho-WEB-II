@@ -3,8 +3,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-// Formato da resposta do backend (ApiResponse). Confira os nomes dos campos
-// no JSON que apareceu no seu Postman e ajuste se forem diferentes.
 export interface ApiResponse<T> {
   data: T;
   message: string;
