@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { LoginService } from '../../services/login.service';
@@ -26,7 +26,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private loginService: LoginService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -79,6 +80,7 @@ export class LoginComponent implements OnInit {
     this.loginService.login(this.loginData).subscribe({
       next: resposta => {
         this.loading = false;
+        this.cdr.markForCheck();
 
         const usuario = new LoggedUser(
           resposta.data.userId,
@@ -95,6 +97,7 @@ export class LoginComponent implements OnInit {
       },
       error: erro => {
         this.loading = false;
+        this.cdr.markForCheck();
 
         if (erro.status === 401) {
           this.message = 'E-mail ou senha inválidos.';
