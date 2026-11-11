@@ -118,4 +118,25 @@ public class EmployeeService {
         return new EmployeeDTO(e.getId(), e.getName(), e.getEmail(),
                 e.getBirthDate(), e.isActive());
     }
+
+    @Transactional
+    public ApiResponse<EmployeeDTO> desativar(Long id, Long idSolicitante) {
+        Employee employee = employeeRepository.findById(id).orElse(null);
+        if (employee == null)
+            return new ApiResponse<>("Funcionário não encontrado", false);
+
+        if (!employee.isActive())
+            return new ApiResponse<>("Funcionário já está desativado", false);
+
+        if (idSolicitante != null && idSolicitante.equals(id))
+            return new ApiResponse<>("Você não pode desativar a si próprio", false);
+
+        if (employeeRepository.countByActiveTrue() <= 1)
+            return new ApiResponse<>("Não é possível desativar o último funcionário ativo", false);
+
+        employee.setActive(false);
+        Employee salvo = employeeRepository.save(employee);
+
+        return new ApiResponse<>(toDTO(salvo), "Funcionário desativado com sucesso", true);
+    }
 }

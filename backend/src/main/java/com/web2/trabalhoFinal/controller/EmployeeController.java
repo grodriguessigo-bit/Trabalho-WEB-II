@@ -57,4 +57,19 @@ public class EmployeeController {
 
         return ResponseEntity.status(status).body(resposta);
     }
+
+    @PatchMapping("/{id}/deactivate")
+    public ResponseEntity<ApiResponse<EmployeeDTO>> desativar(
+            @PathVariable Long id,
+            @RequestHeader(value = "X-Employee-Id", required = false) Long idSolicitante) {
+
+        ApiResponse<EmployeeDTO> resposta = employeeService.desativar(id, idSolicitante);
+
+        HttpStatus status;
+        if (resposta.isSuccess()) status = HttpStatus.OK;
+        else if ("Funcionário não encontrado".equals(resposta.getMessage())) status = HttpStatus.NOT_FOUND;
+        else status = HttpStatus.CONFLICT;
+
+        return ResponseEntity.status(status).body(resposta);
+    }
 }
