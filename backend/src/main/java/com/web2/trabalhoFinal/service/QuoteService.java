@@ -31,7 +31,7 @@ public class QuoteService {
     public ApiResponse<QuoteDTO> buscarPorSolicitacaoId(Long requestId, Long loggedClientId) {
         MaintenanceRequest request = maintenanceRequestRepository.findById(requestId).orElseThrow(() -> new InvalidMaintenanceRequestException("Solicitação não encontrada."));
 
-        if (!java.util.Objects.equals(request.getClient().getId_person(), loggedClientId)) {
+        if (!java.util.Objects.equals(request.getClient().getId(), loggedClientId)) {
             throw new RuntimeException("Acesso negado: a solicitação pertence a outro usuário.");
         }
 
@@ -42,10 +42,7 @@ public class QuoteService {
 
         String nomeFuncionario = (quote.getEmployee() != null) ? quote.getEmployee().getName() : "Técnico Responsável";
         QuoteDTO dto = new QuoteDTO(
-                quote.getPrice(),
-                request.getEquipmentDescription(),
-                quote.getQuoteDateTime(),
-                nomeFuncionario);
+                quote.getPrice(), request.getEquipmentDescription(),quote.getQuoteDateTime(), nomeFuncionario);
 
         return new ApiResponse<>(dto, "Orçamento encontrado com sucesso", true);
     }
