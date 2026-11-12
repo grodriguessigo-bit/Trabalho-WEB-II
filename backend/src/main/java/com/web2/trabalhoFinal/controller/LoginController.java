@@ -47,6 +47,8 @@ public class LoginController {
 
         session.setAttribute("userId", usuario.userId());
         session.setAttribute("profile", usuario.profile());
+        session.setAttribute("name", usuario.name());
+        session.setAttribute("email", usuario.email());
 
         if ("CLIENT".equals(usuario.profile())) {
             session.setAttribute("clientId", usuario.userId());
@@ -55,6 +57,24 @@ public class LoginController {
         }
 
         return ResponseEntity.ok(resposta);
+    }
+
+    @GetMapping("/session")
+    public ResponseEntity<ApiResponse<LoginResponseDTO>> session(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+
+        if (session == null || session.getAttribute("userId") == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse<>("Sessão não encontrada.", false));
+        }
+
+        Long userId = (Long) session.getAttribute("userId");
+        String profile = (String) session.getAttribute("profile");
+        String name = (String) session.getAttribute("name");
+        String email = (String) session.getAttribute("email");
+
+        LoginResponseDTO usuario = new LoginResponseDTO(userId, name, email, profile);
+
+        return ResponseEntity.ok(new ApiResponse<>(usuario, "Sessão restaurada com sucesso.", true));
     }
 
     @PostMapping("/logout")

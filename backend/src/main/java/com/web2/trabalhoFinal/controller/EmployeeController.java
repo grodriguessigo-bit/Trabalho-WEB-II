@@ -5,7 +5,7 @@ import com.web2.trabalhoFinal.dto.CreateEmployeeDTO;
 import com.web2.trabalhoFinal.dto.EmployeeDTO;
 import com.web2.trabalhoFinal.dto.UpdateEmployeeDTO;
 import com.web2.trabalhoFinal.service.EmployeeService;
-import com.web2.trabalhoFinal.service.PermissaoFuncionario;
+import com.web2.trabalhoFinal.service.EmployeePermission;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,14 +18,14 @@ import java.util.List;
 public class EmployeeController {
 
     private final EmployeeService employeeService;
-    private final PermissaoFuncionario permissaoFuncionario;
+    private final EmployeePermission employeePermission;
 
     public EmployeeController(
             EmployeeService employeeService,
-            PermissaoFuncionario permissaoFuncionario
+            EmployeePermission employeePermission
     ) {
         this.employeeService = employeeService;
-        this.permissaoFuncionario = permissaoFuncionario;
+        this.employeePermission = employeePermission;
     }
 
     @PostMapping
@@ -33,7 +33,7 @@ public class EmployeeController {
             @RequestBody CreateEmployeeDTO dto,
             @SessionAttribute(name = "employeeId", required = false) Long employeeId
     ) {
-        permissaoFuncionario.verificar(employeeId);
+        employeePermission.verificar(employeeId);
         ApiResponse<EmployeeDTO> resposta = employeeService.salvar(dto);
 
         HttpStatus status;
@@ -48,7 +48,7 @@ public class EmployeeController {
     public ResponseEntity<ApiResponse<List<EmployeeDTO>>> listar(
             @SessionAttribute(name = "employeeId", required = false) Long employeeId
     ) {
-        permissaoFuncionario.verificar(employeeId);
+        employeePermission.verificar(employeeId);
         return ResponseEntity.ok(employeeService.listar());
     }
 
@@ -57,7 +57,7 @@ public class EmployeeController {
             @PathVariable Long id,
             @SessionAttribute(name = "employeeId", required = false) Long employeeId
     ) {
-        permissaoFuncionario.verificar(employeeId);
+        employeePermission.verificar(employeeId);
         ApiResponse<EmployeeDTO> resposta = employeeService.buscarPorId(id);
         HttpStatus status = resposta.isSuccess() ? HttpStatus.OK : HttpStatus.NOT_FOUND;
         return ResponseEntity.status(status).body(resposta);
@@ -68,7 +68,7 @@ public class EmployeeController {
                                                               @RequestBody UpdateEmployeeDTO dto,
                                                               @SessionAttribute(name = "employeeId", required = false) Long employeeId)
     {
-        permissaoFuncionario.verificar(employeeId);
+        employeePermission.verificar(employeeId);
         ApiResponse<EmployeeDTO> resposta = employeeService.atualizar(id, dto);
 
         HttpStatus status;
@@ -84,7 +84,7 @@ public class EmployeeController {
     public ResponseEntity<ApiResponse<EmployeeDTO>> desativar(
             @PathVariable Long id,
             @SessionAttribute(value = "employeeId", required = false) Long idSolicitante) {
-        permissaoFuncionario.verificar(idSolicitante);
+        employeePermission.verificar(idSolicitante);
         if (idSolicitante == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
                     new ApiResponse<>("Entre como funcionário.", false)

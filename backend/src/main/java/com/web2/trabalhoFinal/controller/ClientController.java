@@ -1,15 +1,12 @@
 package com.web2.trabalhoFinal.controller;
 
 import com.web2.trabalhoFinal.dto.ApiResponse;
-import com.web2.trabalhoFinal.entities.Client;
+import com.web2.trabalhoFinal.dto.ClientRegistrationDTO;
+import com.web2.trabalhoFinal.dto.ClientResponseDTO;
 import com.web2.trabalhoFinal.service.ClientService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/clients")
@@ -23,8 +20,13 @@ public class ClientController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Client>> salvar(@RequestBody Client client) {
-        ApiResponse<Client> resposta = clientService.salvar(client);
-        return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
+    public ResponseEntity<ApiResponse<ClientResponseDTO>> salvar(@RequestBody ClientRegistrationDTO client) {
+        ApiResponse<ClientResponseDTO> response = clientService.salvar(client);
+
+        if (!response.isSuccess()) {
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

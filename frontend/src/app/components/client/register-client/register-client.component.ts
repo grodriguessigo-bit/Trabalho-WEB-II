@@ -1,4 +1,4 @@
-import { Component, ViewChild, Input, signal } from '@angular/core';
+import { Component, ViewChild, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Client } from '../../../shared/models/client.model';
@@ -72,30 +72,33 @@ export class RegisterClientComponent {
   }
 
   insert(): void {
-    this.message.set("");
+    this.message.set('');
     this.success.set(false);
 
     if (!this.formClient.form.valid) {
+      this.message.set('Preencha corretamente todos os campos obrigatórios.');
       return;
     }
 
     if (!this.client().address.street) {
-      this.message.set("Busque o CEP antes de cadastrar.");
+      this.message.set('Busque o CEP antes de cadastrar.');
       return;
     }
 
     this.clientService.insert(this.client()).subscribe({
-      next: (data) =>{
+      next: data => {
         this.success.set(data.success);
         this.message.set(data.message);
-        console.log(data);
       },
-      error: () => {
-        this.message.set("Não foi possível cadastrar. Tente novamente.")
-        }
-      })
-
-  };
+      error: error => {
+        this.success.set(false);
+        this.message.set(
+          error.error?.message ??
+          'Não foi possível cadastrar. Tente novamente.'
+        );
+      }
+    });
+  }
 
   clearAddress(): void {
     this.client().address.street = "";

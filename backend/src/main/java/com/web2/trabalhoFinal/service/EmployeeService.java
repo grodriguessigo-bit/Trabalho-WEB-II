@@ -1,5 +1,4 @@
 package com.web2.trabalhoFinal.service;
-
 import com.web2.trabalhoFinal.dto.ApiResponse;
 import com.web2.trabalhoFinal.dto.CreateEmployeeDTO;
 import com.web2.trabalhoFinal.dto.EmployeeDTO;
@@ -9,6 +8,7 @@ import com.web2.trabalhoFinal.repository.EmployeeRepository;
 import com.web2.trabalhoFinal.repository.PersonRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.regex.Pattern;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,6 +19,8 @@ public class EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final PersonRepository personRepository;
     private final PasswordService passwordService;
+    private static final Pattern EMAIL_PATTERN =
+        Pattern.compile("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$");
     public EmployeeService(EmployeeRepository employeeRepository, PersonRepository personRepository, PasswordService passwordService) {
         this.employeeRepository = employeeRepository;
         this.personRepository = personRepository;
@@ -31,7 +33,10 @@ public class EmployeeService {
 
         if (dto.email() == null || dto.email().isBlank())
             return new ApiResponse<>("Email não pode ser vazio", false);
-        if(personRepository.existsByEmail(dto.email()))
+        String email = dto.email().trim().toLowerCase();
+        if (!EMAIL_PATTERN.matcher(email).matches())
+            return new ApiResponse<>("Email inválido", false);
+        if (personRepository.existsByEmail(email))
             return new ApiResponse<>("Email já cadastrado", false);
         if (dto.name() == null || dto.name().isBlank())
             return new ApiResponse<>("Nome não pode ser vazio", false);
@@ -46,7 +51,7 @@ public class EmployeeService {
 
         Employee employee = new Employee();
         employee.setName(dto.name());
-        employee.setEmail(dto.email());
+        employee.setEmail(email);
         employee.setBirthDate(dto.birthDate());
         employee.setActive(true);
         String salt = passwordService.generateSalt();
@@ -72,6 +77,11 @@ public class EmployeeService {
 
         if (dto.email() == null || dto.email().isBlank())
             return new ApiResponse<>("Email não pode ser vazio", false);
+
+        String email = dto.email().trim().toLowerCase();
+
+        if (!EMAIL_PATTERN.matcher(email).matches())
+            return new ApiResponse<>("Email inválido", false);
         if (dto.name() == null || dto.name().isBlank())
             return new ApiResponse<>("Nome não pode ser vazio", false);
         if (dto.birthDate() == null)
@@ -80,11 +90,11 @@ public class EmployeeService {
             return new ApiResponse<>("Data de nascimento não pode ser no futuro", false);
         if (dto.birthDate().isBefore(hoje.minusYears(120)))
             return new ApiResponse<>("Data de nascimento inválida", false);
-        if (personRepository.existsByEmailAndOtherId(dto.email(), id))
+        if (personRepository.existsByEmailAndOtherId(email, id))
             return new ApiResponse<>("Email já cadastrado", false);
 
         employee.setName(dto.name());
-        employee.setEmail(dto.email());
+        employee.setEmail(email);
         employee.setBirthDate(dto.birthDate());
 
         if (dto.newPassword() != null && !dto.newPassword().isBlank()) {

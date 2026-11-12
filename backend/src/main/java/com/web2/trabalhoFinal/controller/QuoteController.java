@@ -1,7 +1,7 @@
 package com.web2.trabalhoFinal.controller;
 
 import com.web2.trabalhoFinal.dto.*;
-import com.web2.trabalhoFinal.service.PermissaoFuncionario;
+import com.web2.trabalhoFinal.service.EmployeePermission;
 import com.web2.trabalhoFinal.service.QuoteService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.*;
 public class QuoteController {
 
     private final QuoteService quoteService;
-    private final PermissaoFuncionario permissaoFuncionario;
+    private final EmployeePermission employeePermission;
 
-    public QuoteController(QuoteService quoteService, PermissaoFuncionario permissaoFuncionario) {
+    public QuoteController(QuoteService quoteService, EmployeePermission employeePermission) {
         this.quoteService = quoteService;
-        this.permissaoFuncionario = permissaoFuncionario;
+        this.employeePermission = employeePermission;
     }
 
     @PostMapping("/request/{requestId}")
@@ -30,7 +30,7 @@ public class QuoteController {
             Long employeeId,
             @RequestBody CreateQuoteDTO dto
     ) {
-        permissaoFuncionario.verificar(employeeId);
+        employeePermission.verificar(employeeId);
         ApiResponse<QuoteDTO> response = quoteService.create(
                 requestId,
                 employeeId,

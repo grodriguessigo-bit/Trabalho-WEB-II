@@ -1,23 +1,18 @@
 <div class="container">
-
   <div class="col-md-12">
-
     <h1>Editar Funcionário</h1>
 
     <div class="well">
-
       <form #formEmployee="ngForm">
-
         <div class="form-group row">
           <label for="name" class="col-md-2 control-label">Nome:</label>
 
           <div class="col-md-6">
-            <input type="text" class="form-control" id="name" name="name"
-            [(ngModel)]="employee.name" #name="ngModel" required>
+            <input type="text" class="form-control" id="name" name="name" [ngModel]="name()" (ngModelChange)="name.set($event)" #nameField="ngModel" required>
 
-            @if (name.errors && (name.dirty || name.touched)) {
+            @if (nameField.errors && (nameField.dirty || nameField.touched)) {
               <div class="alert alert-danger">
-                <div [hidden]="!name.errors['required']">
+                <div [hidden]="!nameField.errors['required']">
                   Digite o nome do funcionário.
                 </div>
               </div>
@@ -29,13 +24,16 @@
           <label for="email" class="col-md-2 control-label">E-mail:</label>
 
           <div class="col-md-6">
-            <input type="email" class="form-control" id="email" name="email"
-            [(ngModel)]="employee.email" #email="ngModel" required>
+            <input type="email" class="form-control" id="email" name="email" [ngModel]="email()" (ngModelChange)="email.set($event)" #emailField="ngModel" required email>
 
-            @if (email.errors && (email.dirty || email.touched)) {
+            @if (emailField.errors && (emailField.dirty || emailField.touched)) {
               <div class="alert alert-danger">
-                <div [hidden]="!email.errors['required']">
+                <div [hidden]="!emailField.errors['required']">
                   Digite o e-mail do funcionário.
+                </div>
+
+                <div [hidden]="!emailField.errors['email']">
+                  Digite um e-mail válido.
                 </div>
               </div>
             }
@@ -46,8 +44,13 @@
           <label for="birthDate" class="col-md-2 control-label">Data de Nascimento:</label>
 
           <div class="col-md-4">
-            <input type="date" class="form-control" id="birthDate" name="birthDate"
-            [(ngModel)]="employee.birthDate" #birthDate="ngModel" required>
+            <input type="date" class="form-control" id="birthDate" name="birthDate" [ngModel]="birthDate()" (ngModelChange)="birthDate.set($event)" #birthDateField="ngModel" required>
+
+            @if (birthDateField.errors && (birthDateField.dirty || birthDateField.touched)) {
+              <div class="alert alert-danger">
+                Informe a data de nascimento.
+              </div>
+            }
           </div>
         </div>
 
@@ -55,17 +58,15 @@
           <label for="newPassword" class="col-md-2 control-label">Nova senha:</label>
 
           <div class="col-md-4">
-            <input type="password" class="form-control" id="newPassword" name="newPassword"
-            [(ngModel)]="employee.newPassword" #newPassword="ngModel"
-            placeholder="Deixe em branco para manter a atual">
+            <input type="password" class="form-control" id="newPassword" name="newPassword" [ngModel]="newPassword()" (ngModelChange)="newPassword.set($event)" placeholder="Deixe em branco para manter a atual">
           </div>
         </div>
 
-        @if (message) {
+        @if (message()) {
           <div class="row">
             <div class="col-md-6 col-md-offset-2">
               <div class="alert alert-danger">
-                {{ message }}
+                {{ message() }}
               </div>
             </div>
           </div>
@@ -73,21 +74,16 @@
 
         <div class="form-group row">
           <div class="col-md-6 col-md-offset-2">
-
-            <button type="button" class="btn btn-primary"
-            (click)="update()" [disabled]="!formEmployee.form.valid">
+            <button type="button" class="btn btn-primary" (click)="update()" [disabled]="!formEmployee.form.valid">
               Salvar
             </button>
 
-            <a class="btn btn-default" [routerLink]="['/employee/list']"> Voltar </a>
-
+            <a class="btn btn-default" [routerLink]="['/employee/list']">
+              Voltar
+            </a>
           </div>
         </div>
-
       </form>
-
     </div>
-
   </div>
-
 </div>

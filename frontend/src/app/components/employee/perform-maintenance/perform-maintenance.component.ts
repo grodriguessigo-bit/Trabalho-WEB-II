@@ -6,7 +6,7 @@ import { LoginService } from '../../../services/login.service';
 import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
 import { MaintenanceService } from '../../../services/maintenance.service';
 import { RequestStatus } from '../../../shared/enum/request-status.enum';
-import { EmployeeRequestDetailsDTO } from '../../../shared/models/request-api.model';
+import { EmployeeRequestDetailsDTO, STATUS_LABELS } from '../../../shared/models/request-api.model';
 
 @Component({
   selector: 'app-perform-maintenance',
@@ -121,5 +121,9 @@ export class PerformMaintenanceComponent implements OnInit {
         request.requestId
       ]);
     }
+  }
+
+  getStatusLabel(status: RequestStatus): string {
+    return STATUS_LABELS[status];
   }
 }
