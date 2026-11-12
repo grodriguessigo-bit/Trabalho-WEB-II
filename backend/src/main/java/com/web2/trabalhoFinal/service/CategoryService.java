@@ -22,7 +22,15 @@ public class CategoryService {
 
     @Transactional (readOnly = true)
     public ApiResponse<List<CategoryDTO>> listarTodasAtivas() {
-        List<Category> categorias = categoryRepository.findByActiveTrue();
+        return montarLista(categoryRepository.findByActiveTrue());
+    }
+
+    @Transactional(readOnly = true)
+    public ApiResponse<List<CategoryDTO>> listarParaFuncionario() {
+        return montarLista(categoryRepository.findAll());
+    }
+
+    private ApiResponse<List<CategoryDTO>> montarLista(List<Category> categorias) {
         List<CategoryDTO> dtos = new ArrayList<>();
 
         for (Category c : categorias) {
@@ -50,12 +58,17 @@ public class CategoryService {
             return new ApiResponse<>(null, "O nome da categoria é obrigatório", false);
         }
 
-        if (categoryRepository.existsByName(dto.name())) {
+        String name = dto.name().trim();
+        if (name.length() > 100) {
+            return new ApiResponse<>(null, "O nome da categoria pode ter até 100 caracteres.", false);
+        }
+
+        if (categoryRepository.existsByName(name)) {
             return new ApiResponse<>(null, "Categoria já existente", false);
         }
 
         Category category = new Category();
-        category.setName(dto.name());
+        category.setName(name);
         category.setActive(true);
 
         Category salva = categoryRepository.save(category);
@@ -77,6 +90,10 @@ public class CategoryService {
 
         String name = dto.name().trim();
 
+        if (name.length() > 100) {
+            return new ApiResponse<>(null, "O nome da categoria pode ter até 100 caracteres.", false);
+        }
+
         if (categoryRepository.existsByNameAndIdNot(name, id)) {
             return new ApiResponse<>(
                     "Já existe outra categoria com esse nome.",
@@ -86,6 +103,10 @@ public class CategoryService {
 
         Category category = optCategory.get();
         category.setName(name);
+
+        if (dto.active()) {
+            category.setActive(true);
+        }
 
         Category atualizada = categoryRepository.save(category);
 
