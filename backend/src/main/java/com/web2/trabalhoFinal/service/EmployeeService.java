@@ -1,5 +1,4 @@
 package com.web2.trabalhoFinal.service;
-
 import com.web2.trabalhoFinal.dto.ApiResponse;
 import com.web2.trabalhoFinal.dto.CreateEmployeeDTO;
 import com.web2.trabalhoFinal.dto.EmployeeDTO;
@@ -7,9 +6,6 @@ import com.web2.trabalhoFinal.dto.UpdateEmployeeDTO;
 import com.web2.trabalhoFinal.entities.Employee;
 import com.web2.trabalhoFinal.repository.EmployeeRepository;
 import com.web2.trabalhoFinal.repository.PersonRepository;
-
-import main.java.com.web2.trabalhoFinal.service.PasswordService;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.regex.Pattern;
@@ -55,7 +51,7 @@ public class EmployeeService {
 
         Employee employee = new Employee();
         employee.setName(dto.name());
-        employee.setEmail(dto.email());
+        employee.setEmail(email);
         employee.setBirthDate(dto.birthDate());
         employee.setActive(true);
         String salt = passwordService.generateSalt();

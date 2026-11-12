@@ -1,13 +1,9 @@
 <div class="container">
-
   <div class="col-md-12">
-
     <h1>Editar Funcionário</h1>
 
     <div class="well">
-
       <form #formEmployee="ngForm">
-
         <div class="form-group row">
           <label for="name" class="col-md-2 control-label">Nome:</label>
 
@@ -28,7 +24,7 @@
           <label for="email" class="col-md-2 control-label">E-mail:</label>
 
           <div class="col-md-6">
-            <input type="email" class="form-control" id="email" name="email" [ngModel]="email()" (ngModelChange)="email.set($event)" #emailField="ngModel" required>
+            <input type="email" class="form-control" id="email" name="email" [ngModel]="email()" (ngModelChange)="email.set($event)" #emailField="ngModel" required email>
 
             @if (emailField.errors && (emailField.dirty || emailField.touched)) {
               <div class="alert alert-danger">
@@ -49,6 +45,12 @@
 
           <div class="col-md-4">
             <input type="date" class="form-control" id="birthDate" name="birthDate" [ngModel]="birthDate()" (ngModelChange)="birthDate.set($event)" #birthDateField="ngModel" required>
+
+            @if (birthDateField.errors && (birthDateField.dirty || birthDateField.touched)) {
+              <div class="alert alert-danger">
+                Informe a data de nascimento.
+              </div>
+            }
           </div>
         </div>
 
@@ -60,11 +62,11 @@
           </div>
         </div>
 
-        @if (message) {
+        @if (message()) {
           <div class="row">
             <div class="col-md-6 col-md-offset-2">
               <div class="alert alert-danger">
-                {{ message }}
+                {{ message() }}
               </div>
             </div>
           </div>
@@ -72,21 +74,16 @@
 
         <div class="form-group row">
           <div class="col-md-6 col-md-offset-2">
-
-            <button type="button" class="btn btn-primary"
-            (click)="update()" [disabled]="!formEmployee.form.valid">
+            <button type="button" class="btn btn-primary" (click)="update()" [disabled]="!formEmployee.form.valid">
               Salvar
             </button>
 
-            <a class="btn btn-default" [routerLink]="['/employee/list']"> Voltar </a>
-
+            <a class="btn btn-default" [routerLink]="['/employee/list']">
+              Voltar
+            </a>
           </div>
         </div>
-
       </form>
-
     </div>
-
   </div>
-
 </div>
