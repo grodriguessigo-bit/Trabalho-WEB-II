@@ -2,11 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
-import { QuoteService } from '../../../services/quote.service';
-import { MaintenanceRequest } from '../../../shared/models/maintenance-request';
-import { RequestStatus } from '../../../shared/enum/request-status.enum';
-import { HistoryActions } from '../../../shared/enum/history-actions.enum';
+import { ReportService } from '../../../services/report.service';
 import { jsPDF } from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
 
@@ -35,8 +31,7 @@ export class ViewRevenueReportComponent implements OnInit {
   message: string = '';
 
   constructor(
-    private maintenanceRequestService: MaintenanceRequestService,
-    private quoteService: QuoteService
+    private reportService: ReportService
   ) {}
 
   ngOnInit(): void {
@@ -59,142 +54,36 @@ export class ViewRevenueReportComponent implements OnInit {
     this.dailyRevenue = [];
     this.totalRevenue = 0;
 
+    if (this.startDate && this.endDate && this.startDate > this.endDate) {
+      this.message = 'A data inicial não pode ser maior que a data final.';
+      return;
+    }
 
-      let start: Date | null = null;
-      let end: Date | null = null;
+    this.reportService.getDailyRevenue(this.startDate || undefined, this.endDate || undefined).subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          const items = response.data.items || [];
+          this.dailyRevenue = items.map((item) => {
+            const [year, month, day] = item.date.split('-').map(Number);
+            return {
+              date: new Date(year, month - 1, day),
+              total: Number(item.amount),
+            };
+          });
+          this.totalRevenue = Number(response.data.total || 0);
 
-      if (this.startDate) {
-        start = new Date(this.startDate + 'T00:00:00');
-      }
-
-      if (this.endDate) {
-        end = new Date(this.endDate + 'T23:59:59.999');
-      }
-
-      if (start && end && start > end) {
-        this.message = 'A data inicial não pode ser maior que a data final.';
-        return;
-      }
-
-    const requests =
-      this.maintenanceRequestService.listAll();
-
-    requests.forEach(request => {
-
-      if (
-        request.status !== RequestStatus.PAID &&
-        request.status !== RequestStatus.FINALIZED
-      ) {
-        return;
-      }
-
-      const paymentDate =
-        this.getPaymentDate(request);
-
-      if (!paymentDate) {
-        return;
-      }
-
-      if (start && paymentDate < start) {
-        return;
-      }
-
-      if (end && paymentDate > end) {
-        return;
-      }
-
-      const value =
-        this.getRequestValue(request);
-
-      const day = new Date(
-        paymentDate.getFullYear(),
-        paymentDate.getMonth(),
-        paymentDate.getDate()
-      );
-
-      const existingDay =
-        this.dailyRevenue.find(
-          item =>
-            item.date.getTime() ===
-            day.getTime()
-        );
-
-      if (existingDay) {
-        existingDay.total += value;
-      } else {
-        this.dailyRevenue.push({
-          date: day,
-          total: value
-        });
-      }
+          if (this.dailyRevenue.length === 0) {
+            this.message = 'Nenhuma receita encontrada no período informado.';
+          }
+        } else {
+          this.message = response.message || 'Erro ao carregar receitas.';
+        }
+      },
+      error: (error) => {
+        this.message = error.error?.message || 'Erro ao comunicar com o servidor.';
+      },
     });
-
-    this.dailyRevenue.sort(
-      (a, b) =>
-        a.date.getTime() -
-        b.date.getTime()
-    );
-
-    this.calculateTotal();
-
-    if (this.dailyRevenue.length === 0) {
-      this.message =
-        'Nenhuma receita encontrada para o período selecionado.';
-    }
   }
-
-  getPaymentDate(
-    request: MaintenanceRequest
-  ): Date | null {
-
-    const history =
-      (request.requestHistory || [])
-        .find(
-          item =>
-            item.action ===
-            HistoryActions.PAYMENT_CONFIRMED
-        );
-
-    if (!history) {
-      return null;
-    }
-
-    if (!history.changeDateTime) {
-      return null;
-    }
-
-    return new Date(
-      history.changeDateTime
-    );
-  }
-
-  getRequestValue(
-    request: MaintenanceRequest
-  ): number {
-
-    const quote =
-      this.quoteService.findByRequestId(
-        request.id
-      );
-
-    if (!quote) {
-      return 0;
-    }
-
-    return Number(
-      quote.price
-    );
-  }
-
-  calculateTotal(): void {
-    this.totalRevenue =
-      this.dailyRevenue.reduce(
-        (total, item) =>
-          total + item.total,
-        0
-      );
-  }
-
 
   formatCurrency(value: number): string {
     return value.toLocaleString('pt-BR', {
