@@ -30,6 +30,11 @@
           {{ request.requestDateTime | date:'dd/MM/yyyy HH:mm' }}
         </p>
 
+        <p>
+          <strong>Status:</strong>
+          {{ getStatusLabel(request.status) }}
+        </p>
+
       </div>
 
       <div class="well">
@@ -59,12 +64,29 @@
         @if (request.client.address; as address) {
 
           <p>
+            <strong>CEP:</strong>
+            {{ address.zipCode }}
+          </p>
+
+          <p>
             <strong>Endereço:</strong>
+            {{ address.street }}, {{ address.number }}
+          </p>
 
-            {{ address.street }},
-            {{ address.number }} -
+          @if (address.complement) {
+            <p>
+              <strong>Complemento:</strong>
+              {{ address.complement }}
+            </p>
+          }
 
-            {{ address.neighborhood }},
+          <p>
+            <strong>Bairro:</strong>
+            {{ address.neighborhood }}
+          </p>
+
+          <p>
+            <strong>Cidade/Estado:</strong>
             {{ address.city }}/{{ address.state }}
           </p>
 
@@ -87,33 +109,28 @@
             name="price"
             [(ngModel)]="price"
             min="0.01"
-            step="0.01">
+            step="0.01"
+            required>
 
         </div>
 
         @if (message()) {
-
-          <div class="alert alert-danger">
+          <div class="alert alert-danger mt-3">
             {{ message() }}
           </div>
-
         }
 
         <button
           type="button"
           class="btn btn-primary"
           (click)="createQuote()">
-
           Efetuar Orçamento
-
         </button>
 
         <a
           class="btn btn-default"
           [routerLink]="['/employee/home']">
-
           Voltar
-
         </a>
 
       </div>

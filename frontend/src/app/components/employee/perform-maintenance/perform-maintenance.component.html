@@ -16,44 +16,34 @@
             </strong>
           </div>
 
-          <div class="panel-body">
+        <p><strong>Cliente:</strong> {{ request.client.name }}</p>
+        <p><strong>CPF:</strong> {{ request.client.cpf }}</p>
+        <p><strong>E-mail:</strong> {{ request.client.email }}</p>
+        <p><strong>Telefone:</strong> {{ request.client.phone }}</p>
 
-            <p>
-              <strong>Cliente:</strong>
-              {{ request.client.name }}
-            </p>
+        @if (request.client.address; as address) {
+          <p><strong>CEP:</strong> {{ address.zipCode }}</p>
+          <p><strong>Endereço:</strong> {{ address.street }}, {{ address.number }}</p>
 
-            <p>
-              <strong>E-mail:</strong>
-              {{ request.client.email }}
-            </p>
+          @if (address.complement) {
+            <p><strong>Complemento:</strong> {{ address.complement }}</p>
+          }
 
-            <p>
-              <strong>Telefone:</strong>
-              {{ request.client.phone }}
-            </p>
+          <p><strong>Bairro:</strong> {{ address.neighborhood }}</p>
+          <p><strong>Cidade/Estado:</strong> {{ address.city }}/{{ address.state }}</p>
+        }
 
-            <p>
-              <strong>Equipamento:</strong>
-              {{ request.equipmentDescription }}
-            </p>
+        <hr>
 
-            <p>
-              <strong>Defeito Relatado:</strong>
-              {{ request.defectDescription }}
-            </p>
+        <p><strong>Data/Hora da Solicitação:</strong> {{ request.requestDateTime | date:'dd/MM/yyyy HH:mm' }}</p>
+        <p><strong>Equipamento:</strong> {{ request.equipmentDescription }}</p>
+        <p><strong>Defeito Relatado:</strong> {{ request.defectDescription }}</p>
+        <p><strong>Categoria:</strong> {{ request.categoryName }}</p>
+        <p><strong>Estado Atual:</strong> {{ getStatusLabel(request.status) }}</p>
 
-            <p>
-              <strong>Categoria:</strong>
-              {{ request.categoryName }}
-            </p>
-
-            <p>
-              <strong>Estado Atual:</strong>
-              {{ request.status }}
-            </p>
-
-          </div>
+        @if (request.quote) {
+          <p><strong>Valor do Orçamento:</strong> {{ request.quote.price | currency:'BRL' }}</p>
+        }
 
         </div>
 

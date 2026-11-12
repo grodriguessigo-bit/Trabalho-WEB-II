@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, signal, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
@@ -9,10 +9,9 @@ import { LoginService } from '../../../services/login.service';
   selector: 'app-insert-employee',
   imports: [FormsModule, RouterModule],
   templateUrl: './insert-employee.component.html',
-  styleUrl: './insert-employee.component.css',
+  styleUrl: './insert-employee.component.css'
 })
 export class InsertEmployeeComponent {
-
   @ViewChild('formEmployee') formEmployee!: NgForm;
 
   employee: CreateEmployeeDTO = {
@@ -22,34 +21,34 @@ export class InsertEmployeeComponent {
     password: ''
   };
 
-  message: string = "";
+  message = signal('');
 
   constructor(
     private employeeService: EmployeeService,
     private loginService: LoginService,
     private router: Router
   ) {
-
-    if (this.loginService.getLoggedUserType() !== "EMPLOYEE") {
+    if (this.loginService.getLoggedUserType() !== 'EMPLOYEE') {
       this.router.navigate(['/login']);
     }
-
   }
 
   insert(): void {
-
-    if (this.formEmployee.form.valid) {
-      this.message = "";
-      this.employeeService.insert(this.employee).subscribe({
-        next: () => {
-          this.router.navigate(['/employee/list']);
-        },
-        error: (err) => {
-          this.message = err.error?.message ?? "Erro ao cadastrar funcionário.";
-        }
-      });
+    if (!this.formEmployee.form.valid) {
+      return;
     }
 
-  }
+    this.message.set('');
 
+    this.employeeService.insert(this.employee).subscribe({
+      next: () => {
+        this.router.navigate(['/employee/list']);
+      },
+      error: error => {
+        this.message.set(
+          error.error?.message ?? 'Erro ao cadastrar funcionário.'
+        );
+      }
+    });
+  }
 }

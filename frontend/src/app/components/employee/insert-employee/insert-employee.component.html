@@ -27,12 +27,10 @@
           <label for="email" class="col-md-2 control-label">E-mail:</label>
 
           <div class="col-md-6">
-            <input type="email" class="form-control" id="email" name="email"
-            [(ngModel)]="employee.email" #email="ngModel" required>
-
+            <input type="email" class="form-control" id="email" name="email" [(ngModel)]="employee.email" #email="ngModel" required>
             @if (email.errors && (email.dirty || email.touched)) {
               <div class="alert alert-danger">
-                <div [hidden]="!email.errors['required']"> Digite o e-mail do funcionário. </div>
+                <div [hidden]="!email.errors?.['email']"> </div>Digite um e-mail válido </div>
               </div>
             }
           </div>
@@ -56,10 +54,10 @@
           </div>
         </div>
 
-        @if (message) {
+        @if (message()) {
           <div class="row">
             <div class="col-md-6 col-md-offset-2">
-              <div class="alert alert-danger"> {{ message }} </div>
+              <div class="alert alert-danger"> {{ message() }} </div>
             </div>
           </div>
         }
