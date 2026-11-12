@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
@@ -13,7 +13,7 @@ import { LoginService } from '../../../services/login.service';
   styleUrl: './categories.component.css',
 })
 export class CategoriesComponent implements OnInit {
-  categories: Category[] = [];
+  categories = signal<Category[]>([]);
   showModal = false;
   showDeactivateModal = false;
   showOnlyActive = false;
@@ -38,10 +38,10 @@ export class CategoriesComponent implements OnInit {
   }
 
   listAll(): void {
-    this.categoryService.listAll().subscribe({
+    this.categoryService.listForEmployee().subscribe({
       next: (resposta) => {
         if (resposta.success) {
-          this.categories = resposta.data;
+          this.categories.set(resposta.data);
         }
       },
       error: (err) => console.error('Erro ao buscar categorias:', err),
@@ -50,10 +50,10 @@ export class CategoriesComponent implements OnInit {
 
   get displayedCategories(): Category[] {
     if (this.showOnlyActive) {
-      return this.categories.filter((category) => category.active);
+      return this.categories().filter((category) => category.active);
     }
 
-    return this.categories;
+    return this.categories();
   }
 
   toggleActiveFilter(): void {
@@ -89,15 +89,14 @@ export class CategoriesComponent implements OnInit {
       return;
     }
 
-    const categoryAlreadyExists = this.categories.some(
+    const categoryAlreadyExists = this.categories().some(
       (category) =>
-        category.active &&
         category.id !== this.editingCategory?.id &&
         category.name.trim().toLowerCase() === name.toLowerCase(),
     );
 
     if (categoryAlreadyExists) {
-      this.message = 'Já existe uma categoria ativa com esse nome.';
+      this.message = 'Já existe uma categoria com esse nome.';
       return;
     }
 

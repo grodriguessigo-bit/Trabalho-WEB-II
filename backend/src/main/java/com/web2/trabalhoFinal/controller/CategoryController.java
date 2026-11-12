@@ -32,6 +32,14 @@ public class CategoryController {
         return ResponseEntity.ok(resposta);
     }
 
+    @GetMapping("/employee")
+    public ResponseEntity<ApiResponse<List<CategoryDTO>>> listarParaFuncionario(
+            @SessionAttribute(name = "employeeId", required = false) Long employeeId
+    ) {
+        employeePermission.verificar(employeeId);
+        return ResponseEntity.ok(categoryService.listarParaFuncionario());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<CategoryDTO>> buscarPorId(@PathVariable Long id) {
         ApiResponse<CategoryDTO> resposta = categoryService.findById(id);

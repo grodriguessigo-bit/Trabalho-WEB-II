@@ -17,19 +17,24 @@ export class CategoryService {
     return this.http.get<ApiResponse<Category[]>>(this.apiUrl);
   }
 
+  listForEmployee(): Observable<ApiResponse<Category[]>> {
+    return this.http.get<ApiResponse<Category[]>>(`${this.apiUrl}/employee`,
+      { withCredentials: true });
+  }
+
   findById(id: number): Observable<ApiResponse<Category>> {
     return this.http.get<ApiResponse<Category>>(`${this.apiUrl}/${id}`);
   }
 
   insert(category: Category): Observable<ApiResponse<Category>> {
-    return this.http.post<ApiResponse<Category>>(this.apiUrl, category);
+    return this.http.post<ApiResponse<Category>>(this.apiUrl, category, { withCredentials: true });
   }
 
   update(category: Category): Observable<ApiResponse<Category>> {
-    return this.http.put<ApiResponse<Category>>(`${this.apiUrl}/${category.id}`, category);
+    return this.http.put<ApiResponse<Category>>(`${this.apiUrl}/${category.id}`, category, { withCredentials: true });
   }
 
   remove(id: number): Observable<ApiResponse<void>> {
-    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
+    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`, { withCredentials: true });
   }
 }
