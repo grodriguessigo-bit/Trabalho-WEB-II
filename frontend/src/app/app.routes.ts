@@ -11,8 +11,6 @@ import { EmployeeHomeComponent } from './components/employee/employee-home/emplo
 import { ListEmployeeComponent } from './components/employee/list-employee/list-employee.component';
 import { InsertEmployeeComponent } from './components/employee/insert-employee/insert-employee.component';
 import { EditEmployeeComponent } from './components/employee/edit-employee/edit-employee.component';
-// import { ViewRevenueReportByCategoryComponent } from './components/employee/view-revenue-report-by-category/view-revenue-report-by-category.component';
-// import { ViewRevenueReportComponent } from './components/employee/view-revenue-report/view-revenue-report.component';
 import { CategoriesComponent } from './components/employee/categories/categories.component';
 import { QuoteFormComponent } from './components/employee/quote-form/quote-form.component';
 import { BudgetComponent } from './components/employee/budget/budget.component';
@@ -120,23 +118,29 @@ export const routes: Routes = [
     }
   },
 
-  // {
-  //   path: 'employee/revenue-report',
-  //   component: ViewRevenueReportComponent,
-  //   canActivate: [authGuard],
-  //   data: {
-  //     role: 'EMPLOYEE'
-  //   }
-  // },
-  //
-  // {
-  //   path: 'employee/revenue-report-category',
-  //   component: ViewRevenueReportByCategoryComponent,
-  //   canActivate: [authGuard],
-  //   data: {
-  //     role: 'EMPLOYEE'
-  //   }
-  // },
+  {
+    path: 'employee/revenue-report',
+    loadComponent: () =>
+      import(
+        './components/employee/view-revenue-report/view-revenue-report.component'
+      ).then((m) => m.ViewRevenueReportComponent),
+    canActivate: [authGuard],
+    data: {
+      role: 'EMPLOYEE'
+    }
+  },
+
+  {
+    path: 'employee/revenue-report-category',
+    loadComponent: () =>
+      import(
+        './components/employee/view-revenue-report-by-category/view-revenue-report-by-category.component'
+      ).then((m) => m.ViewRevenueReportByCategoryComponent),
+    canActivate: [authGuard],
+    data: {
+      role: 'EMPLOYEE'
+    }
+  },
 
   {
     path: 'employee/categories',

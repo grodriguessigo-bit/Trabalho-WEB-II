@@ -1,16 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { CategoryService } from '../../../services/category.service';
-import { MaintenanceRequestService } from '../../../services/maintenance-request.service';
-import { QuoteService } from '../../../services/quote.service';
+import { ReportService } from '../../../services/report.service';
 import { Category } from '../../../shared/models/category.model';
-import { RequestStatus } from '../../../shared/enum/request-status.enum';
 import { jsPDF } from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
 
 @Component({
   selector: 'app-view-revenue-report-by-category',
+  standalone: true,
   imports: [
     CommonModule,
     RouterModule
@@ -27,13 +25,10 @@ export class ViewRevenueReportByCategoryComponent implements OnInit {
   }[] = [];
 
   totalRevenue: number = 0;
-
   message: string = '';
 
   constructor(
-    private categoryService: CategoryService,
-    private maintenanceRequestService: MaintenanceRequestService,
-    private quoteService: QuoteService
+    private reportService: ReportService
   ) {}
 
   ngOnInit(): void {
@@ -41,74 +36,32 @@ export class ViewRevenueReportByCategoryComponent implements OnInit {
   }
 
   generateReport(): void {
-
     this.revenueByCategory = [];
     this.totalRevenue = 0;
     this.message = '';
 
-    this.categoryService.listAll().subscribe({
+    this.reportService.getRevenueByCategory().subscribe({
       next: (response) => {
-        if (response.success) {
-          this.calculateRevenue(response.data);
+        if (response.success && response.data) {
+          const items = response.data.items || [];
+          this.revenueByCategory = items.map((item) => ({
+            category: new Category(item.categoryId, item.categoryName),
+            requestsCount: Number(item.requestsCount),
+            total: Number(item.amount),
+          }));
+          this.totalRevenue = Number(response.data.total || 0);
+
+          if (this.revenueByCategory.length === 0) {
+            this.message = 'Nenhuma categoria cadastrada.';
+          }
         } else {
-          this.message = response.message;
+          this.message = response.message || 'Erro ao carregar receitas por categoria.';
         }
       },
       error: (error) => {
-        this.message = error.error?.message ?? error.message;
+        this.message = error.error?.message || 'Erro ao comunicar com o servidor.';
       },
     });
-  }
-
-  private calculateRevenue(categories: Category[]): void {
-    this.revenueByCategory = [];
-    this.totalRevenue = 0;
-    this.message = '';
-
-    const requests =
-      this.maintenanceRequestService
-        .listAll()
-        .filter(request =>
-          request.status === RequestStatus.PAID ||
-          request.status === RequestStatus.FINALIZED
-        );
-
-    categories.forEach(category => {
-
-      const categoryRequests =
-        requests.filter(
-          request =>
-            request.categoryId === category.id
-        );
-
-      let categoryRevenue = 0;
-
-      categoryRequests.forEach(request => {
-
-        const quote =
-          this.quoteService.findByRequestId(
-            request.id
-          );
-
-        if (quote) {
-          categoryRevenue += quote.price;
-        }
-
-      });
-
-      this.revenueByCategory.push({
-        category: category,
-        requestsCount: categoryRequests.length,
-        total: categoryRevenue
-      });
-
-      this.totalRevenue += categoryRevenue;
-    });
-
-    if (this.totalRevenue === 0) {
-      this.message =
-        'Nenhuma receita encontrada.';
-    }
   }
 
   formatCurrency(value: number): string {
@@ -119,8 +72,8 @@ export class ViewRevenueReportByCategoryComponent implements OnInit {
   }
 
   printReport(): void {
-    if (this.totalRevenue === 0) {
-      this.message = 'Não existem receitas para gerar o relatório.';
+    if (this.totalRevenue === 0 && this.revenueByCategory.length === 0) {
+      this.message = 'Não existem dados para gerar o relatório.';
       return;
     }
 
@@ -140,5 +93,4 @@ export class ViewRevenueReportByCategoryComponent implements OnInit {
 
     doc.save('receitas-por-categoria.pdf');
   }
-
 }
