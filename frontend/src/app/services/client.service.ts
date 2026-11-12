@@ -21,7 +21,27 @@ export class ClientService {
   constructor(private httpClient: HttpClient) {}
 
   insert(client: Client): Observable<{ message: string; success: boolean }> {
-    return this.httpClient.post<{ message: string; success: boolean }>(this.BASE_URL, JSON.stringify(client), this.httpOptions);
+    const body = {
+      cpf: client.cpf.replace(/\D/g, ''),
+      name: client.name.trim(),
+      email: client.email.trim(),
+      phone: client.phone.replace(/\D/g, ''),
+      address: {
+        zipCode: client.address.zipCode.replace(/\D/g, ''),
+        street: client.address.street.trim(),
+        number: client.address.number.trim(),
+        complement: client.address.complement.trim(),
+        neighborhood: client.address.neighborhood.trim(),
+        city: client.address.city.trim(),
+        state: client.address.state.trim()
+      }
+    };
+
+    return this.httpClient.post<{ message: string; success: boolean }>(
+      this.BASE_URL,
+      body,
+      this.httpOptions
+    );
   }
 
   alter(client: Client): Observable<Client> {
