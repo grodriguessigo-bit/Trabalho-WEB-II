@@ -15,7 +15,11 @@ import {
 
 @Component({
   selector: 'app-quote-form',
-  imports: [FormsModule, RouterModule, CommonModule],
+  imports: [
+    FormsModule,
+    RouterModule,
+    CommonModule
+  ],
   templateUrl: './quote-form.component.html',
   styleUrl: './quote-form.component.css'
 })
